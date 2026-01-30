@@ -17,23 +17,23 @@ import json
 # Product data - matching the catalog
 products = [
     {"height": 150, "width": 70, "depth": 30, "color": "Černá", "price": 599, "priceOrig": 2396, "shelves": 4, "capacity": 700, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/v/v6903779a99ff1-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerny-pravy-15070304700black1.jpeg", "seoUrl": "regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerny"},
-    {"height": 150, "width": 70, "depth": 30, "color": "Červená", "price": 599, "priceOrig": 2396, "shelves": 4, "capacity": 700, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/c/c690377c0d46a4-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerveny-pravy-18090405875red1.jpeg", "seoUrl": "regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny"},
+    {"height": 150, "width": 70, "depth": 30, "color": "Červená", "price": 599, "priceOrig": 2396, "shelves": 4, "capacity": 700, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/9/e/9eef5f9f2ad8880b75926a3eae58485b-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny-pravy-15070304700red1.jpeg", "seoUrl": "regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny"},
     {"height": 150, "width": 70, "depth": 30, "color": "Bílá", "price": 599, "priceOrig": 2396, "shelves": 4, "capacity": 700, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg", "seoUrl": "regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-bily"},
-    {"height": 150, "width": 70, "depth": 30, "color": "Zinkovaný", "price": 549, "priceOrig": 2196, "shelves": 4, "capacity": 700, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg", "seoUrl": "regal-1500x700x300-mm-pozinkovany-4-policovy-nosnost-700-kg"},
+    {"height": 150, "width": 70, "depth": 30, "color": "Zinkovaný", "price": 549, "priceOrig": 2196, "shelves": 4, "capacity": 700, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg", "seoUrl": "regal-1500x700x300-mm-zinkovany-4-policovy-nosnost-700-kg"},
     {"height": 180, "width": 90, "depth": 40, "color": "Černá", "price": 739, "priceOrig": 2956, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", "seoUrl": "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny", "bestseller": True},
     {"height": 180, "width": 90, "depth": 40, "color": "Bílá", "price": 739, "priceOrig": 2956, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg", "seoUrl": "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-bily"},
-    {"height": 180, "width": 90, "depth": 40, "color": "Zinkovaný", "price": 649, "priceOrig": 2596, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg", "seoUrl": "regal-1800x900x400-mm-pozinkovany-5-policovy-nosnost-875-kg"},
-    {"height": 180, "width": 90, "depth": 40, "color": "Červená", "price": 759, "priceOrig": 3036, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/c/c690377c0d46a4-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerveny-pravy-18090405875red1.jpeg", "seoUrl": "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerveny"},
-    {"height": 180, "width": 90, "depth": 40, "color": "Modrá", "price": 759, "priceOrig": 3036, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/b/b690377c6f0f7e-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-modry-pravy-18090405875blue1.jpeg", "seoUrl": "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-modry"},
+    {"height": 180, "width": 90, "depth": 40, "color": "Zinkovaný", "price": 649, "priceOrig": 2596, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg", "seoUrl": "regal-1800x900x400-mm-zinkovany-5-policovy-nosnost-875-kg"},
+    {"height": 180, "width": 90, "depth": 40, "color": "Červená", "price": 759, "priceOrig": 3036, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/9/e/9eef5f9f2ad8880b75926a3eae58485b-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny-pravy-15070304700red1.jpeg", "seoUrl": "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerveny"},
+    {"height": 180, "width": 90, "depth": 40, "color": "Modrá", "price": 759, "priceOrig": 3036, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/1/c/1c64831c1231f5847cf9e7a36f6cdf6f-1-15070304700blue1.jpeg", "seoUrl": "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-modry"},
     {"height": 180, "width": 60, "depth": 40, "color": "Černá", "price": 689, "priceOrig": 2756, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/j/j690377a5dc94d-1-regal-1800x600x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18060405875black1.jpeg", "seoUrl": "regal-1800x600x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny"},
     {"height": 180, "width": 60, "depth": 40, "color": "Bílá", "price": 689, "priceOrig": 2756, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg", "seoUrl": "regal-1800x600x400-mm-lakovany-5-policovy-nosnost-875-kg-bily"},
     {"height": 180, "width": 40, "depth": 40, "color": "Černá", "price": 629, "priceOrig": 2516, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/2/2690377a330269-1-regal-1800x400x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18040405875black1.jpeg", "seoUrl": "regal-1800x400x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny"},
-    {"height": 180, "width": 40, "depth": 40, "color": "Zinkovaný", "price": 579, "priceOrig": 2316, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg", "seoUrl": "regal-1800x400x400-mm-pozinkovany-5-policovy-nosnost-875-kg"},
-    {"height": 180, "width": 40, "depth": 30, "color": "Zinkovaný", "price": 549, "priceOrig": 2196, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg", "seoUrl": "regal-1800x400x300-mm-pozinkovany-5-policovy-nosnost-875-kg"},
+    {"height": 180, "width": 40, "depth": 40, "color": "Zinkovaný", "price": 579, "priceOrig": 2316, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg", "seoUrl": "regal-1800x400x400-mm-zinkovany-5-policovy-nosnost-875-kg"},
+    {"height": 180, "width": 40, "depth": 30, "color": "Zinkovaný", "price": 549, "priceOrig": 2196, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg", "seoUrl": "regal-1800x400x300-mm-zinkovany-5-policovy-nosnost-875-kg"},
     {"height": 200, "width": 90, "depth": 40, "color": "Černá", "price": 849, "priceOrig": 3396, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", "seoUrl": "regal-2000x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny"},
     {"height": 220, "width": 90, "depth": 45, "color": "Černá", "price": 899, "priceOrig": 3596, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", "seoUrl": "regal-2200x900x450-mm-lakovany-5-policovy-nosnost-875-kg-cerny"},
     {"height": 180, "width": 120, "depth": 50, "color": "Černá", "price": 1149, "priceOrig": 4596, "shelves": 5, "capacity": 875, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", "seoUrl": "regal-1800x1200x500-mm-lakovany-5-policovy-nosnost-875-kg-cerny"},
-    {"height": 180, "width": 120, "depth": 50, "color": "Profesionální", "price": 1249, "priceOrig": 4996, "shelves": 5, "capacity": 1050, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", "seoUrl": "regal-1800x1200x500-mm-lakovany-5-policovy-nosnost-1050-kg-profesionalni"},
+    {"height": 180, "width": 120, "depth": 50, "color": "Profesionální", "price": 1249, "priceOrig": 4996, "shelves": 5, "capacity": 1050, "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/b/1/b17ce5b491bdb73a0df3160b51fbcf7e-1-regal-1800x1200x500-mm-lakovany-5-policovy-nosnost-1050-kg-modro-oranzovy-pravy-18120501050orangeblue1.jpeg", "seoUrl": "regal-1800x1200x500-mm-lakovany-5-policovy-nosnost-1050-kg-modro-oranzovy"},
 ]
 
 # Additional generated products
@@ -43,12 +43,12 @@ widths = [40, 60, 70, 90, 120]
 depths = [30, 40, 45, 50]
 
 color_images = {
-    "Černá": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg",
-    "Bílá": "https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg",
-    "Červená": "https://vyprodej-regalucz.s26.cdn-upgates.com/c/c690377c0d46a4-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerveny-pravy-18090405875red1.jpeg",
-    "Modrá": "https://vyprodej-regalucz.s26.cdn-upgates.com/b/b690377c6f0f7e-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-modry-pravy-18090405875blue1.jpeg",
-    "Zinkovaný": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg",
-    "Profesionální": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg"
+    "Černá": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/l/l/ll690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg",
+    "Bílá": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/6/6/6690a777ad6edc-1-18090405875white1.jpeg",
+    "Červená": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/9/e/9eef5f9f2ad8880b75926a3eae58485b-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny-pravy-15070304700red1.jpeg",
+    "Modrá": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/1/c/1c64831c1231f5847cf9e7a36f6cdf6f-1-15070304700blue1.jpeg",
+    "Zinkovaný": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/z/z/z6914605330838-5-pol-pravy-zink.jpg",
+    "Profesionální": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/b/1/b17ce5b491bdb73a0df3160b51fbcf7e-1-regal-1800x1200x500-mm-lakovany-5-policovy-nosnost-1050-kg-modro-oranzovy-pravy-18120501050orangeblue1.jpeg"
 }
 
 color_czech_map = {
@@ -74,7 +74,7 @@ import random
 random.seed(42)
 
 existing_files = [
-    "regal-150x70x30-cerna", "regal-150x70x30-cervena", "regal-180x90x40-bila", "regal-180x90x40-zinkovany",
+    "regal-150x70x30-cerna", "regal-150x70x30-cervena", "regal-150x70x30-zinkovany", "regal-180x90x40-bila", "regal-180x90x40-zinkovany",
     "regal-180x60x40-cerna", "regal-180x40x40-cerna", "regal-200x90x40-cerna", "regal-220x90x45-cerna",
     "regal-180x120x50-cerna", "regal-180x90x40-modra", "regal-180x40x30-zinkovany", "regal-180x90x45-cerna",
     "regal-220x70x45-bila", "regal-200x40x30-modra", "regal-200x70x45-cerna", "regal-200x120x40-cerna",
@@ -148,14 +148,14 @@ def get_filename(p):
 
 def get_seo_url(p):
     """Generate SEO URL for vyprodej-regalu.cz"""
-    surface_text = "pozinkovany" if p.get("surface") == "Pozinkovaný" or p["color"] == "Zinkovaný" else "lakovany"
+    surface_text = "zinkovany" if p.get("surface") == "Pozinkovaný" or p["color"] == "Zinkovaný" else "lakovany"
     color_seo = {
         "Černá": "cerny",
         "Bílá": "bily",
         "Červená": "cerveny",
         "Modrá": "modry",
         "Zinkovaný": "",
-        "Profesionální": "cerny"
+        "Profesionální": "modro-oranzovy"
     }.get(p["color"], "")
 
     if p["color"] == "Zinkovaný":
@@ -897,7 +897,7 @@ def generate_html(p):
       </div>
     </div>
     <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
-      © 2026 Bazarovyregal.cz - Všechna práva vyhrazena
+      © 2026 Bazarovyregal.cz - Shoptet.cz - Budujeme regálové impérium
     </div>
   </div>
 </footer>
@@ -939,6 +939,53 @@ function toggleFaq(btn) {{
   btn.closest('.faq-item').classList.toggle('open');
 }}
 </script>
+
+<!-- AI CHAT WIDGET -->
+<div id="chatWidget" class="fixed bottom-6 right-4 z-40">
+  <button onclick="toggleChat()" class="bg-primary-500 hover:bg-primary-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-transform hover:scale-110">
+    💬
+  </button>
+
+  <div id="chatWindow" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div class="bg-gradient-to-r from-primary-500 to-orange-500 text-white p-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">🤖</div>
+          <div>
+            <div class="font-bold">RegálBot</div>
+            <div class="text-xs text-white/80 flex items-center gap-1">
+              <span class="w-2 h-2 bg-green-400 rounded-full"></span> Online
+            </div>
+          </div>
+        </div>
+        <button onclick="toggleChat()" class="text-white/80 hover:text-white text-xl">✕</button>
+      </div>
+    </div>
+
+    <div id="chatMessages" class="h-80 overflow-y-auto p-4 space-y-4">
+      <div class="flex gap-3">
+        <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">🤖</div>
+        <div class="bg-gray-100 rounded-2xl rounded-tl-none p-3 text-sm max-w-[80%]">
+          Ahoj! 👋 Jsem RegálBot a pomohu vám vybrat ideální regál. Na co se chcete zeptat?
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t p-4">
+      <div class="flex gap-2">
+        <input type="text" id="chatInput" placeholder="Napište zprávu..." class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500" onkeypress="if(event.key==='Enter')sendMessage()">
+        <button onclick="sendMessage()" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition">➤</button>
+      </div>
+      <div class="flex flex-wrap gap-1 mt-2">
+        <button onclick="quickQuestion('Jaký regál do garáže?')" class="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full">🚗 Do garáže</button>
+        <button onclick="quickQuestion('Regál do vlhka?')" class="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full">💧 Do vlhka</button>
+        <button onclick="quickQuestion('Nejlevnější regál?')" class="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full">💰 Nejlevnější</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="chatbot.js"></script>
 
 </body>
 </html>'''

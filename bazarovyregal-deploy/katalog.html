@@ -977,9 +977,7 @@ function showLivePurchase() {
   setTimeout(() => notification.remove(), 5000);
 }
 
-// Show live purchase every 30-60 seconds
-setInterval(showLivePurchase, Math.random() * 30000 + 30000);
-setTimeout(showLivePurchase, 5000); // First one after 5s
+// Live purchase notifications disabled
 
 // ========== EXIT INTENT POPUP ==========
 let exitPopupShown = false;
