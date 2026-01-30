@@ -95,31 +95,62 @@
         </div>
 
         <!-- Search Dropdown - Luigi's Box Style -->
-        <div id="searchDropdown" class="search-dropdown absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border overflow-hidden hidden z-50">
-          <div class="grid md:grid-cols-3 divide-x">
-            <!-- Kategorie -->
-            <div class="p-4">
-              <h3 class="text-xs font-bold text-primary-500 uppercase mb-3">Kategorie</h3>
-              <div id="searchCategories" class="space-y-2">
-                <!-- Dynamicky -->
+        <div id="searchDropdown" class="search-dropdown absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border overflow-hidden hidden z-50" style="min-width: 800px; left: 50%; transform: translateX(-50%);">
+          <!-- Šipka nahoru -->
+          <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-l border-t rotate-45"></div>
+
+          <div class="flex">
+            <!-- Levý sloupec - Fráze, Kategorie, Články -->
+            <div class="w-56 bg-white p-5 border-r flex-shrink-0">
+              <!-- Populární fráze -->
+              <div class="mb-5">
+                <h3 class="text-sm font-bold text-gray-900 mb-3">Populární fráze</h3>
+                <div id="searchPhrases" class="flex flex-wrap gap-2">
+                  <span class="px-3 py-1 bg-gray-100 hover:bg-primary-100 text-sm rounded cursor-pointer" onclick="setSearch('regál')">regál</span>
+                  <span class="px-3 py-1 bg-gray-100 hover:bg-primary-100 text-sm rounded cursor-pointer" onclick="setSearch('kovový regál')">kovový regál</span>
+                  <span class="px-3 py-1 bg-gray-100 hover:bg-primary-100 text-sm rounded cursor-pointer" onclick="setSearch('180 cm')">180 cm</span>
+                  <span class="px-3 py-1 bg-gray-100 hover:bg-primary-100 text-sm rounded cursor-pointer" onclick="setSearch('zinkovaný')">zinkovaný</span>
+                </div>
+              </div>
+
+              <!-- Populární kategorie -->
+              <div class="mb-5">
+                <h3 class="text-sm font-bold text-gray-900 mb-3">Populární kategorie</h3>
+                <div id="searchCategories" class="space-y-2 text-sm">
+                  <a href="regaly-do-garaze.html" class="block text-gray-600 hover:text-primary-500">Regály do garáže a dílny</a>
+                  <a href="regaly-do-sklepa.html" class="block text-gray-600 hover:text-primary-500">Regály do sklepa a spíže</a>
+                  <a href="zinkove-regaly.html" class="block text-gray-600 hover:text-primary-500">Zinkované regály</a>
+                </div>
+              </div>
+
+              <!-- Články -->
+              <div>
+                <h3 class="text-sm font-bold text-gray-900 mb-3">Články</h3>
+                <div id="searchArticles" class="space-y-2 text-sm">
+                  <a href="jak-vybrat-regal-do-garaze.html" class="block text-gray-600 hover:text-primary-500 truncate">Který regál vybrat do garáže...</a>
+                  <a href="blog.html" class="block text-gray-600 hover:text-primary-500 truncate">Jak vybavit domácí dílnu...</a>
+                </div>
               </div>
             </div>
 
-            <!-- Top produkt -->
-            <div class="p-4 bg-gray-50">
-              <h3 class="text-xs font-bold text-primary-500 uppercase mb-3">Top produkt</h3>
-              <div id="searchTopProduct">
-                <!-- Dynamicky -->
+            <!-- Střední sloupec - Top produkt -->
+            <div class="w-56 bg-gray-50 p-5 border-r flex-shrink-0">
+              <h3 class="text-sm font-bold text-gray-900 mb-3">Top produkt</h3>
+              <div id="searchTopProduct" class="text-center">
+                <!-- Dynamicky generováno -->
               </div>
             </div>
 
-            <!-- Produkty -->
-            <div class="p-4">
-              <h3 class="text-xs font-bold text-primary-500 uppercase mb-3">Produkty</h3>
-              <div id="searchProducts" class="space-y-3 max-h-80 overflow-y-auto">
-                <!-- Dynamicky -->
+            <!-- Pravý sloupec - Produkty grid -->
+            <div class="flex-1 p-5">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-bold text-gray-900">Produkty</h3>
+                <button onclick="document.getElementById('searchDropdown').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-xl">×</button>
               </div>
-              <a href="#" id="searchShowAll" class="block mt-4 text-center bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg font-medium text-sm transition">
+              <div id="searchProducts" class="grid grid-cols-2 gap-3 mb-4">
+                <!-- Dynamicky generováno - 2x3 grid -->
+              </div>
+              <a href="#" id="searchShowAll" class="block text-center bg-primary-500 hover:bg-primary-600 text-white py-3 rounded-lg font-bold text-sm transition">
                 ZOBRAZIT VŠECHNY PRODUKTY
               </a>
             </div>
@@ -376,17 +407,17 @@
 // ========== PRODUCT DATA (102 produktů) ==========
 const allProducts = [
   { id: 1, code: "15070304700BLACK1", name: "Regál 150×70×30 cm černý", price: 599, priceOrig: 1198, height: 150, width: 70, depth: 30, color: "Černá", surface: "Lakovaný", shelves: 4, capacity: 700, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/v/v6903779a99ff1-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerny-pravy-15070304700black1.jpeg", seoUrl: "regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerny", stock: 47, sold7days: 23 },
-  { id: 2, code: "15070304700RED1", name: "Regál 150×70×30 cm červený", price: 599, priceOrig: 1198, height: 150, width: 70, depth: 30, color: "Červená", surface: "Lakovaný", shelves: 4, capacity: 700, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/c/c690377c0d46a4-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerveny-pravy-18090405875red1.jpeg", seoUrl: "regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny", stock: 31, sold7days: 12 },
+  { id: 2, code: "15070304700RED1", name: "Regál 150×70×30 cm červený", price: 599, priceOrig: 1198, height: 150, width: 70, depth: 30, color: "Červená", surface: "Lakovaný", shelves: 4, capacity: 700, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/9/e/9eef5f9f2ad8880b75926a3eae58485b-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny-pravy-15070304700red1.jpeg", seoUrl: "regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny", stock: 31, sold7days: 12 },
   { id: 3, code: "15070304700WHITE1", name: "Regál 150×70×30 cm bílý", price: 599, priceOrig: 1198, height: 150, width: 70, depth: 30, color: "Bílá", surface: "Lakovaný", shelves: 4, capacity: 700, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg", seoUrl: "regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-bily", stock: 28, sold7days: 15 },
   { id: 4, code: "18090405875BLACK1", name: "Regál 180×90×40 cm černý", price: 739, priceOrig: 1478, height: 180, width: 90, depth: 40, color: "Černá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", seoUrl: "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny", stock: 156, sold7days: 89, bestseller: true },
   { id: 5, code: "18090405875WHITE1", name: "Regál 180×90×40 cm bílý", price: 739, priceOrig: 1478, height: 180, width: 90, depth: 40, color: "Bílá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg", seoUrl: "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-bily", stock: 98, sold7days: 67 },
-  { id: 6, code: "18090405875ZINK", name: "Regál 180×90×40 cm zinkovaný", price: 649, priceOrig: 1298, height: 180, width: 90, depth: 40, color: "Zinkovaný", surface: "Pozinkovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg", seoUrl: "regal-1800x900x400-mm-pozinkovany-5-policovy-nosnost-875-kg", stock: 203, sold7days: 78 },
+  { id: 6, code: "18090405875ZINK", name: "Regál 180×90×40 cm zinkovaný", price: 649, priceOrig: 1298, height: 180, width: 90, depth: 40, color: "Zinkovaný", surface: "Pozinkovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/z/z/z6914605330838-5-pol-pravy-zink.jpg", seoUrl: "regal-1800x900x400-mm-zinkovany-5-policovy-nosnost-875-kg", stock: 203, sold7days: 78 },
   { id: 7, code: "18060405875BLACK1", name: "Regál 180×60×40 cm černý", price: 689, priceOrig: 1378, height: 180, width: 60, depth: 40, color: "Černá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/j/j690377a5dc94d-1-regal-1800x600x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18060405875black1.jpeg", seoUrl: "regal-1800x600x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny", stock: 67, sold7days: 34 },
   { id: 8, code: "18040405875BLACK1", name: "Regál 180×40×40 cm černý", price: 629, priceOrig: 1258, height: 180, width: 40, depth: 40, color: "Černá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/2/2690377a330269-1-regal-1800x400x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18040405875black1.jpeg", seoUrl: "regal-1800x400x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny", stock: 45, sold7days: 21 },
   { id: 9, code: "20090405875BLACK1", name: "Regál 200×90×40 cm černý", price: 849, priceOrig: 1698, height: 200, width: 90, depth: 40, color: "Černá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", seoUrl: "regal-2000x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny", stock: 34, sold7days: 19 },
   { id: 10, code: "22090455875BLACK1", name: "Regál 220×90×45 cm černý", price: 899, priceOrig: 1798, height: 220, width: 90, depth: 45, color: "Černá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", seoUrl: "regal-2200x900x450-mm-lakovany-5-policovy-nosnost-875-kg-cerny", stock: 23, sold7days: 11 },
   { id: 11, code: "18012005875BLACK1", name: "Regál 180×120×50 cm černý", price: 1149, priceOrig: 2298, height: 180, width: 120, depth: 50, color: "Černá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", seoUrl: "regal-1800x1200x500-mm-lakovany-5-policovy-nosnost-875-kg-cerny", stock: 19, sold7days: 8 },
-  { id: 12, code: "18090405875BLUE1", name: "Regál 180×90×40 cm modrý", price: 759, priceOrig: 1518, height: 180, width: 90, depth: 40, color: "Modrá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/b/b690377c6f0f7e-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-modry-pravy-18090405875blue1.jpeg", seoUrl: "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-modry", stock: 15, sold7days: 7 },
+  { id: 12, code: "18090405875BLUE1", name: "Regál 180×90×40 cm modrý", price: 759, priceOrig: 1518, height: 180, width: 90, depth: 40, color: "Modrá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/1/c/1c64831c1231f5847cf9e7a36f6cdf6f-1-15070304700blue1.jpeg", seoUrl: "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-modry", stock: 15, sold7days: 7 },
 ];
 
 // Fix prices: double original prices and recalculate discounts
@@ -406,12 +437,31 @@ const depths = [30, 40, 45, 50];
 
 // Obrázky podle barvy
 const colorImages = {
-  "Černá": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg",
-  "Bílá": "https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg",
-  "Červená": "https://vyprodej-regalucz.s26.cdn-upgates.com/c/c690377c0d46a4-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerveny-pravy-18090405875red1.jpeg",
-  "Modrá": "https://vyprodej-regalucz.s26.cdn-upgates.com/b/b690377c6f0f7e-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-modry-pravy-18090405875blue1.jpeg",
-  "Zinkovaný": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg"
+  "Černá": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/l/l/ll690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg",
+  "Bílá": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/6/6/6690a777ad6edc-1-18090405875white1.jpeg",
+  "Červená": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/9/e/9eef5f9f2ad8880b75926a3eae58485b-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny-pravy-15070304700red1.jpeg",
+  "Modrá": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/1/c/1c64831c1231f5847cf9e7a36f6cdf6f-1-15070304700blue1.jpeg",
+  "Zinkovaný": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/z/z/z6914605330838-5-pol-pravy-zink.jpg"
 };
+
+// Generování správného seoUrl pro vyprodej-regalu.cz
+function generateSeoUrl(height, width, depth, color, shelves, capacity) {
+  const colorSeoMap = {
+    "Černá": "cerny",
+    "Bílá": "bily",
+    "Červená": "cerveny",
+    "Modrá": "modry",
+    "Zinkovaný": ""
+  };
+  const surfaceText = color === "Zinkovaný" ? "zinkovany" : "lakovany";
+  const colorSeo = colorSeoMap[color] || "";
+
+  if (color === "Zinkovaný") {
+    return `regal-${height*10}x${width*10}x${depth*10}-mm-${surfaceText}-${shelves}-policovy-nosnost-${capacity}-kg`;
+  } else {
+    return `regal-${height*10}x${width*10}x${depth*10}-mm-${surfaceText}-${shelves}-policovy-nosnost-${capacity}-kg-${colorSeo}`;
+  }
+}
 
 for (let i = 13; i <= 102; i++) {
   const height = heights[Math.floor(Math.random() * heights.length)];
@@ -439,7 +489,7 @@ for (let i = 13; i <= 102; i++) {
     shelves: shelves,
     capacity: capacity,
     image: colorImages[color],
-    seoUrl: `regal-${height}x${width}x${depth}-cm-${color.toLowerCase().replace('á','a').replace('ý','y')}`,
+    seoUrl: generateSeoUrl(height, width, depth, color, shelves, capacity),
     stock: Math.floor(Math.random() * 100) + 10,
     sold7days: Math.floor(Math.random() * 50) + 5
   });
@@ -504,7 +554,7 @@ function renderGridCard(p) {
           <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">-${discount}%</span>
           ${p.bestseller ? '<span class="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">⭐ HIT</span>' : ''}
         </div>
-        ${lowStock ? '<div class="absolute bottom-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded">Zbývá ${p.stock} ks!</div>' : ''}
+        ${lowStock ? `<div class="absolute bottom-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded">Zbývá ${p.stock} ks!</div>` : ''}
       </div>
       <div class="p-4">
         <a href="${productUrl}" class="font-medium text-sm hover:text-primary-500 line-clamp-2 mb-2">${p.name}</a>
@@ -715,11 +765,18 @@ function setView(view) {
 }
 
 // ========== SEARCH (Luigi's Box Style) ==========
+function setSearch(term) {
+  document.getElementById('searchInput').value = term;
+  handleSearch({ target: { value: term } });
+}
+
 function handleSearch(event) {
   const query = event.target.value.toLowerCase();
 
-  if (query.length < 2) {
-    document.getElementById('searchDropdown').classList.add('hidden');
+  if (query.length < 1) {
+    // Zobraz populární položky při prázdném poli
+    showSearchDropdown();
+    renderDefaultSearch();
     return;
   }
 
@@ -730,61 +787,109 @@ function handleSearch(event) {
     p.name.toLowerCase().includes(query) ||
     p.color.toLowerCase().includes(query) ||
     String(p.height).includes(query) ||
-    String(p.width).includes(query)
+    String(p.width).includes(query) ||
+    String(p.height * 10).includes(query)
   ).slice(0, 6);
-
-  // Categories
-  const categories = [];
-  if (query.includes('180') || query.includes('vysok')) categories.push({ name: 'regály výšky 180 cm', count: 34 });
-  if (query.includes('90') || query.includes('širok')) categories.push({ name: 'regály šířky 90 cm', count: 28 });
-  if (query.includes('čern') || query.includes('black')) categories.push({ name: 'černé regály', count: 42 });
-  if (query.includes('bíl') || query.includes('white')) categories.push({ name: 'bílé regály', count: 18 });
-  if (query.includes('zink') || query.includes('vlhk')) categories.push({ name: 'zinkované regály', count: 24 });
-  if (query.includes('garáž')) categories.push({ name: 'regály do garáže', count: 56 });
-  if (query.includes('sklep')) categories.push({ name: 'regály do sklepa', count: 48 });
-
-  // Render categories
-  document.getElementById('searchCategories').innerHTML = categories.length ?
-    categories.map(c => `<a href="?kategorie=${encodeURIComponent(c.name)}" class="block text-sm text-gray-700 hover:text-primary-500 py-1">${c.name} <span class="text-gray-400">(${c.count})</span></a>`).join('') :
-    '<p class="text-sm text-gray-400">Žádné kategorie</p>';
 
   // Top product
   const topProduct = results.find(p => p.bestseller) || results[0];
   if (topProduct) {
     const topProductUrl = getProductUrl(topProduct);
+    const discount = Math.round((1 - topProduct.price / topProduct.priceOrig) * 100);
     document.getElementById('searchTopProduct').innerHTML = `
       <a href="${topProductUrl}" class="block">
-        <img src="${topProduct.image}" alt="${topProduct.name}" class="w-full aspect-square object-contain bg-white rounded-lg mb-2">
-        <div class="space-y-1">
+        <div class="flex flex-wrap gap-1 mb-2">
           <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded">Akce</span>
-          <span class="bg-green-500 text-white text-xs px-2 py-0.5 rounded">Ověřená Kvalita</span>
+          <span class="bg-green-600 text-white text-xs px-2 py-0.5 rounded">Ověřená Kvalita</span>
           <span class="bg-teal-500 text-white text-xs px-2 py-0.5 rounded">Záruka 7 let</span>
         </div>
-        <h4 class="font-medium text-sm mt-2 line-clamp-2">${topProduct.name}</h4>
-        <div class="text-green-600 text-xs mt-1">Skladem</div>
-        <div class="mt-2">
-          <span class="text-xl font-bold">${topProduct.price} Kč</span>
+        <img src="${topProduct.image}" alt="${topProduct.name}" class="w-full aspect-square object-contain bg-white rounded-lg mb-3">
+        <h4 class="font-medium text-sm line-clamp-2 mb-1">${topProduct.name}</h4>
+        <div class="text-green-600 text-xs mb-2">Skladem</div>
+        <div class="mb-3">
+          <span class="text-2xl font-bold">${topProduct.price} Kč</span>
           <span class="text-sm text-gray-400 line-through ml-1">${topProduct.priceOrig} Kč</span>
         </div>
-        <button class="w-full bg-primary-500 text-white py-2 rounded-lg font-medium mt-3 hover:bg-primary-600 transition">DO KOŠÍKU</button>
+        <button onclick="event.preventDefault(); addToCart(${topProduct.id})" class="w-full bg-primary-500 text-white py-2.5 rounded-lg font-bold hover:bg-primary-600 transition">DO KOŠÍKU</button>
+      </a>
+    `;
+  } else {
+    document.getElementById('searchTopProduct').innerHTML = '<p class="text-sm text-gray-400">Žádný produkt</p>';
+  }
+
+  // Products grid 2x3
+  document.getElementById('searchProducts').innerHTML = results.map(p => {
+    const discount = Math.round((1 - p.price / p.priceOrig) * 100);
+    return `
+    <a href="${getProductUrl(p)}" class="flex gap-2 p-2 hover:bg-gray-50 rounded-lg group">
+      <div class="relative flex-shrink-0">
+        <span class="absolute -top-1 -left-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">Akce</span>
+        <img src="${p.image}" alt="${p.name}" class="w-16 h-16 object-contain bg-gray-100 rounded">
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs font-medium line-clamp-2 group-hover:text-primary-500 mb-1">${p.name}</div>
+        <div class="text-xs text-green-600 mb-1">Skladem</div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-bold">${p.price} Kč</span>
+          <span class="text-xs text-gray-400 line-through">${p.priceOrig} Kč</span>
+        </div>
+      </div>
+      <button onclick="event.preventDefault(); event.stopPropagation(); addToCart(${p.id})" class="w-8 h-8 bg-primary-500 hover:bg-primary-600 rounded-full flex items-center justify-center text-white flex-shrink-0 self-center">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      </button>
+    </a>
+  `}).join('') || '<p class="text-sm text-gray-400 col-span-2">Žádné produkty</p>';
+
+  document.getElementById('searchShowAll').href = `katalog.html?hledat=${encodeURIComponent(query)}`;
+}
+
+function renderDefaultSearch() {
+  // Default top product (bestseller)
+  const topProduct = allProducts.find(p => p.bestseller) || allProducts[0];
+  if (topProduct) {
+    const topProductUrl = getProductUrl(topProduct);
+    document.getElementById('searchTopProduct').innerHTML = `
+      <a href="${topProductUrl}" class="block">
+        <div class="flex flex-wrap gap-1 mb-2">
+          <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded">Akce</span>
+          <span class="bg-green-600 text-white text-xs px-2 py-0.5 rounded">Ověřená Kvalita</span>
+          <span class="bg-teal-500 text-white text-xs px-2 py-0.5 rounded">Záruka 7 let</span>
+        </div>
+        <img src="${topProduct.image}" alt="${topProduct.name}" class="w-full aspect-square object-contain bg-white rounded-lg mb-3">
+        <h4 class="font-medium text-sm line-clamp-2 mb-1">${topProduct.name}</h4>
+        <div class="text-green-600 text-xs mb-2">Skladem</div>
+        <div class="mb-3">
+          <span class="text-2xl font-bold">${topProduct.price} Kč</span>
+          <span class="text-sm text-gray-400 line-through ml-1">${topProduct.priceOrig} Kč</span>
+        </div>
+        <button onclick="event.preventDefault(); addToCart(${topProduct.id})" class="w-full bg-primary-500 text-white py-2.5 rounded-lg font-bold hover:bg-primary-600 transition">DO KOŠÍKU</button>
       </a>
     `;
   }
 
-  // Products list
-  document.getElementById('searchProducts').innerHTML = results.map(p => `
-    <a href="${getProductUrl(p)}" class="flex gap-3 hover:bg-gray-50 rounded-lg p-2 -m-2">
-      <img src="${p.image}" alt="${p.name}" class="w-16 h-16 object-contain bg-gray-100 rounded">
-      <div class="flex-1 min-w-0">
-        <div class="text-sm font-medium line-clamp-1">${p.name}</div>
-        <div class="text-xs text-green-600">Skladem</div>
-        <div class="text-sm font-bold text-primary-600">${p.price} Kč</div>
+  // Popular products (first 6)
+  const popularProducts = allProducts.slice(0, 6);
+  document.getElementById('searchProducts').innerHTML = popularProducts.map(p => `
+    <a href="${getProductUrl(p)}" class="flex gap-2 p-2 hover:bg-gray-50 rounded-lg group">
+      <div class="relative flex-shrink-0">
+        <span class="absolute -top-1 -left-1 bg-green-600 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">Ověřená Kvalita</span>
+        <img src="${p.image}" alt="${p.name}" class="w-16 h-16 object-contain bg-gray-100 rounded">
       </div>
-      <button onclick="event.preventDefault(); addToCart(${p.id})" class="w-8 h-8 bg-primary-100 hover:bg-primary-200 rounded-full flex items-center justify-center text-primary-600 flex-shrink-0">🛒</button>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs font-medium line-clamp-2 group-hover:text-primary-500 mb-1">${p.name}</div>
+        <div class="text-xs text-green-600 mb-1">Skladem</div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-bold">${p.price} Kč</span>
+          <span class="text-xs text-gray-400 line-through">${p.priceOrig} Kč</span>
+        </div>
+      </div>
+      <button onclick="event.preventDefault(); event.stopPropagation(); addToCart(${p.id})" class="w-8 h-8 bg-primary-500 hover:bg-primary-600 rounded-full flex items-center justify-center text-white flex-shrink-0 self-center">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      </button>
     </a>
-  `).join('') || '<p class="text-sm text-gray-400">Žádné produkty</p>';
+  `).join('');
 
-  document.getElementById('searchShowAll').href = `?hledat=${encodeURIComponent(query)}`;
+  document.getElementById('searchShowAll').href = 'katalog.html';
 }
 
 function showSearchDropdown() {
