@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kontakt - Bazarovyregal.cz | Volejte nebo napište</title>
+  <meta name="description" content="Kontaktujte nás - Bazarovyregal.cz. Jsme tu pro vás. Odpovídáme na vaše dotazy do 24 hodin. Email: info@bazarovyregal.cz">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            primary: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12' },
+            danger: { 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .hero-gradient { background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%); }
+    .urgency-bar { background: linear-gradient(90deg, #dc2626, #ea580c, #dc2626); background-size: 200% 100%; animation: urgencyPulse 3s ease infinite; }
+    @keyframes urgencyPulse { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    .form-input { transition: all 0.3s; }
+    .form-input:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1); }
+    .form-error { border-color: #dc2626; }
+    .form-error:focus { box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+    .form-success { border-color: #16a34a; }
+    .form-success:focus { box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1); }
+    .cta-button { transition: all 0.2s; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4); }
+    .cta-button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5); }
+    .contact-card { transition: all 0.3s; }
+    .contact-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1); }
+    .success-message { animation: slideIn 0.3s ease forwards; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .map-placeholder { background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%); }
+    .trust-icon { transition: transform 0.3s; }
+    .trust-icon:hover { transform: scale(1.1); }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+<!-- URGENCY TOP BAR -->
+<div class="urgency-bar text-white text-center py-2 px-4 text-sm font-bold">
+  <span class="inline-flex items-center gap-2">
+    🔥 LIKVIDACE SKLADU - Slevy až 40% | Akce končí za:
+    <span id="topCountdown" class="bg-black/30 px-2 py-0.5 rounded font-mono">2d 14:23:45</span>
+    | Doprava ZDARMA nad 2000 Kč
+  </span>
+</div>
+
+<!-- HEADER -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between py-4">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg">
+          <span class="text-white text-2xl">🏭</span>
+        </div>
+        <div>
+          <div class="text-2xl font-black text-gray-900">Bazarovyregal<span class="text-primary-500">.cz</span></div>
+          <div class="text-xs text-red-600 font-bold uppercase tracking-wider">Likvidace skladu</div>
+        </div>
+      </a>
+
+      <!-- Search -->
+      <div class="hidden lg:flex flex-1 max-w-xl mx-8">
+        <div class="relative w-full">
+          <input type="text" placeholder="Hledat regály... (např. regál 180x90)" class="w-full pl-5 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-0 transition-colors">
+          <button class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-500 text-xl">🔍</button>
+        </div>
+      </div>
+
+      <!-- Contact & Cart -->
+      <div class="flex items-center gap-6">
+        <button class="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-5 py-3 rounded-xl font-bold transition-colors">
+          🛒 Košík <span class="bg-white text-primary-600 text-sm px-2 py-0.5 rounded-full">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex gap-1 pb-3 overflow-x-auto">
+      <a href="index.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap transition-colors">🏠 Úvod</a>
+      <a href="index.html#produkty" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap transition-colors">📦 Všechny regály</a>
+      <a href="#" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap transition-colors">🏡 Do domu</a>
+      <a href="#" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap transition-colors">🏭 Do skladu</a>
+      <a href="#" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap transition-colors">🔧 Do garáže</a>
+      <a href="#" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap transition-colors">⚙️ Konfigurátor</a>
+      <a href="#" class="px-4 py-2 text-sm font-medium text-primary-500 bg-primary-50 rounded-lg whitespace-nowrap">✉️ Kontakt</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO SECTION -->
+<section class="hero-gradient text-white relative overflow-hidden py-16 lg:py-24">
+  <!-- Background pattern -->
+  <div class="absolute inset-0 opacity-5">
+    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect fill=\"white\" width=\"2\" height=\"100\"/><rect fill=\"white\" width=\"100\" height=\"2\" y=\"49\"/></svg>'); background-size: 50px 50px;"></div>
+  </div>
+
+  <div class="container mx-auto px-4 relative text-center">
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight">
+      Kontaktujte nás
+    </h1>
+    <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+      Jsme tu pro vás. Rádi odpovíme na vaše dotazy.
+    </p>
+    <p class="text-gray-400 text-lg">
+      Máte otázku k produktu, chcete objednat nebo máte reklamaci? Nechte nám vzkaz a my se vám ozvu co nejdříve.
+    </p>
+  </div>
+
+  <!-- Wave divider -->
+  <div class="absolute bottom-0 left-0 right-0">
+    <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#f9fafb"/>
+    </svg>
+  </div>
+</section>
+
+<!-- CONTACT CARDS -->
+<section class="py-16 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-3 gap-6 mb-12">
+      <!-- Phone Card -->
+      <div class="contact-card bg-white rounded-2xl p-8 shadow-sm border-2 border-gray-100">
+        <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-4xl mb-6">
+          📞
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">Telefon</h3>
+        <p class="text-gray-600 mb-4">Volejte nás přímo</p>
+        <a href="mailto:info@bazarovyregal.cz" class="text-primary-600 font-bold text-lg hover:text-primary-700">
+          info@bazarovyregal.cz
+        </a>
+        <p class="text-sm text-gray-500 mt-4">
+          <strong>Po-Pá:</strong> 8:00 - 16:00<br>
+          <strong>So-Ne:</strong> Zavřeno
+        </p>
+      </div>
+
+      <!-- Email Card -->
+      <div class="contact-card bg-white rounded-2xl p-8 shadow-sm border-2 border-gray-100">
+        <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-4xl mb-6">
+          ✉️
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">Email</h3>
+        <p class="text-gray-600 mb-4">Napište nám email</p>
+        <a href="mailto:info@bazarovyregal.cz" class="text-primary-600 font-bold text-lg hover:text-primary-700">
+          info@bazarovyregal.cz
+        </a>
+        <p class="text-sm text-gray-500 mt-4">
+          Odpovídáme do 24 hodin<br>
+          v pracovní dny
+        </p>
+      </div>
+
+      <!-- Address Card -->
+      <div class="contact-card bg-white rounded-2xl p-8 shadow-sm border-2 border-gray-100">
+        <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-4xl mb-6">
+          📍
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">Adresa</h3>
+        <p class="text-gray-600 mb-4">Osobní odběr po domluvě</p>
+        <p class="font-bold text-gray-900 mb-4">
+          Praha 5<br>
+          Česká republika
+        </p>
+        <p class="text-sm text-gray-500">
+          Kontaktujte nás pro<br>
+          přesnou adresu
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT FORM & MAP -->
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <div class="grid lg:grid-cols-2 gap-12">
+      <!-- Contact Form -->
+      <div>
+        <h2 class="text-3xl font-black text-gray-900 mb-2">Napište nám</h2>
+        <p class="text-gray-600 mb-8">Vyplňte formulář a my se vám ozveme co nejdříve.</p>
+
+        <form id="contactForm" class="space-y-6">
+          <!-- Success Message -->
+          <div id="successMessage" class="hidden success-message bg-green-50 border-2 border-green-200 rounded-xl p-4 flex items-center gap-3">
+            <span class="text-2xl">✓</span>
+            <div>
+              <div class="font-bold text-green-900">Zpráva odeslána!</div>
+              <div class="text-sm text-green-700">Děkujeme za vaši zprávu. Odpovíme vám do 24 hodin.</div>
+            </div>
+          </div>
+
+          <!-- Name Field -->
+          <div>
+            <label for="name" class="block text-sm font-bold text-gray-900 mb-2">Jméno a příjmení *</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Vaše jméno"
+              class="form-input w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none transition-all"
+              required
+            >
+            <div class="error-message text-danger-500 text-sm mt-1 hidden"></div>
+          </div>
+
+          <!-- Email Field -->
+          <div>
+            <label for="email" class="block text-sm font-bold text-gray-900 mb-2">Email *</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="vase.jmeno@email.com"
+              class="form-input w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none transition-all"
+              required
+            >
+            <div class="error-message text-danger-500 text-sm mt-1 hidden"></div>
+          </div>
+
+          <!-- Phone Field -->
+          <div>
+            <label for="phone" class="block text-sm font-bold text-gray-900 mb-2">Telefon (volitelné)</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              placeholder="+420 xxx xxx xxx"
+              class="form-input w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none transition-all"
+            >
+            <div class="error-message text-danger-500 text-sm mt-1 hidden"></div>
+          </div>
+
+          <!-- Subject Field -->
+          <div>
+            <label for="subject" class="block text-sm font-bold text-gray-900 mb-2">Předmět *</label>
+            <select
+              id="subject"
+              name="subject"
+              class="form-input w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none transition-all"
+              required
+            >
+              <option value="">Vyberte předmět...</option>
+              <option value="dotaz">Dotaz k produktu</option>
+              <option value="objednavka">Objednávka</option>
+              <option value="reklamace">Reklamace</option>
+              <option value="spoluprace">Spolupráce</option>
+              <option value="jine">Jiné</option>
+            </select>
+          </div>
+
+          <!-- Message Field -->
+          <div>
+            <label for="message" class="block text-sm font-bold text-gray-900 mb-2">Zpráva *</label>
+            <textarea
+              id="message"
+              name="message"
+              placeholder="Napište nám vaši zprávu..."
+              rows="6"
+              class="form-input w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none transition-all resize-none"
+              required
+            ></textarea>
+            <div class="error-message text-danger-500 text-sm mt-1 hidden"></div>
+          </div>
+
+          <!-- Privacy Checkbox -->
+          <div class="flex items-start gap-3">
+            <input
+              type="checkbox"
+              id="privacy"
+              name="privacy"
+              class="mt-1 w-5 h-5 accent-primary-500 cursor-pointer"
+              required
+            >
+            <label for="privacy" class="text-sm text-gray-600">
+              Souhlasím se zpracováním mých osobních údajů *
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="cta-button w-full bg-primary-500 hover:bg-primary-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all"
+          >
+            Odeslat zprávu →
+          </button>
+
+          <p class="text-xs text-gray-500 text-center">
+            Všechna pole označená * jsou povinná
+          </p>
+        </form>
+      </div>
+
+      <!-- Map Placeholder -->
+      <div>
+        <h2 class="text-3xl font-black text-gray-900 mb-2">Kde nás najdete</h2>
+        <p class="text-gray-600 mb-8">Máme možnost osobního odběru v Praze. Kontaktujte nás pro přesné místo a dobu.</p>
+
+        <div class="map-placeholder rounded-2xl h-96 flex items-center justify-center relative overflow-hidden">
+          <!-- Placeholder Map -->
+          <div class="text-center">
+            <div class="text-6xl mb-4">🗺️</div>
+            <h3 class="font-bold text-gray-700 mb-2">Praha 5, Česká republika</h3>
+            <p class="text-gray-600 text-sm">Přesné místo po domluvě</p>
+            <div class="mt-6">
+              <a href="https://maps.google.com/?q=Prague" target="_blank" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                Otevřít v Mapách →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="mt-8 bg-primary-50 rounded-2xl p-6 border-2 border-primary-200">
+          <h3 class="font-bold text-gray-900 mb-4">💡 Poznámka</h3>
+          <p class="text-gray-600 text-sm">
+            Osobní odběr je možný po domluvě. Volejte nás nebo napište email a domluvíme si čas a místo.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ SECTION -->
+<section class="py-16 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Často kladené otázky</h2>
+      <p class="text-gray-600 text-lg">Nenašli jste odpověď? Podívejte se do naší FAQ</p>
+    </div>
+
+    <div class="max-w-3xl mx-auto grid md:grid-cols-2 gap-6">
+      <!-- FAQ Card 1 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100">
+        <h3 class="font-bold text-gray-900 mb-3 flex items-start gap-3">
+          <span class="text-xl">❓</span>
+          Jaká je doba doručení?
+        </h3>
+        <p class="text-gray-600 text-sm">
+          Expedujeme do 24 hodin. Doručení trvá 2-3 pracovní dny dle vaší lokality.
+        </p>
+      </div>
+
+      <!-- FAQ Card 2 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100">
+        <h3 class="font-bold text-gray-900 mb-3 flex items-start gap-3">
+          <span class="text-xl">❓</span>
+          Jak funguje záruka?
+        </h3>
+        <p class="text-gray-600 text-sm">
+          Všechny regály mají 7letou záruku. Pokud se cokoliv stane, volejte nás.
+        </p>
+      </div>
+
+      <!-- FAQ Card 3 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100">
+        <h3 class="font-bold text-gray-900 mb-3 flex items-start gap-3">
+          <span class="text-xl">❓</span>
+          Jaké jsou platební možnosti?
+        </h3>
+        <p class="text-gray-600 text-sm">
+          Přijímáme platby kartou, bankovním převodem, dobírkou a Bitcoin.
+        </p>
+      </div>
+
+      <!-- FAQ Card 4 -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100">
+        <h3 class="font-bold text-gray-900 mb-3 flex items-start gap-3">
+          <span class="text-xl">❓</span>
+          Mohu vrátit objednávku?
+        </h3>
+        <p class="text-gray-600 text-sm">
+          Ano, máte 30 dní na vrácení bez udání důvodu. Vrátíme vám celý obnos.
+        </p>
+      </div>
+    </div>
+
+    <div class="text-center mt-10">
+      <a href="#" class="inline-flex items-center gap-2 text-primary-500 hover:text-primary-600 font-bold text-lg">
+        Zobrazit všechny otázky →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST & RESPONSE TIME -->
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Response Time -->
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-2 border-green-200">
+          <div class="text-4xl mb-4">⏱️</div>
+          <h3 class="text-2xl font-black text-gray-900 mb-3">Doba odpovědi</h3>
+          <p class="text-gray-600 mb-6">
+            Na všechny dotazy odpovídáme do 24 hodin v pracovní dny. Pokud nás kontaktujete přes formulář během pracovní doby, odpovíme vám ještě dnes.
+          </p>
+          <div class="flex items-center gap-2 text-green-700 font-bold">
+            <span>✓</span> Pondělí - Pátek 8:00 - 16:00
+          </div>
+        </div>
+
+        <!-- Shopping Info -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border-2 border-blue-200">
+          <div class="text-4xl mb-4">🛒</div>
+          <h3 class="text-2xl font-black text-gray-900 mb-3">Nákupy online</h3>
+          <p class="text-gray-600 mb-6">
+            Nákupy probíhají přes ověřený e-shop <strong>Vyprodej-regalu.cz</strong>. Všechny transakce jsou bezpečné a chráněné.
+          </p>
+          <a href="https://www.vyprodej-regalu.cz" target="_blank" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+            Jít na e-shop →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="bg-white py-8 border-t">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="trust-icon flex flex-col items-center gap-3 text-center cursor-pointer">
+        <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-3xl">✅</div>
+        <div>
+          <div class="font-bold text-gray-900">10 000+ skladem</div>
+          <div class="text-sm text-gray-500">Expedice do 24h</div>
+        </div>
+      </div>
+      <div class="trust-icon flex flex-col items-center gap-3 text-center cursor-pointer">
+        <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl">🛡️</div>
+        <div>
+          <div class="font-bold text-gray-900">Záruka 7 let</div>
+          <div class="text-sm text-gray-500">Na všechny regály</div>
+        </div>
+      </div>
+      <div class="trust-icon flex flex-col items-center gap-3 text-center cursor-pointer">
+        <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-3xl">🚚</div>
+        <div>
+          <div class="font-bold text-gray-900">Doprava od 99 Kč</div>
+          <div class="text-sm text-gray-500">Zdarma nad 2000 Kč</div>
+        </div>
+      </div>
+      <div class="trust-icon flex flex-col items-center gap-3 text-center cursor-pointer">
+        <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-3xl">📦</div>
+        <div>
+          <div class="font-bold text-gray-900">Nové a nerozbalené</div>
+          <div class="text-sm text-gray-500">100% kvalita</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-gray-900 text-white py-16">
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+      <!-- About -->
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">🏭</div>
+          <div class="text-xl font-bold">Bazarovyregal<span class="text-primary-500">.cz</span></div>
+        </div>
+        <p class="text-gray-400 text-sm mb-4">
+          Likvidace skladu kovových regálů. Pouze nové a nerozbalené zboží se zárukou 7 let.
+        </p>
+        <div class="flex gap-3">
+          <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors">📘</a>
+          <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors">📸</a>
+          <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center justify-center transition-colors">▶️</a>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div>
+        <h4 class="font-bold text-lg mb-4">Kategorie</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-primary-400 transition-colors">Regály do domu</a></li>
+          <li><a href="#" class="hover:text-primary-400 transition-colors">Regály do skladu</a></li>
+          <li><a href="#" class="hover:text-primary-400 transition-colors">Regály do garáže</a></li>
+          <li><a href="#" class="hover:text-primary-400 transition-colors">Regály do kanceláře</a></li>
+          <li><a href="#" class="hover:text-primary-400 transition-colors">Profesionální regály</a></li>
+        </ul>
+      </div>
+
+      <!-- Info -->
+      <div>
+        <h4 class="font-bold text-lg mb-4">Informace</h4>
+        <ul class="space-y-2 text-gray-400">
+          <li><a href="#" class="hover:text-primary-400 transition-colors">O nás</a></li>
+          <li><a href="#" class="hover:text-primary-400 transition-colors">Doprava a platba</a></li>
+          <li><a href="#" class="hover:text-primary-400 transition-colors">Obchodní podmínky</a></li>
+          <li><a href="#" class="hover:text-primary-400 transition-colors">Ochrana osobních údajů</a></li>
+          <li><a href="#" class="hover:text-primary-400 transition-colors">Reklamace a vrácení</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h4 class="font-bold text-lg mb-4">Kontakt</h4>
+        <ul class="space-y-3 text-gray-400">
+          <li class="flex items-center gap-3">
+            <span class="text-xl">✉️</span>
+            <a href="mailto:info@bazarovyregal.cz" class="hover:text-primary-400">info@bazarovyregal.cz</a>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-xl">🕐</span>
+            <span>Po-Pá 8:00 - 16:00</span>
+          </li>
+        </ul>
+
+        <!-- Payment icons -->
+        <div class="mt-6">
+          <div class="text-sm text-gray-500 mb-2">Platební metody:</div>
+          <div class="flex gap-2">
+            <div class="bg-gray-800 rounded px-3 py-1 text-xs">💳 Karta</div>
+            <div class="bg-gray-800 rounded px-3 py-1 text-xs">🏦 Převod</div>
+            <div class="bg-gray-800 rounded px-3 py-1 text-xs">📦 Dobírka</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="border-t border-gray-800 pt-8">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-sm">
+        <div>© 2026 Bazarovyregal.cz - Všechna práva vyhrazena</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Countdown Timer
+function updateCountdown() {
+  const now = new Date();
+  const end = new Date(now.getTime() + (2 * 24 + 14) * 60 * 60 * 1000 + 23 * 60 * 1000 + 45 * 1000);
+
+  const stored = localStorage.getItem('countdownEnd');
+  let endTime;
+
+  if (stored) {
+    endTime = parseInt(stored);
+  } else {
+    endTime = end.getTime();
+    localStorage.setItem('countdownEnd', endTime);
+  }
+
+  function tick() {
+    const now = Date.now();
+    const diff = endTime - now;
+
+    if (diff <= 0) {
+      endTime = Date.now() + (2 * 24 + 14) * 60 * 60 * 1000;
+      localStorage.setItem('countdownEnd', endTime);
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    const topCountdown = document.getElementById('topCountdown');
+    if (topCountdown) {
+      topCountdown.textContent = `${days}d ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+  }
+
+  tick();
+  setInterval(tick, 1000);
+}
+
+// Form Handling
+function setupForm() {
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Get form values
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value.trim();
+    const privacy = document.getElementById('privacy').checked;
+
+    // Validation
+    let isValid = true;
+    const inputs = [
+      { id: 'name', value: name, type: 'text' },
+      { id: 'email', value: email, type: 'email' },
+      { id: 'subject', value: subject, type: 'select' },
+      { id: 'message', value: message, type: 'text' }
+    ];
+
+    inputs.forEach(input => {
+      const element = document.getElementById(input.id);
+      const errorDiv = element.nextElementSibling;
+
+      if (!input.value) {
+        element.classList.add('form-error');
+        element.classList.remove('form-success');
+        if (errorDiv && errorDiv.classList.contains('error-message')) {
+          errorDiv.textContent = 'Toto pole je povinné';
+          errorDiv.classList.remove('hidden');
+        }
+        isValid = false;
+      } else if (input.type === 'email' && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        element.classList.add('form-error');
+        element.classList.remove('form-success');
+        if (errorDiv && errorDiv.classList.contains('error-message')) {
+          errorDiv.textContent = 'Zadejte platný email';
+          errorDiv.classList.remove('hidden');
+        }
+        isValid = false;
+      } else {
+        element.classList.remove('form-error');
+        element.classList.add('form-success');
+        if (errorDiv && errorDiv.classList.contains('error-message')) {
+          errorDiv.classList.add('hidden');
+        }
+      }
+    });
+
+    if (!privacy) {
+      isValid = false;
+      alert('Musíte souhlasit se zpracováním osobních údajů');
+    }
+
+    if (isValid) {
+      // Show success message
+      const successMessage = document.getElementById('successMessage');
+      successMessage.classList.remove('hidden');
+
+      // Reset form
+      form.reset();
+
+      // Clear inputs
+      document.querySelectorAll('.form-input').forEach(input => {
+        input.classList.remove('form-success');
+        input.classList.remove('form-error');
+      });
+
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        successMessage.classList.add('hidden');
+      }, 5000);
+
+      // Here you would send the data to your backend
+      console.log({
+        name,
+        email,
+        phone,
+        subject,
+        message
+      });
+    }
+  });
+
+  // Clear error on input
+  document.querySelectorAll('.form-input').forEach(input => {
+    input.addEventListener('focus', function() {
+      this.classList.remove('form-error');
+    });
+    input.addEventListener('blur', function() {
+      if (this.value.trim()) {
+        this.classList.add('form-success');
+      } else {
+        this.classList.remove('form-success');
+      }
+    });
+  });
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  updateCountdown();
+  setupForm();
+});
+</script>
+
+</body>
+</html>

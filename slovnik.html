@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slovník pojmů - Regály a skladování | Bazarovyregal.cz</title>
+  <meta name="description" content="Kompletní slovník pojmů z oblasti regálů a skladování. Nosnost, police, pozinkování, šroubové regály a další pojmy srozumitelně vysvětlené.">
+  <meta name="keywords" content="slovník regálů, nosnost regálu, pozinkovaný regál, šroubový regál, police regálu">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            primary: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .term-card { transition: all 0.2s; }
+    .term-card:hover { transform: translateY(-2px); }
+    .term-card:target { animation: highlight 2s; }
+    @keyframes highlight { 0%, 100% { background: white; } 50% { background: #fff7ed; } }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+<!-- HEADER -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between py-4">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg">
+          <span class="text-white text-2xl">🏭</span>
+        </div>
+        <div>
+          <div class="text-2xl font-black text-gray-900">Bazarovyregal<span class="text-primary-500">.cz</span></div>
+          <div class="text-xs text-red-600 font-bold uppercase tracking-wider">Likvidace skladu</div>
+        </div>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="katalog.html" class="hidden md:flex items-center gap-2 text-gray-600 hover:text-primary-500 font-medium">📦 Katalog</a>
+        <a href="katalog.html" class="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-5 py-3 rounded-xl font-bold transition-colors">
+          🛒 Nakoupit
+        </a>
+      </div>
+    </div>
+    <nav class="flex gap-1 pb-3 overflow-x-auto">
+      <a href="index.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap">🏠 Úvod</a>
+      <a href="katalog.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap transition-colors">📦 Všechny regály</a>
+      <a href="blog.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap">📝 Blog</a>
+      <a href="slovnik.html" class="px-4 py-2 text-sm font-medium text-primary-500 bg-primary-50 rounded-lg whitespace-nowrap">📖 Slovník pojmů</a>
+      <a href="o-nas.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap transition-colors">ℹ️ O nás</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="bg-white border-b">
+  <div class="container mx-auto px-4 py-3">
+    <nav class="text-sm text-gray-500">
+      <a href="index.html" class="hover:text-primary-500">Úvod</a>
+      <span class="mx-2">›</span>
+      <span class="text-gray-900 font-medium">Slovník pojmů</span>
+    </nav>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="container mx-auto px-4 py-12">
+
+  <!-- Header -->
+  <div class="text-center mb-12">
+    <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">📖 Slovník pojmů</h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">Všechny důležité pojmy z oblasti regálů a skladování srozumitelně vysvětlené. Klikněte na pojem pro více informací.</p>
+  </div>
+
+  <!-- Quick Navigation -->
+  <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+    <h2 class="font-bold text-gray-900 mb-4">Rychlá navigace</h2>
+    <div class="flex flex-wrap gap-2">
+      <a href="#A" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">A</a>
+      <a href="#B" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">B</a>
+      <a href="#C" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">C</a>
+      <a href="#D" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">D</a>
+      <a href="#H" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">H</a>
+      <a href="#K" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">K</a>
+      <a href="#N" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">N</a>
+      <a href="#P" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">P</a>
+      <a href="#R" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">R</a>
+      <a href="#S" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">S</a>
+      <a href="#Z" class="px-3 py-1 bg-gray-100 hover:bg-primary-100 rounded font-medium text-gray-700">Z</a>
+    </div>
+  </div>
+
+  <!-- Terms List -->
+  <div class="space-y-12">
+
+    <!-- A -->
+    <section id="A">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">A</h2>
+      <div class="grid gap-4">
+        <article id="archivni-regal" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Archivní regál</h3>
+          <p class="text-gray-600 mb-3">Specializovaný typ regálu určený pro skladování dokumentů, šanonů a archivních krabic. Typicky má menší hloubku polic (30-40 cm) a výšku uzpůsobenou formátu A4.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#kovovy-regal" class="hover:underline ml-1">Kovový regál</a>,
+            <a href="#police" class="hover:underline ml-1">Police</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- B -->
+    <section id="B">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">B</h2>
+      <div class="grid gap-4">
+        <article id="bezpecnostni-zarážka" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Bezpečnostní zarážka</h3>
+          <p class="text-gray-600 mb-3">Pojistný prvek, který brání vypadnutí police z regálu nebo sklouznutí předmětů. U kvalitních regálů je standardní výbavou pro každou polici.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#police" class="hover:underline ml-1">Police</a>,
+            <a href="#nosnost" class="hover:underline ml-1">Nosnost</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- C -->
+    <section id="C">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">C</h2>
+      <div class="grid gap-4">
+        <article id="celkova-nosnost" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Celková nosnost regálu</h3>
+          <p class="text-gray-600 mb-3">Maximální hmotnost, kterou může nést celý regál včetně všech polic. Typicky se pohybuje od 400 kg u lehkých regálů až po 1750+ kg u těžkých průmyslových. Celková nosnost není prostý součet nosností polic – vždy platí nižší hodnota.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#nosnost" class="hover:underline ml-1">Nosnost police</a>,
+            <a href="#rovnomerne-rozlozeni" class="hover:underline ml-1">Rovnoměrné rozložení</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- D -->
+    <section id="D">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">D</h2>
+      <div class="grid gap-4">
+        <article id="dratena-police" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Drátěná police</h3>
+          <p class="text-gray-600 mb-3">Typ police tvořený sítí z ocelových drátů. Propouští světlo a vzduch, ideální pro skladování potravin, sportovního vybavení nebo oblečení. Nižší nosnost než plné police.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#police" class="hover:underline ml-1">Police</a>,
+            <a href="#kovovy-regal" class="hover:underline ml-1">Kovový regál</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- H -->
+    <section id="H">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">H</h2>
+      <div class="grid gap-4">
+        <article id="hloubka-police" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Hloubka police</h3>
+          <p class="text-gray-600 mb-3">Rozměr police od přední k zadní hraně. Standardní hloubky jsou 30, 40, 45, 50 a 60 cm. Hlubší police pojmou více, ale zabírají prostor. Pro garáže je ideální 40-50 cm.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#police" class="hover:underline ml-1">Police</a>,
+            <a href="#rozmery" class="hover:underline ml-1">Rozměry regálu</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- K -->
+    <section id="K">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">K</h2>
+      <div class="grid gap-4">
+        <article id="kovovy-regal" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Kovový regál</h3>
+          <p class="text-gray-600 mb-3">Regál s nosnou konstrukcí z kovu (ocel, hliník). Vyniká vysokou nosností, odolností a dlouhou životností. Dostupný v lakované nebo pozinkované variantě. Ideální do garáží, sklepů, dílen a skladů.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#pozinkovany-regal" class="hover:underline ml-1">Pozinkovaný regál</a>,
+            <a href="#lakovany-regal" class="hover:underline ml-1">Lakovaný regál</a>
+          </div>
+        </article>
+
+        <article id="kotveni" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Kotvení regálu</h3>
+          <p class="text-gray-600 mb-3">Upevnění regálu ke zdi nebo podlaze pomocí speciálních kotev. Zvyšuje stabilitu a bezpečnost, zejména u vysokých regálů nebo při vyšším zatížení. Doporučeno pro všechny regály nad 150 cm výšky.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#stabilita" class="hover:underline ml-1">Stabilita</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- N -->
+    <section id="N">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">N</h2>
+      <div class="grid gap-4">
+        <article id="nosnost" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Nosnost police</h3>
+          <p class="text-gray-600 mb-3">Maximální hmotnost, kterou unese jedna police regálu při rovnoměrném rozložení zátěže. Běžné hodnoty jsou 80-350 kg na polici. Vždy kontrolujte, zda výrobce uvádí nosnost při rovnoměrném rozložení.</p>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+            <p class="text-sm text-yellow-800"><strong>⚠️ Pozor:</strong> Nosnost platí pouze při rovnoměrném rozložení zátěže po celé ploše police!</p>
+          </div>
+          <div class="text-sm text-primary-600 mt-3">
+            <span class="font-medium">Související:</span>
+            <a href="#celkova-nosnost" class="hover:underline ml-1">Celková nosnost</a>,
+            <a href="#rovnomerne-rozlozeni" class="hover:underline ml-1">Rovnoměrné rozložení</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- P -->
+    <section id="P">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">P</h2>
+      <div class="grid gap-4">
+        <article id="police" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Police</h3>
+          <p class="text-gray-600 mb-3">Vodorovná plocha regálu určená k ukládání předmětů. Může být plná (kovová, MDF) nebo drátěná. Výškově nastavitelná police umožňuje přizpůsobit rozestupy podle potřeby.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#nosnost" class="hover:underline ml-1">Nosnost</a>,
+            <a href="#hloubka-police" class="hover:underline ml-1">Hloubka police</a>
+          </div>
+        </article>
+
+        <article id="pozinkovany-regal" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Pozinkovaný regál</h3>
+          <p class="text-gray-600 mb-3">Kovový regál s povrchovou úpravou zinkováním. Vrstva zinku chrání ocel před korozí a je ideální do vlhkých prostor jako sklepy, nevytápěné garáže nebo venkovní zastřešené prostory. Vyšší odolnost = vyšší cena.</p>
+          <div class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+            <p class="text-sm text-green-800"><strong>💡 Tip:</strong> Pro sklepy a garáže vždy volte pozinkovaný regál – investice se vyplatí.</p>
+          </div>
+          <div class="text-sm text-primary-600 mt-3">
+            <span class="font-medium">Související:</span>
+            <a href="#lakovany-regal" class="hover:underline ml-1">Lakovaný regál</a>,
+            <a href="#kovovy-regal" class="hover:underline ml-1">Kovový regál</a>
+          </div>
+        </article>
+
+        <article id="praskove-lakovani" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Práškové lakování</h3>
+          <p class="text-gray-600 mb-3">Metoda povrchové úpravy, kdy se na kov nanáší práškový lak a následně vytvrzuje v peci. Vytváří odolný, rovnoměrný povrch v různých barvách. Běžnější a levnější než zinkování, ale méně odolné ve vlhku.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#lakovany-regal" class="hover:underline ml-1">Lakovaný regál</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- R -->
+    <section id="R">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">R</h2>
+      <div class="grid gap-4">
+        <article id="rozmery" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Rozměry regálu</h3>
+          <p class="text-gray-600 mb-3">Základní rozměry regálu se uvádějí jako výška × šířka × hloubka (V×Š×H) v centimetrech. Standardní výšky jsou 150, 180 a 200 cm. Šířky 60, 90, 100 a 120 cm. Hloubky 30, 40, 45 a 60 cm.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#hloubka-police" class="hover:underline ml-1">Hloubka police</a>
+          </div>
+        </article>
+
+        <article id="rovnomerne-rozlozeni" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Rovnoměrné rozložení zátěže</h3>
+          <p class="text-gray-600 mb-3">Podmínka pro dosažení uvedené nosnosti police. Zátěž musí být rozprostřena po celé ploše police, nikoliv soustředěna na jednom místě. Bodové zatížení může vést k poškození nebo zhroucení police.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#nosnost" class="hover:underline ml-1">Nosnost</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- S -->
+    <section id="S">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">S</h2>
+      <div class="grid gap-4">
+        <article id="sroubovy-regal" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Šroubový regál</h3>
+          <p class="text-gray-600 mb-3">Typ regálu, kde se jednotlivé díly spojují šrouby. Vyšší nosnost a stabilita než zasouvací systémy. Montáž je náročnější, ale výsledek je pevnější. Vhodný pro těžké zatížení.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#zasouvaci-regal" class="hover:underline ml-1">Zasouvací regál</a>,
+            <a href="#nosnost" class="hover:underline ml-1">Nosnost</a>
+          </div>
+        </article>
+
+        <article id="stabilita" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Stabilita regálu</h3>
+          <p class="text-gray-600 mb-3">Schopnost regálu odolávat převržení nebo vychýlení. Ovlivňuje ji poměr výšky k šířce, rozložení zátěže a kotvení. Stabilitu zvyšuje ukládání těžších předmětů na spodní police.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#kotveni" class="hover:underline ml-1">Kotvení</a>
+          </div>
+        </article>
+
+        <article id="skladovy-regal" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Skladový regál</h3>
+          <p class="text-gray-600 mb-3">Robustní regál určený pro skladování zboží v profesionálních skladech. Vysoká nosnost (často 300+ kg na polici), masivní konstrukce a možnost sestavení do řad. Pro domácí použití obvykle předimenzovaný.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#kovovy-regal" class="hover:underline ml-1">Kovový regál</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Z -->
+    <section id="Z">
+      <h2 class="text-2xl font-black text-primary-500 mb-4 pb-2 border-b-2 border-primary-200">Z</h2>
+      <div class="grid gap-4">
+        <article id="zasouvaci-regal" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Zasouvací regál (bezšroubový)</h3>
+          <p class="text-gray-600 mb-3">Typ regálu, kde se police a stojiny spojují zasunutím bez nutnosti šroubů. Rychlá a snadná montáž bez nářadí. Nižší nosnost než šroubové systémy, ale pro běžné domácí použití dostačující.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#sroubovy-regal" class="hover:underline ml-1">Šroubový regál</a>
+          </div>
+        </article>
+
+        <article id="lakovany-regal" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Lakovaný regál</h3>
+          <p class="text-gray-600 mb-3">Kovový regál s povrchovou úpravou práškového lakování. Dostupný v různých barvách (nejčastěji šedá, modrá, černá). Vhodný do suchých prostor. Levnější než pozinkovaný, ale méně odolný ve vlhku.</p>
+          <div class="text-sm text-primary-600">
+            <span class="font-medium">Související:</span>
+            <a href="#pozinkovany-regal" class="hover:underline ml-1">Pozinkovaný regál</a>,
+            <a href="#praskove-lakovani" class="hover:underline ml-1">Práškové lakování</a>
+          </div>
+        </article>
+
+        <article id="zaruka" class="term-card bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Záruka na regál</h3>
+          <p class="text-gray-600 mb-3">Doba, po kterou výrobce garantuje bezchybnou funkci regálu. U kvalitních kovových regálů se pohybuje od 2 do 10 let. Vztahuje se na vady materiálu a zpracování, nikoliv na poškození nesprávným používáním.</p>
+        </article>
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+<!-- CTA Section -->
+<section class="bg-primary-500 py-12">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-3xl font-black text-white mb-4">Hledáte kvalitní regál?</h2>
+    <p class="text-primary-100 mb-6 max-w-2xl mx-auto">Právě probíhá likvidace skladu. Všechny regály se slevou až 61%, se 7letou zárukou.</p>
+    <a href="katalog.html" class="inline-flex items-center gap-2 bg-white text-primary-600 px-8 py-4 rounded-xl font-bold hover:bg-primary-50 transition-colors">
+      Prohlédnout regály →
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-gray-900 text-gray-400 py-12">
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
+            <span class="text-white text-xl">🏭</span>
+          </div>
+          <span class="text-white font-bold text-xl">Bazarovyregal.cz</span>
+        </div>
+        <p class="text-sm">Specialista na kovové regály. Likvidace skladu s nejlepšími cenami v ČR.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4">Kategorie</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="regaly-do-garaze.html" class="hover:text-primary-500">Regály do garáže</a></li>
+          <li><a href="regaly-do-sklepa.html" class="hover:text-primary-500">Regály do sklepa</a></li>
+          <li><a href="regaly-do-dilny.html" class="hover:text-primary-500">Regály do dílny</a></li>
+          <li><a href="katalog.html" class="hover:text-primary-500">Všechny regály</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4">Informace</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="blog.html" class="hover:text-primary-500">Blog</a></li>
+          <li><a href="slovnik.html" class="hover:text-primary-500">Slovník pojmů</a></li>
+          <li><a href="o-nas.html" class="hover:text-primary-500">O nás</a></li>
+          <li><a href="faq.html" class="hover:text-primary-500">FAQ</a></li>
+          <li><a href="kontakt.html" class="hover:text-primary-500">Kontakt</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4">Kontakt</h4>
+        <p class="text-sm">info@bazarovyregal.cz</p>
+        <p class="text-sm mt-2">Po-Pá: 8:00 - 16:00</p>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 pt-8 text-center text-sm">
+      <p>© 2025 Bazarovyregal.cz - Všechna práva vyhrazena</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

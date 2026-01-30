@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regály s dopravou do vašeho města | Bazarovyregal.cz</title>
+  <meta name="description" content="Kovové regály s rychlým doručením do celé ČR. Doručujeme do Prahy, Brna, Ostravy a dalších 100 měst. Likvidace skladu - slevy až 50%.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            primary: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .city-card:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Header -->
+<header class="bg-white shadow-sm">
+  <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <svg viewBox="0 0 48 48" class="w-10 h-10">
+        <rect x="2" y="2" width="44" height="44" fill="none" stroke="#374151" stroke-width="2" rx="4"/>
+        <line x1="2" y1="16" x2="46" y2="16" stroke="#374151" stroke-width="1.5"/>
+        <line x1="2" y1="32" x2="46" y2="32" stroke="#374151" stroke-width="1.5"/>
+        <rect x="5" y="5" width="10" height="9" fill="#f97316" rx="1"/>
+        <rect x="17" y="6" width="8" height="8" fill="#ea580c" rx="1"/>
+        <rect x="27" y="4" width="12" height="10" fill="#fb923c" rx="1"/>
+        <rect x="5" y="19" width="14" height="10" fill="#3b82f6" rx="1"/>
+        <rect x="21" y="20" width="10" height="9" fill="#60a5fa" rx="1"/>
+        <rect x="33" y="18" width="10" height="11" fill="#2563eb" rx="1"/>
+        <rect x="5" y="35" width="12" height="10" fill="#22c55e" rx="1"/>
+        <rect x="19" y="36" width="9" height="9" fill="#4ade80" rx="1"/>
+        <rect x="30" y="34" width="13" height="11" fill="#16a34a" rx="1"/>
+      </svg>
+      <div>
+        <div class="text-xl font-bold text-gray-900">Bazarovyregal<span class="text-primary-500">.cz</span></div>
+        <div class="text-xs text-red-600 font-medium">Likvidace skladu</div>
+      </div>
+    </a>
+    <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
+      <a href="index.html" class="hover:text-primary-500">Úvod</a>
+      <a href="#mesta" class="hover:text-primary-500">Města</a>
+      <a href="kontakt.html" class="hover:text-primary-500">Affiliate</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="bg-gradient-to-r from-primary-500 to-orange-500 text-white py-16">
+  <div class="container mx-auto px-4 text-center">
+    <h1 class="text-4xl md:text-5xl font-black mb-4">🚚 Regály s dopravou do vašeho města</h1>
+    <p class="text-xl text-white/90 mb-8">Doručujeme do 100+ měst v ČR. Obvykle do 2-3 pracovních dnů.</p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="#praha" class="bg-white text-primary-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">Praha</a>
+      <a href="#brno" class="bg-white text-primary-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">Brno</a>
+      <a href="#ostrava" class="bg-white text-primary-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">Ostrava</a>
+      <a href="#plzen" class="bg-white text-primary-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">Plzeň</a>
+    </div>
+  </div>
+</section>
+
+<!-- Mapa pokrytí -->
+<section class="py-12 bg-white">
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-3 gap-8 text-center">
+      <div>
+        <div class="text-4xl font-black text-primary-500">100+</div>
+        <div class="text-gray-600">měst s doručením</div>
+      </div>
+      <div>
+        <div class="text-4xl font-black text-primary-500">2-3 dny</div>
+        <div class="text-gray-600">průměrná doba doručení</div>
+      </div>
+      <div>
+        <div class="text-4xl font-black text-primary-500">od 99 Kč</div>
+        <div class="text-gray-600">doprava</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KRAJSKÁ MĚSTA -->
+<section id="mesta" class="py-16">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-12">🏙️ Krajská města</h2>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- PRAHA -->
+      <article id="praha" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Praha</h3>
+          <p class="text-red-100">Hlavní město, 1.3 mil. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            Hledáte <strong>kovové regály v Praze</strong>? Doručujeme do všech pražských částí - Praha 1 až Praha 22, včetně Zličína, Letňan, Štěrbohol a dalších.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Doručení do 24-48 hodin</li>
+            <li>✓ Možnost vyzvednutí na pobočce</li>
+            <li>✓ Doprava od 99 Kč</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=praha&utm_source=lokalni&utm_medium=praha" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- BRNO -->
+      <article id="brno" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Brno</h3>
+          <p class="text-blue-100">Jihomoravský kraj, 380 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály do garáže v Brně</strong> a okolí. Pokrýváme Brno-město, Brno-venkov, Židenice, Líšeň, Bystrc, Bohunice i Královo Pole.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Doručení do 2-3 dnů</li>
+            <li>✓ Doprava od 99 Kč</li>
+            <li>✓ 102 typů regálů skladem</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=brno&utm_source=lokalni&utm_medium=brno" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- OSTRAVA -->
+      <article id="ostrava" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-gray-700 to-gray-800 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Ostrava</h3>
+          <p class="text-gray-300">Moravskoslezský kraj, 285 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Skladové regály Ostrava</strong> - ideální pro průmyslové využití. Poruba, Hrabůvka, Zábřeh, Mariánské Hory a další části.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Doručení do 2-3 dnů</li>
+            <li>✓ Vysoká nosnost až 875 kg</li>
+            <li>✓ Záruka 7 let</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=ostrava&utm_source=lokalni&utm_medium=ostrava" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- PLZEŇ -->
+      <article id="plzen" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Plzeň</h3>
+          <p class="text-yellow-100">Plzeňský kraj, 175 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály Plzeň</strong> - pro domácnost i firmu. Bory, Slovany, Lochotín, Doubravka. Rychlé doručení z centrálního skladu.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Doručení do 2-3 dnů</li>
+            <li>✓ Bezšroubová montáž</li>
+            <li>✓ Slevy až 50%</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=plzen&utm_source=lokalni&utm_medium=plzen" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- LIBEREC -->
+      <article id="liberec" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Liberec</h3>
+          <p class="text-green-100">Liberecký kraj, 105 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Kovové regály Liberec</strong> a Jablonec nad Nisou. Vhodné do garáží, sklepů i dílen v podhorských oblastech.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Odolné zinkované varianty</li>
+            <li>✓ Ideální do vlhka</li>
+            <li>✓ Doručení do 3 dnů</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=liberec&utm_source=lokalni&utm_medium=liberec" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- OLOMOUC -->
+      <article id="olomouc" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Olomouc</h3>
+          <p class="text-purple-100">Olomoucký kraj, 100 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály Olomouc</strong> - univerzitní město s vysokou poptávkou. Hodolany, Nová Ulice, Neředín a okolní obce.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Regály pro studenty</li>
+            <li>✓ Kompaktní rozměry</li>
+            <li>✓ Od 599 Kč</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=olomouc&utm_source=lokalni&utm_medium=olomouc" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ČESKÉ BUDĚJOVICE -->
+      <article id="ceske-budejovice" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály České Budějovice</h3>
+          <p class="text-teal-100">Jihočeský kraj, 95 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály České Budějovice</strong> a jižní Čechy. Suché Vrbné, Máj, Vltava. Ideální pro sklepy a pivnice.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Zinkované do vlhka</li>
+            <li>✓ Nosnost až 875 kg</li>
+            <li>✓ 7 let záruka</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=ceske-budejovice&utm_source=lokalni&utm_medium=cb" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- HRADEC KRÁLOVÉ -->
+      <article id="hradec-kralove" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Hradec Králové</h3>
+          <p class="text-indigo-100">Královéhradecký kraj, 93 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály Hradec Králové</strong> - Slezské Předměstí, Pražské Předměstí, Malšovice. Rychlé doručení do východních Čech.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Doručení do 2-3 dnů</li>
+            <li>✓ Černé a bílé varianty</li>
+            <li>✓ Montáž za 10 minut</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=hradec-kralove&utm_source=lokalni&utm_medium=hk" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- PARDUBICE -->
+      <article id="pardubice" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-pink-500 to-pink-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Pardubice</h3>
+          <p class="text-pink-100">Pardubický kraj, 91 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály Pardubice</strong> - Zelené Předměstí, Polabiny, Studánka. Město koní a perníku s rychlým doručením.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Skladem 102 typů</li>
+            <li>✓ Výprodejové ceny</li>
+            <li>✓ Likvidace skladu</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=pardubice&utm_source=lokalni&utm_medium=pardubice" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ÚSTÍ NAD LABEM -->
+      <article id="usti-nad-labem" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Ústí nad Labem</h3>
+          <p class="text-orange-100">Ústecký kraj, 92 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály Ústí nad Labem</strong> - průmyslové město s poptávkou po skladových regálech. Střekov, Severní Terasa, Krásné Březno.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Průmyslové regály</li>
+            <li>✓ Vysoká nosnost</li>
+            <li>✓ Doručení do 3 dnů</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=usti-nad-labem&utm_source=lokalni&utm_medium=usti" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ZLÍN -->
+      <article id="zlin" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-red-400 to-red-500 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Zlín</h3>
+          <p class="text-red-100">Zlínský kraj, 75 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály Zlín</strong> - město Bati s tradicí průmyslu. Malenovice, Kudlov, Prštné. Kvalitní regály za nejlepší ceny.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Tradice kvality</li>
+            <li>✓ Slevy až 50%</li>
+            <li>✓ Bezšroubová montáž</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=zlin&utm_source=lokalni&utm_medium=zlin" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- JIHLAVA -->
+      <article id="jihlava" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Jihlava</h3>
+          <p class="text-emerald-100">Kraj Vysočina, 51 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály Jihlava</strong> - srdce Vysočiny. Horní Kosov, Bedřichov, Handlovy Dvory. Doručení do celého kraje.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Celá Vysočina</li>
+            <li>✓ Doprava od 99 Kč</li>
+            <li>✓ 7 let záruka</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=jihlava&utm_source=lokalni&utm_medium=jihlava" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- KARLOVY VARY -->
+      <article id="karlovy-vary" class="bg-white rounded-2xl shadow-sm overflow-hidden city-card transition-all">
+        <div class="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white p-6">
+          <h3 class="text-2xl font-bold">Regály Karlovy Vary</h3>
+          <p class="text-cyan-100">Karlovarský kraj, 48 tis. obyvatel</p>
+        </div>
+        <div class="p-6">
+          <p class="text-gray-600 mb-4">
+            <strong>Regály Karlovy Vary</strong> - lázeňské město s potřebou kvalitního skladování. Drahovice, Tuhnice, Bohatice.
+          </p>
+          <ul class="text-sm text-gray-500 mb-4 space-y-1">
+            <li>✓ Elegantní bílé varianty</li>
+            <li>✓ Kompaktní rozměry</li>
+            <li>✓ Doručení do 3 dnů</li>
+          </ul>
+          <div class="flex gap-2">
+            <a href="index.html?mesto=karlovy-vary&utm_source=lokalni&utm_medium=kv" class="flex-1 bg-primary-500 text-white text-center py-2 rounded-lg font-medium hover:bg-primary-600 transition">Zobrazit regály</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- DALŠÍ MĚSTA - ABECEDNÍ SEZNAM -->
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-4">📍 Doručujeme do 100+ měst v ČR</h2>
+    <p class="text-gray-600 text-center mb-12">Vyberte své město a objednejte s rychlým doručením</p>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+      <!-- A -->
+      <a href="?mesto=aš" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Aš</a>
+
+      <!-- B -->
+      <a href="?mesto=benesov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Benešov</a>
+      <a href="?mesto=beroun" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Beroun</a>
+      <a href="?mesto=bilina" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Bílina</a>
+      <a href="?mesto=blansko" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Blansko</a>
+      <a href="?mesto=bohumin" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Bohumín</a>
+      <a href="?mesto=boskovice" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Boskovice</a>
+      <a href="?mesto=brandys" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Brandýs n. L.</a>
+      <a href="?mesto=breclav" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Břeclav</a>
+      <a href="?mesto=bruntal" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Bruntál</a>
+
+      <!-- C -->
+      <a href="?mesto=caslav" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Čáslav</a>
+      <a href="?mesto=ceska-lipa" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Česká Lípa</a>
+      <a href="?mesto=ceska-trebova" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Česká Třebová</a>
+      <a href="?mesto=cesky-krumlov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Český Krumlov</a>
+      <a href="?mesto=cesky-tesin" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Český Těšín</a>
+      <a href="?mesto=cheb" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Cheb</a>
+      <a href="?mesto=chomutov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Chomutov</a>
+      <a href="?mesto=chrudim" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Chrudim</a>
+
+      <!-- D -->
+      <a href="?mesto=decin" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Děčín</a>
+      <a href="?mesto=domazlice" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Domažlice</a>
+      <a href="?mesto=dvur-kralove" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Dvůr Králové</a>
+
+      <!-- F -->
+      <a href="?mesto=frydek-mistek" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Frýdek-Místek</a>
+
+      <!-- H -->
+      <a href="?mesto=havířov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Havířov</a>
+      <a href="?mesto=hodonin" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Hodonín</a>
+      <a href="?mesto=holesov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Holešov</a>
+      <a href="?mesto=hradec-nad-moravici" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Hradec n. M.</a>
+      <a href="?mesto=humpolec" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Humpolec</a>
+
+      <!-- J -->
+      <a href="?mesto=jablonec" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Jablonec n. N.</a>
+      <a href="?mesto=jicin" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Jičín</a>
+      <a href="?mesto=jindrichuv-hradec" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Jindřichův Hradec</a>
+
+      <!-- K -->
+      <a href="?mesto=karvina" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Karviná</a>
+      <a href="?mesto=kladno" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Kladno</a>
+      <a href="?mesto=klatovy" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Klatovy</a>
+      <a href="?mesto=kolin" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Kolín</a>
+      <a href="?mesto=koprivnice" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Kopřivnice</a>
+      <a href="?mesto=kromeriz" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Kroměříž</a>
+      <a href="?mesto=kutna-hora" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Kutná Hora</a>
+
+      <!-- L -->
+      <a href="?mesto=litomerice" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Litoměřice</a>
+      <a href="?mesto=litvinov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Litvínov</a>
+      <a href="?mesto=louny" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Louny</a>
+
+      <!-- M -->
+      <a href="?mesto=melnik" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Mělník</a>
+      <a href="?mesto=mikulov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Mikulov</a>
+      <a href="?mesto=mlada-boleslav" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Mladá Boleslav</a>
+      <a href="?mesto=mohelnice" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Mohelnice</a>
+      <a href="?mesto=most" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Most</a>
+
+      <!-- N -->
+      <a href="?mesto=nachod" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Náchod</a>
+      <a href="?mesto=novy-jicin" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Nový Jičín</a>
+      <a href="?mesto=nymburk" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Nymburk</a>
+
+      <!-- O -->
+      <a href="?mesto=opava" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Opava</a>
+      <a href="?mesto=orlova" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Orlová</a>
+
+      <!-- P -->
+      <a href="?mesto=pelhrimov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Pelhřimov</a>
+      <a href="?mesto=pisek" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Písek</a>
+      <a href="?mesto=prerov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Přerov</a>
+      <a href="?mesto=pribram" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Příbram</a>
+      <a href="?mesto=prostejov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Prostějov</a>
+
+      <!-- R -->
+      <a href="?mesto=rakovnik" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Rakovník</a>
+      <a href="?mesto=rokycany" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Rokycany</a>
+      <a href="?mesto=roudnice" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Roudnice n. L.</a>
+
+      <!-- S -->
+      <a href="?mesto=sokolov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Sokolov</a>
+      <a href="?mesto=strakonice" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Strakonice</a>
+      <a href="?mesto=sumperk" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Šumperk</a>
+      <a href="?mesto=svitavy" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Svitavy</a>
+
+      <!-- T -->
+      <a href="?mesto=tabor" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Tábor</a>
+      <a href="?mesto=teplice" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Teplice</a>
+      <a href="?mesto=trebic" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Třebíč</a>
+      <a href="?mesto=trinec" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Třinec</a>
+      <a href="?mesto=trutnov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Trutnov</a>
+      <a href="?mesto=turnov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Turnov</a>
+
+      <!-- U -->
+      <a href="?mesto=uherske-hradiste" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Uherské Hradiště</a>
+      <a href="?mesto=unicov" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Uničov</a>
+
+      <!-- V -->
+      <a href="?mesto=valasske-mezirici" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Valašské Meziříčí</a>
+      <a href="?mesto=varnsdorf" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Varnsdorf</a>
+      <a href="?mesto=veseli-nad-moravou" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Veselí n. M.</a>
+      <a href="?mesto=vsetin" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Vsetín</a>
+
+      <!-- Z -->
+      <a href="?mesto=zdar-nad-sazavou" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Žďár n. Sázavou</a>
+      <a href="?mesto=znojmo" class="bg-gray-50 hover:bg-primary-50 px-4 py-2 rounded-lg text-sm transition">Znojmo</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-16 bg-gradient-to-r from-primary-500 to-orange-500 text-white">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-3xl font-bold mb-4">Nenašli jste své město?</h2>
+    <p class="text-xl text-white/90 mb-8">Doručujeme do celé ČR. Stačí si vybrat regál a zadat svou adresu.</p>
+    <a href="index.html?utm_source=lokalni&utm_medium=cta" class="inline-block bg-white text-primary-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition">
+      Zobrazit všechny regály →
+    </a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-12">
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <svg viewBox="0 0 48 48" class="w-10 h-10">
+            <rect x="2" y="2" width="44" height="44" fill="none" stroke="#6b7280" stroke-width="2" rx="4"/>
+            <line x1="2" y1="16" x2="46" y2="16" stroke="#6b7280" stroke-width="1.5"/>
+            <line x1="2" y1="32" x2="46" y2="32" stroke="#6b7280" stroke-width="1.5"/>
+            <rect x="5" y="5" width="10" height="9" fill="#f97316" rx="1"/>
+            <rect x="17" y="6" width="8" height="8" fill="#ea580c" rx="1"/>
+            <rect x="27" y="4" width="12" height="10" fill="#fb923c" rx="1"/>
+            <rect x="5" y="19" width="14" height="10" fill="#3b82f6" rx="1"/>
+            <rect x="21" y="20" width="10" height="9" fill="#60a5fa" rx="1"/>
+            <rect x="33" y="18" width="10" height="11" fill="#2563eb" rx="1"/>
+            <rect x="5" y="35" width="12" height="10" fill="#22c55e" rx="1"/>
+            <rect x="19" y="36" width="9" height="9" fill="#4ade80" rx="1"/>
+            <rect x="30" y="34" width="13" height="11" fill="#16a34a" rx="1"/>
+          </svg>
+          <div class="text-xl font-bold">Bazarovyregal<span class="text-primary-500">.cz</span></div>
+        </div>
+        <p class="text-gray-400 text-sm">Likvidace skladu. Největší slevy na regály v ČR.</p>
+        <p class="text-gray-500 text-xs mt-4">Budujeme regálové impérium 🏗️</p>
+      </div>
+      <div>
+        <h4 class="font-bold text-lg mb-4">Krajská města</h4>
+        <ul class="space-y-2 text-gray-400 text-sm">
+          <li><a href="#praha" class="hover:text-primary-400">Praha</a></li>
+          <li><a href="#brno" class="hover:text-primary-400">Brno</a></li>
+          <li><a href="#ostrava" class="hover:text-primary-400">Ostrava</a></li>
+          <li><a href="#plzen" class="hover:text-primary-400">Plzeň</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-lg mb-4">Informace</h4>
+        <ul class="space-y-2 text-gray-400 text-sm">
+          <li><a href="index.html" class="hover:text-primary-400">Všechny regály</a></li>
+          <li><a href="index.html" class="hover:text-primary-400">Blog</a></li>
+          <li><a href="kontakt.html" class="hover:text-primary-400">Affiliate</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-lg mb-4">Kontakt</h4>
+        <ul class="space-y-2 text-gray-400 text-sm">
+          <li>✉️ info@bazarovyregal.cz</li>
+          <li>🕐 Po-Pá 8:00 - 16:00</li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
+      © 2026 Bazarovyregal.cz - Regály s dopravou do celé ČR
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
