@@ -398,8 +398,16 @@ const allProducts = [
   { id: 10, code: "22090455875BLACK1", name: "Regál 220×90×45 cm černý", price: 899, priceOrig: 1798, height: 220, width: 90, depth: 45, color: "Černá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", seoUrl: "regal-2200x900x450-mm-lakovany-5-policovy-nosnost-875-kg-cerny", stock: 23, sold7days: 11 },
   { id: 11, code: "18012005875BLACK1", name: "Regál 180×120×50 cm černý", price: 1149, priceOrig: 2298, height: 180, width: 120, depth: 50, color: "Černá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", seoUrl: "regal-1800x1200x500-mm-lakovany-5-policovy-nosnost-875-kg-cerny", stock: 19, sold7days: 8 },
   { id: 12, code: "18090405875BLUE1", name: "Regál 180×90×40 cm modrý", price: 759, priceOrig: 1518, height: 180, width: 90, depth: 40, color: "Modrá", surface: "Lakovaný", shelves: 5, capacity: 875, image: "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg", seoUrl: "regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-modry", stock: 15, sold7days: 7 },
-  // ... Generuji dalších 90 produktů programaticky
 ];
+
+// Fix prices: double original prices and recalculate discounts
+for (let i = 0; i < allProducts.length; i++) {
+  const p = allProducts[i];
+  if (i < 12) {
+    // For manually defined products, double the original price and recalculate discount
+    p.priceOrig = p.priceOrig * 2;
+  }
+}
 
 // Generování dalších produktů pro celkový počet 102
 const colors = ["Černá", "Bílá", "Červená", "Modrá", "Zinkovaný"];
@@ -417,13 +425,14 @@ for (let i = 13; i <= 102; i++) {
   const capacity = shelves * 175;
   const basePrice = 400 + (height / 10) * 15 + (width / 10) * 10;
   const price = Math.round(basePrice / 10) * 10 - 1;
+  const priceOrig = Math.round(price * 2) * 2;
 
   allProducts.push({
     id: i,
     code: `${height}${width}${depth}${shelves}${capacity}${color.substring(0,3).toUpperCase()}`,
     name: `Regál ${height}×${width}×${depth} cm ${color.toLowerCase()}`,
     price: price,
-    priceOrig: Math.round(price * 2),
+    priceOrig: priceOrig,
     height: height,
     width: width,
     depth: depth,
@@ -491,7 +500,7 @@ function renderGridCard(p) {
         </div>
         <div class="flex items-center justify-between">
           <span class="text-xs text-green-600">✓ Skladem</span>
-          <button onclick="addToCart(${p.id})" class="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
+          <button onclick="event.preventDefault(); addToCart(${p.id})" class="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
             Do košíku
           </button>
         </div>
@@ -521,7 +530,7 @@ function renderListCard(p) {
             <span class="text-2xl font-bold text-primary-600">${p.price} Kč</span>
             <span class="text-sm text-gray-400 line-through ml-2">${p.priceOrig} Kč</span>
           </div>
-          <button onclick="addToCart(${p.id})" class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-lg font-medium transition">
+          <button onclick="event.preventDefault(); addToCart(${p.id})" class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-lg font-medium transition">
             Do košíku →
           </button>
         </div>
@@ -570,12 +579,34 @@ function filterByPrice(value) {
 
 function applyFilters() {
   filteredProducts = allProducts.filter(p => {
-    if (activeFilters.color.length && !activeFilters.color.includes(p.color)) return false;
-    if (activeFilters.height.length && !activeFilters.height.includes(String(p.height))) return false;
-    if (activeFilters.width.length && !activeFilters.width.includes(String(p.width))) return false;
-    if (activeFilters.surface.length && !activeFilters.surface.includes(p.surface)) return false;
-    if (activeFilters.capacity.length && !activeFilters.capacity.some(c => p.capacity >= parseInt(c))) return false;
+    // Color filter - if colors are selected, product color must match one of them
+    if (activeFilters.color.length > 0) {
+      if (!activeFilters.color.includes(p.color)) return false;
+    }
+
+    // Height filter
+    if (activeFilters.height.length > 0) {
+      if (!activeFilters.height.includes(String(p.height))) return false;
+    }
+
+    // Width filter
+    if (activeFilters.width.length > 0) {
+      if (!activeFilters.width.includes(String(p.width))) return false;
+    }
+
+    // Surface filter
+    if (activeFilters.surface.length > 0) {
+      if (!activeFilters.surface.includes(p.surface)) return false;
+    }
+
+    // Capacity filter
+    if (activeFilters.capacity.length > 0) {
+      if (!activeFilters.capacity.some(c => p.capacity >= parseInt(c))) return false;
+    }
+
+    // Price filter
     if (p.price > maxPrice) return false;
+
     return true;
   });
 
@@ -769,6 +800,7 @@ let cart = [];
 
 function addToCart(productId) {
   const product = allProducts.find(p => p.id === productId);
+  if (!product) return;
 
   // Redirect to vyprodej-regalu.cz with UTM tracking
   const url = `https://www.vyprodej-regalu.cz/p/${product.seoUrl}?addtocart=1&quantity=1&return=cart&utm_source=bazarovyregal&utm_medium=affiliate&utm_campaign=katalog`;
