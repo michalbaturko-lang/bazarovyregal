@@ -43,11 +43,11 @@ widths = [40, 60, 70, 90, 120]
 depths = [30, 40, 45, 50]
 
 color_images = {
-    "Černá": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/l/l/ll690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg",
-    "Bílá": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/6/6/6690a777ad6edc-1-18090405875white1.jpeg",
+    "Černá": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg",
+    "Bílá": "https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg",
     "Červená": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/9/e/9eef5f9f2ad8880b75926a3eae58485b-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny-pravy-15070304700red1.jpeg",
     "Modrá": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/1/c/1c64831c1231f5847cf9e7a36f6cdf6f-1-15070304700blue1.jpeg",
-    "Zinkovaný": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/z/z/z6914605330838-5-pol-pravy-zink.jpg",
+    "Zinkovaný": "https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg",
     "Profesionální": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/b/1/b17ce5b491bdb73a0df3160b51fbcf7e-1-regal-1800x1200x500-mm-lakovany-5-policovy-nosnost-1050-kg-modro-oranzovy-pravy-18120501050orangeblue1.jpeg"
 }
 
@@ -213,6 +213,25 @@ def generate_html(p):
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{full_name} | Bazarovyregal.cz</title>
   <meta name="description" content="Profesionální kovový regál {height}×{width}×{depth} cm s nosností {capacity} kg. {shelves} nastavitelných polic, bezšroubová montáž za 10 minut. Záruka 7 let. Skladem.">
+
+  <!-- OpenGraph Meta Tags -->
+  <meta property="og:title" content="{full_name} | Bazarovyregal.cz">
+  <meta property="og:description" content="🔥 SLEVA {discount}%! Kovový regál {height}×{width}×{depth} cm s nosností {capacity} kg. Pouze {price} Kč místo {priceOrig} Kč. Záruka 7 let, montáž za 10 min.">
+  <meta property="og:image" content="{image}">
+  <meta property="og:url" content="https://bazarovyregal.cz/{filename}.html">
+  <meta property="og:type" content="product">
+  <meta property="og:site_name" content="Bazarovyregal.cz">
+  <meta property="og:locale" content="cs_CZ">
+  <meta property="product:price:amount" content="{price}">
+  <meta property="product:price:currency" content="CZK">
+  <meta property="product:availability" content="in stock">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{full_name}">
+  <meta name="twitter:description" content="🔥 SLEVA {discount}%! Pouze {price} Kč. Záruka 7 let, montáž za 10 min.">
+  <meta name="twitter:image" content="{image}">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
