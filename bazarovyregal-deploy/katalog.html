@@ -455,12 +455,12 @@ let maxPrice = 2000;
 
 // ========== URL GENERATION ==========
 function getProductUrl(p) {
-  // Generate clean URL like regal-180x90x40-cerny.html
+  // Generate clean URL like regal-180x90x40-cerna.html
   const colorMap = {
-    'Černá': 'cerny',
-    'Bílá': 'bily',
+    'Černá': 'cerna',
+    'Bílá': 'bila',
     'Červená': 'cervena',
-    'Modrá': 'modry',
+    'Modrá': 'modra',
     'Zinkovaný': 'zinkovany'
   };
   const colorSlug = colorMap[p.color] || p.color.toLowerCase().replace(/[áéíóúýčďěňřšťžů]/g, c =>
@@ -974,7 +974,7 @@ function generateAIResponse(message) {
     return 'Do vlhkého prostředí jednoznačně <a href="?surface=Pozinkovaný" class="text-primary-500 underline">zinkované regály</a>! Jsou odolné proti korozi a vlhkosti. Máme je od 649 Kč. 💧';
   }
   if (msg.includes('levn') || msg.includes('nejlevnější')) {
-    return 'Nejlevnější regál máme za 599 Kč - je to <a href="regal-150x70x30-cerny.html" class="text-primary-500 underline">Regál 150×70×30 cm</a>. Skvělý poměr cena/výkon! 💰';
+    return 'Nejlevnější regál máme za 599 Kč - je to <a href="regal-150x70x30-cerna.html" class="text-primary-500 underline">Regál 150×70×30 cm</a>. Skvělý poměr cena/výkon! 💰';
   }
   if (msg.includes('nosnost') || msg.includes('těžk')) {
     return 'Všechny naše regály mají vysokou nosnost 175 kg na polici. Celková nosnost až 875 kg! To unese opravdu hodně. 💪';
