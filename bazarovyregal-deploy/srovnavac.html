@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Srovnávač regálů - Porovnejte až 4 regály | Bazarovyregal.cz</title>
+  <meta name="description" content="Porovnejte parametry, ceny a vlastnosti regálů vedle sebe. Najděte ideální regál pro vaše potřeby.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            primary: { 50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .compare-col { min-width: 200px; }
+    .highlight-best { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+    .product-image { aspect-ratio: 1; object-fit: contain; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Header -->
+<header class="bg-white shadow-sm">
+  <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <svg viewBox="0 0 48 48" class="w-10 h-10">
+        <rect x="2" y="2" width="44" height="44" fill="none" stroke="#374151" stroke-width="2" rx="4"/>
+        <line x1="2" y1="16" x2="46" y2="16" stroke="#374151" stroke-width="1.5"/>
+        <line x1="2" y1="32" x2="46" y2="32" stroke="#374151" stroke-width="1.5"/>
+        <rect x="5" y="5" width="10" height="9" fill="#f97316" rx="1"/>
+        <rect x="17" y="6" width="8" height="8" fill="#ea580c" rx="1"/>
+        <rect x="27" y="4" width="12" height="10" fill="#fb923c" rx="1"/>
+        <rect x="5" y="19" width="14" height="10" fill="#3b82f6" rx="1"/>
+        <rect x="21" y="20" width="10" height="9" fill="#60a5fa" rx="1"/>
+        <rect x="33" y="18" width="10" height="11" fill="#2563eb" rx="1"/>
+        <rect x="5" y="35" width="12" height="10" fill="#22c55e" rx="1"/>
+        <rect x="19" y="36" width="9" height="9" fill="#4ade80" rx="1"/>
+        <rect x="30" y="34" width="13" height="11" fill="#16a34a" rx="1"/>
+      </svg>
+      <div>
+        <div class="text-xl font-bold text-gray-900">Bazarovyregal<span class="text-primary-500">.cz</span></div>
+        <div class="text-xs text-red-600 font-medium">Likvidace skladu</div>
+      </div>
+    </a>
+    <nav class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
+      <a href="index.html" class="hover:text-primary-500">Všechny regály</a>
+      <a href="quiz.html" class="hover:text-primary-500">Kalkulačka</a>
+      <a href="quiz.html" class="hover:text-primary-500">Quiz</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-12">
+  <div class="container mx-auto px-4 text-center">
+    <h1 class="text-3xl md:text-4xl font-black mb-4">⚖️ Srovnávač regálů</h1>
+    <p class="text-xl text-blue-100">Porovnejte až 4 regály vedle sebe a vyberte ten pravý</p>
+  </div>
+</section>
+
+<main class="container mx-auto px-4 py-12">
+
+  <!-- Selection Panel -->
+  <div class="bg-white rounded-2xl shadow-sm p-6 mb-8">
+    <h2 class="text-lg font-bold mb-4">Vyberte regály k porovnání:</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div>
+        <label class="text-sm text-gray-500 mb-1 block">Regál 1</label>
+        <select id="product1" onchange="updateComparison()" class="w-full border rounded-lg p-3">
+          <option value="">-- Vyberte --</option>
+          <option value="1" selected>Regál 180×90×40 černý</option>
+          <option value="2">Regál 180×90×40 bílý</option>
+          <option value="3">Regál 180×90×40 zink</option>
+          <option value="4">Regál 150×70×30 černý</option>
+          <option value="5">Regál 220×90×45 černý</option>
+          <option value="6">Regál 180×60×40 černý</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-sm text-gray-500 mb-1 block">Regál 2</label>
+        <select id="product2" onchange="updateComparison()" class="w-full border rounded-lg p-3">
+          <option value="">-- Vyberte --</option>
+          <option value="1">Regál 180×90×40 černý</option>
+          <option value="2" selected>Regál 180×90×40 bílý</option>
+          <option value="3">Regál 180×90×40 zink</option>
+          <option value="4">Regál 150×70×30 černý</option>
+          <option value="5">Regál 220×90×45 černý</option>
+          <option value="6">Regál 180×60×40 černý</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-sm text-gray-500 mb-1 block">Regál 3</label>
+        <select id="product3" onchange="updateComparison()" class="w-full border rounded-lg p-3">
+          <option value="" selected>-- Vyberte --</option>
+          <option value="1">Regál 180×90×40 černý</option>
+          <option value="2">Regál 180×90×40 bílý</option>
+          <option value="3">Regál 180×90×40 zink</option>
+          <option value="4">Regál 150×70×30 černý</option>
+          <option value="5">Regál 220×90×45 černý</option>
+          <option value="6">Regál 180×60×40 černý</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-sm text-gray-500 mb-1 block">Regál 4</label>
+        <select id="product4" onchange="updateComparison()" class="w-full border rounded-lg p-3">
+          <option value="" selected>-- Vyberte --</option>
+          <option value="1">Regál 180×90×40 černý</option>
+          <option value="2">Regál 180×90×40 bílý</option>
+          <option value="3">Regál 180×90×40 zink</option>
+          <option value="4">Regál 150×70×30 černý</option>
+          <option value="5">Regál 220×90×45 černý</option>
+          <option value="6">Regál 180×60×40 černý</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full" id="comparisonTable">
+        <thead>
+          <tr class="bg-gray-50 border-b">
+            <th class="p-4 text-left font-medium text-gray-500 w-40">Parametr</th>
+            <th class="p-4 text-center compare-col" id="col1Header">Regál 1</th>
+            <th class="p-4 text-center compare-col" id="col2Header">Regál 2</th>
+            <th class="p-4 text-center compare-col hidden" id="col3Header">Regál 3</th>
+            <th class="p-4 text-center compare-col hidden" id="col4Header">Regál 4</th>
+          </tr>
+        </thead>
+        <tbody id="comparisonBody">
+          <!-- Dynamicky generováno -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="mt-6 flex items-center gap-6 text-sm text-gray-500">
+    <div class="flex items-center gap-2">
+      <span class="w-4 h-4 bg-green-100 rounded"></span>
+      <span>Nejlepší hodnota v kategorii</span>
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <div class="mt-12 bg-blue-50 rounded-2xl p-8">
+    <h2 class="text-xl font-bold mb-4">💡 Tipy pro výběr regálu</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div>
+        <h3 class="font-bold mb-2">📏 Rozměry</h3>
+        <p class="text-sm text-gray-600">Změřte si prostor a nechte alespoň 5 cm volného místa okolo regálu pro manipulaci.</p>
+      </div>
+      <div>
+        <h3 class="font-bold mb-2">⚖️ Nosnost</h3>
+        <p class="text-sm text-gray-600">Počítejte s rezervou. Pokud plánujete skladovat 100 kg, vyberte regál s nosností alespoň 150 kg.</p>
+      </div>
+      <div>
+        <h3 class="font-bold mb-2">💧 Povrch</h3>
+        <p class="text-sm text-gray-600">Do vlhkých prostor (sklep, prádelna) vybírejte zinkované regály.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-8 mt-12">
+  <div class="container mx-auto px-4 text-center">
+    <p class="text-gray-400 text-sm">© 2026 Bazarovyregal.cz - Likvidace skladu</p>
+  </div>
+</footer>
+
+<script>
+// Product database
+const products = {
+  1: {
+    name: 'Regál 180×90×40 cm černý',
+    image: 'https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg',
+    price: 739,
+    priceOriginal: 1478,
+    height: 180,
+    width: 90,
+    depth: 40,
+    shelves: 5,
+    loadPerShelf: 175,
+    loadTotal: 875,
+    surface: 'Práškový lak',
+    color: 'Černá',
+    humidity: 'Suchý / mírně vlhký',
+    assembly: '10 minut',
+    warranty: '7 let',
+    url: 'https://www.vyprodej-regalu.cz/p/regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny?utm_source=srovnavac&utm_medium=affiliate'
+  },
+  2: {
+    name: 'Regál 180×90×40 cm bílý',
+    image: 'https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg',
+    price: 739,
+    priceOriginal: 1478,
+    height: 180,
+    width: 90,
+    depth: 40,
+    shelves: 5,
+    loadPerShelf: 175,
+    loadTotal: 875,
+    surface: 'Práškový lak',
+    color: 'Bílá',
+    humidity: 'Suchý / mírně vlhký',
+    assembly: '10 minut',
+    warranty: '7 let',
+    url: 'https://www.vyprodej-regalu.cz/p/regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-bily?utm_source=srovnavac&utm_medium=affiliate'
+  },
+  3: {
+    name: 'Regál 180×90×40 cm zinkovaný',
+    image: 'https://vyprodej-regalucz.s26.cdn-upgates.com/z/z6914605330838-5-pol-pravy-zink.jpg',
+    price: 649,
+    priceOriginal: 1298,
+    height: 180,
+    width: 90,
+    depth: 40,
+    shelves: 5,
+    loadPerShelf: 175,
+    loadTotal: 875,
+    surface: 'Pozinkovaný',
+    color: 'Stříbrná',
+    humidity: 'Vhodný do vlhka',
+    assembly: '10 minut',
+    warranty: '7 let',
+    url: 'https://www.vyprodej-regalu.cz/p/regal-1800x900x400-mm-pozinkovany-5-policovy-nosnost-875-kg?utm_source=srovnavac&utm_medium=affiliate'
+  },
+  4: {
+    name: 'Regál 150×70×30 cm černý',
+    image: 'https://vyprodej-regalucz.s26.cdn-upgates.com/v/v6903779a99ff1-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerny-pravy-15070304700black1.jpeg',
+    price: 599,
+    priceOriginal: 1198,
+    height: 150,
+    width: 70,
+    depth: 30,
+    shelves: 4,
+    loadPerShelf: 175,
+    loadTotal: 700,
+    surface: 'Práškový lak',
+    color: 'Černá',
+    humidity: 'Suchý / mírně vlhký',
+    assembly: '10 minut',
+    warranty: '7 let',
+    url: 'https://www.vyprodej-regalu.cz/p/regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerny?utm_source=srovnavac&utm_medium=affiliate'
+  },
+  5: {
+    name: 'Regál 220×90×45 cm černý',
+    image: 'https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg',
+    price: 899,
+    priceOriginal: 1798,
+    height: 220,
+    width: 90,
+    depth: 45,
+    shelves: 5,
+    loadPerShelf: 175,
+    loadTotal: 875,
+    surface: 'Práškový lak',
+    color: 'Černá',
+    humidity: 'Suchý / mírně vlhký',
+    assembly: '15 minut',
+    warranty: '7 let',
+    url: 'https://www.vyprodej-regalu.cz/p/regal-2200x900x450-mm-lakovany-5-policovy-nosnost-875-kg-cerny?utm_source=srovnavac&utm_medium=affiliate'
+  },
+  6: {
+    name: 'Regál 180×60×40 cm černý',
+    image: 'https://vyprodej-regalucz.s26.cdn-upgates.com/j/j690377a5dc94d-1-regal-1800x600x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18060405875black1.jpeg',
+    price: 1149,
+    priceOriginal: 2298,
+    height: 180,
+    width: 60,
+    depth: 40,
+    shelves: 5,
+    loadPerShelf: 175,
+    loadTotal: 875,
+    surface: 'Práškový lak',
+    color: 'Černá',
+    humidity: 'Suchý / mírně vlhký',
+    assembly: '10 minut',
+    warranty: '7 let',
+    url: 'https://www.vyprodej-regalu.cz/p/regal-1800x600x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny?utm_source=srovnavac&utm_medium=affiliate'
+  }
+};
+
+function updateComparison() {
+  const selected = [];
+  for (let i = 1; i <= 4; i++) {
+    const val = document.getElementById(`product${i}`).value;
+    if (val) selected.push(products[val]);
+  }
+
+  if (selected.length < 2) {
+    alert('Vyberte alespoň 2 regály k porovnání');
+    return;
+  }
+
+  renderComparison(selected);
+}
+
+function renderComparison(items) {
+  const cols = items.length;
+
+  // Update headers visibility
+  for (let i = 1; i <= 4; i++) {
+    const header = document.getElementById(`col${i}Header`);
+    if (i <= cols) {
+      header.classList.remove('hidden');
+      header.textContent = items[i-1].name;
+    } else {
+      header.classList.add('hidden');
+    }
+  }
+
+  // Find best values
+  const lowestPrice = Math.min(...items.map(p => p.price));
+  const highestLoad = Math.max(...items.map(p => p.loadTotal));
+  const mostShelves = Math.max(...items.map(p => p.shelves));
+  const tallest = Math.max(...items.map(p => p.height));
+
+  // Build table rows
+  const rows = [
+    {
+      label: 'Obrázek',
+      values: items.map(p => `<img src="${p.image}" alt="${p.name}" class="product-image w-32 h-32 mx-auto bg-gray-100 rounded-lg">`),
+      type: 'image'
+    },
+    {
+      label: 'Cena',
+      values: items.map(p => `<div class="font-bold text-xl text-primary-600">${p.price} Kč</div><div class="text-sm text-gray-400 line-through">${p.priceOriginal} Kč</div>`),
+      best: items.map(p => p.price === lowestPrice),
+      type: 'price'
+    },
+    {
+      label: 'Výška',
+      values: items.map(p => `${p.height} cm`),
+      best: items.map(p => p.height === tallest)
+    },
+    {
+      label: 'Šířka',
+      values: items.map(p => `${p.width} cm`)
+    },
+    {
+      label: 'Hloubka',
+      values: items.map(p => `${p.depth} cm`)
+    },
+    {
+      label: 'Počet polic',
+      values: items.map(p => `${p.shelves} ks`),
+      best: items.map(p => p.shelves === mostShelves)
+    },
+    {
+      label: 'Nosnost/police',
+      values: items.map(p => `${p.loadPerShelf} kg`)
+    },
+    {
+      label: 'Celková nosnost',
+      values: items.map(p => `<strong>${p.loadTotal} kg</strong>`),
+      best: items.map(p => p.loadTotal === highestLoad)
+    },
+    {
+      label: 'Povrch',
+      values: items.map(p => p.surface)
+    },
+    {
+      label: 'Barva',
+      values: items.map(p => p.color)
+    },
+    {
+      label: 'Vhodnost',
+      values: items.map(p => p.humidity)
+    },
+    {
+      label: 'Montáž',
+      values: items.map(p => p.assembly)
+    },
+    {
+      label: 'Záruka',
+      values: items.map(p => p.warranty)
+    },
+    {
+      label: 'Koupit',
+      values: items.map(p => `<a href="${p.url}" target="_blank" class="inline-block bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition">Do košíku →</a>`),
+      type: 'button'
+    }
+  ];
+
+  // Render
+  let html = '';
+  rows.forEach(row => {
+    html += `<tr class="border-b">`;
+    html += `<td class="p-4 font-medium text-gray-700">${row.label}</td>`;
+    row.values.forEach((val, idx) => {
+      const isBest = row.best && row.best[idx] && items.length > 2;
+      const bestClass = isBest ? 'highlight-best' : '';
+      const hiddenClass = idx >= cols ? 'hidden' : '';
+      html += `<td class="p-4 text-center ${bestClass} ${hiddenClass}">${val}</td>`;
+    });
+    // Fill empty cols
+    for (let i = row.values.length; i < 4; i++) {
+      html += `<td class="p-4 text-center hidden"></td>`;
+    }
+    html += `</tr>`;
+  });
+
+  document.getElementById('comparisonBody').innerHTML = html;
+}
+
+// Initialize
+updateComparison();
+</script>
+
+</body>
+</html>
