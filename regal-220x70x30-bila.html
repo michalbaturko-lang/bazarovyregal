@@ -3,22 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Regál 220×70×30 cm bílá | Sleva 75% | Bazarovyregal.cz</title>
-  <meta name="description" content="Regál 220×70×30 cm bílá - lakovaný regál s nosností 875 kg. 5 polic, rozměry 220×70×30 cm. Sleva 75%, cena pouze 799 Kč. 7 let záruka.">
-  <meta name="keywords" content="regál 220x70, bílá regál, kovový regál, lakovaný regál">
-  <link rel="canonical" href="https://bazarovyregal.cz/regal-220x70x30-bila">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Regál 220×70×30 cm bílá | Sleva 75%">
-  <meta property="og:description" content="Lakovaný regál s nosností 875 kg. Pouze 799 Kč místo 3196 Kč.">
-  <meta property="og:image" content="https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg">
-  <meta property="og:url" content="https://bazarovyregal.cz/regal-220x70x30-bila">
-  <meta property="og:type" content="product">
-  <meta property="product:price:amount" content="799">
-  <meta property="product:price:currency" content="CZK">
-
+  <title>Regál 2200x700x300 mm lakovaný 5-policový, nosnost 875 kg - bílá | Bazarovyregal.cz</title>
+  <meta name="description" content="Profesionální kovový regál 220×70×30 cm s nosností 875 kg. 5 nastavitelných polic, bezšroubová montáž za 10 minut. Záruka 7 let. Skladem.">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
@@ -32,279 +21,746 @@
     }
   </script>
   <style>
+    .product-image { aspect-ratio: 1; object-fit: contain; background: #f8fafc; }
+    .thumbnail { aspect-ratio: 1; object-fit: contain; }
+    .spec-row:nth-child(odd) { background: #f8fafc; }
+    .tab-active { border-bottom: 3px solid #f97316; color: #f97316; }
+    .sticky-bar { transform: translateY(-100%); transition: transform 0.3s; }
+    .sticky-bar.visible { transform: translateY(0); }
+    .pulse-badge { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .faq-item.open .faq-answer { max-height: 500px; }
+    .faq-item.open .faq-icon { transform: rotate(180deg); }
+    .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; }
+    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
     .product-card { transition: all 0.3s; }
     .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
   </style>
-
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": "Regál 220×70×30 cm bílá",
-    "image": "https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg",
-    "description": "Lakovaný kovový regál s 5 policemi a nosností 875 kg.",
-    "brand": { "@type": "Brand", "name": "Bazarovyregal.cz" },
-    "offers": {
-      "@type": "Offer",
-      "price": "799",
-      "priceCurrency": "CZK",
-      "availability": "https://schema.org/InStock",
-      "seller": { "@type": "Organization", "name": "Bazarovyregal.cz" }
-    }
-  }
-  </script>
 </head>
 <body class="bg-gray-50 font-sans">
 
-<!-- HEADER -->
-<header class="bg-white shadow-sm sticky top-0 z-50">
-  <div class="container mx-auto px-4">
-    <div class="flex items-center justify-between py-4">
-      <a href="index.html" class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg">
-          <span class="text-white text-2xl">🏭</span>
-        </div>
-        <div>
-          <div class="text-2xl font-black text-gray-900">Bazarovyregal<span class="text-primary-500">.cz</span></div>
-          <div class="text-xs text-red-600 font-bold uppercase tracking-wider">Likvidace skladu</div>
-        </div>
-      </a>
-      <div class="flex items-center gap-4">
-        <a href="katalog.html" class="hidden md:flex items-center gap-2 text-gray-600 hover:text-primary-500 font-medium">📦 Katalog</a>
-        <a href="katalog.html" class="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-5 py-3 rounded-xl font-bold transition-colors">
-          🛒 Nakoupit
-        </a>
+<!-- Sticky Add to Cart Bar -->
+<div id="stickyBar" class="sticky-bar fixed top-0 left-0 right-0 bg-white shadow-lg z-50 py-3 border-b">
+  <div class="container mx-auto px-4 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg" alt="" class="w-12 h-12 object-contain bg-gray-100 rounded">
+      <div class="hidden sm:block">
+        <div class="font-medium text-sm line-clamp-1">Regál 220×70×30 cm bílá</div>
+        <div class="text-xs text-gray-500">220×70×30 cm • 875 kg</div>
       </div>
     </div>
-    <nav class="flex gap-1 pb-3 overflow-x-auto">
-      <a href="index.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap">🏠 Úvod</a>
-      <a href="katalog.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap transition-colors">📦 Všechny regály</a>
-      <a href="regaly-do-garaze.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap">🚗 Do garáže</a>
-      <a href="blog.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap">📝 Blog</a>
-      <a href="slovnik.html" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg whitespace-nowrap">📖 Slovník</a>
-    </nav>
-  </div>
-</header>
-
-<!-- BREADCRUMB -->
-<div class="bg-white border-b">
-  <div class="container mx-auto px-4 py-3">
-    <nav class="text-sm text-gray-500">
-      <a href="index.html" class="hover:text-primary-500">Úvod</a>
-      <span class="mx-2">›</span>
-      <a href="katalog.html" class="hover:text-primary-500">Regály</a>
-      <span class="mx-2">›</span>
-      <span class="text-gray-900 font-medium">Regál 220×70×30 cm bílá</span>
-    </nav>
+    <div class="flex items-center gap-4">
+      <div class="text-right">
+        <div class="text-xl font-bold text-primary-600">809 Kč</div>
+        <div class="text-xs text-green-600">✓ Skladem</div>
+      </div>
+      <button onclick="addToCart()" class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-bold transition-colors whitespace-nowrap">
+        🛒 Koupit
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- PRODUCT DETAIL -->
-<main class="container mx-auto px-4 py-8">
-  <div class="grid lg:grid-cols-2 gap-12">
+<!-- Top Bar -->
+<div class="bg-gray-900 text-white text-sm py-2">
+  <div class="container mx-auto px-4 flex justify-between items-center">
+    <div class="flex items-center gap-6">
+      <span>✉️ info@bazarovyregal.cz</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span>🚚 Doprava od 99 Kč</span>
+      <span>⭐ 4.9/5 (2847 recenzí)</span>
+    </div>
+  </div>
+</div>
 
-    <!-- Product Image -->
-    <div class="bg-white rounded-2xl p-8 shadow-sm">
-      <div class="relative">
-        <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg" alt="Regál 220×70×30 cm bílá" class="w-full aspect-square object-contain">
-        <div class="absolute top-4 left-4 flex flex-col gap-2">
-          <span class="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-lg">-75%</span>
-          <span class="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-lg">Skladem 34 ks</span>
+<!-- Header -->
+<header class="bg-white shadow-sm">
+  <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <div class="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
+        <span class="text-white text-xl font-bold">🏭</span>
+      </div>
+      <div>
+        <div class="text-xl font-bold text-gray-900">Bazarovyregal<span class="text-primary-500">.cz</span></div>
+        <div class="text-xs text-red-600 font-medium">Největší slevy na regály</div>
+      </div>
+    </a>
+    <nav class="hidden md:flex gap-4 text-sm font-medium text-gray-600">
+      <a href="index.html" class="hover:text-primary-500">🏠 Úvod</a>
+      <a href="katalog.html" class="hover:text-primary-500">📦 Všechny regály</a>
+      <a href="o-nas.html" class="hover:text-primary-500">ℹ️ O nás</a>
+      <a href="faq.html" class="hover:text-primary-500">❓ FAQ</a>
+      <a href="kontakt.html" class="hover:text-primary-500">📧 Kontakt</a>
+    </nav>
+    <button class="flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-lg">
+      🛒 Košík <span class="bg-white text-primary-600 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- Breadcrumb -->
+<nav class="bg-white border-b">
+  <div class="container mx-auto px-4 py-3 text-sm">
+    <ol class="flex items-center gap-2 text-gray-500">
+      <li><a href="index.html" class="hover:text-primary-500">Úvod</a></li>
+      <span>›</span>
+      <li><a href="katalog.html" class="hover:text-primary-500">Kovové regály</a></li>
+      <span>›</span>
+      <li class="text-gray-900 font-medium truncate max-w-xs">Regál 220×70×30 cm bílá</li>
+    </ol>
+  </div>
+</nav>
+
+<main class="container mx-auto px-4 py-8">
+
+  <!-- Product Info -->
+  <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
+
+    <!-- Left Column - Images -->
+    <div>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full pulse-badge">🔥 VÝPRODEJ -75%</span>
+        <span class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">✓ Skladem</span>
+      </div>
+
+      <!-- Main Image -->
+      <div class="relative bg-white rounded-2xl p-6 shadow-sm mb-4">
+        <img id="mainImage" src="https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg" alt="Regál 2200x700x300 mm lakovaný 5-policový, nosnost 875 kg - bílá" class="product-image w-full">
+      </div>
+
+      <!-- Video -->
+      <div class="bg-white rounded-2xl shadow-sm overflow-hidden p-4">
+        <h3 class="font-bold mb-3">🎬 Video - montáž regálu</h3>
+        <div class="video-wrapper">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/BBjY5IomYkk" title="Video - montáž regálu" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
       </div>
     </div>
 
-    <!-- Product Info -->
+    <!-- Right Column - Product Details -->
     <div>
-      <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Regál 220×70×30 cm bílá</h1>
+      <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+        Regál 2200x700x300 mm lakovaný 5-policový, nosnost 875 kg - bílá
+      </h1>
 
-      <div class="flex items-baseline gap-4 mb-6">
-        <span class="text-4xl font-black text-primary-600">799 Kč</span>
-        <span class="text-xl text-gray-400 line-through">3196 Kč</span>
-        <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full font-bold">Ušetříte 2397 Kč</span>
-      </div>
-
-      <!-- Key Features -->
-      <div class="grid grid-cols-2 gap-4 mb-8">
-        <div class="bg-gray-50 rounded-xl p-4">
-          <div class="text-sm text-gray-500">Rozměry</div>
-          <div class="text-lg font-bold">220 × 70 × 30 cm</div>
-        </div>
-        <div class="bg-gray-50 rounded-xl p-4">
-          <div class="text-sm text-gray-500">Nosnost celkem</div>
-          <div class="text-lg font-bold">875 kg</div>
-        </div>
-        <div class="bg-gray-50 rounded-xl p-4">
-          <div class="text-sm text-gray-500">Počet polic</div>
-          <div class="text-lg font-bold">5 ks</div>
-        </div>
-        <div class="bg-gray-50 rounded-xl p-4">
-          <div class="text-sm text-gray-500">Povrch</div>
-          <div class="text-lg font-bold">Lakovaný</div>
+      <div class="flex items-center gap-4 mb-4">
+        <div class="flex items-center gap-1">
+          <span class="text-yellow-400 text-lg">★★★★★</span>
+          <span class="font-medium">4.8</span>
+          <a href="#reviews" class="text-primary-500 hover:underline text-sm">(127 recenzí)</a>
         </div>
       </div>
 
-      <!-- CTA Button -->
-      <a href="https://www.vyprodej-regalu.cz/p/regal-220x70x30-cm-bila?utm_source=bazarovyregal&utm_medium=affiliate&utm_campaign=detail-regal-220x70x30-bila"
-         target="_blank"
-         class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white py-4 rounded-xl font-bold text-lg transition-colors mb-4">
-        🛒 Koupit za 799 Kč
-      </a>
+      <p class="text-gray-600 mb-6">
+        Robustní kovový regál do domácnosti i dílny. 5 nastavitelných polic s nosností 175 kg každá.
+        Bezšroubová montáž za 10 minut bez nářadí. Ideální pro garáž, spíž, sklep nebo kancelář.
+      </p>
+
+      <!-- Price Section -->
+      <div class="bg-gradient-to-r from-primary-50 to-orange-50 rounded-xl p-6 mb-6">
+        <div class="flex items-baseline gap-3 mb-2">
+          <span class="text-4xl font-extrabold text-primary-600">809 Kč</span>
+          <span class="text-xl text-gray-400 line-through">3236 Kč</span>
+          <span class="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">-75%</span>
+        </div>
+        <div class="text-sm text-gray-500 mb-3">
+          Cena bez DPH: 669 Kč | <span class="text-green-600 font-medium">Ušetříte 2427 Kč</span>
+        </div>
+
+        <div class="flex items-center gap-4 text-sm">
+          <div class="flex items-center gap-2 text-green-600">
+            <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+            <span class="font-medium">Skladem</span>
+          </div>
+          <span class="text-gray-400">|</span>
+          <span class="text-orange-600">🔥 Za posledních 24h koupilo 23 lidí</span>
+        </div>
+      </div>
+
+      <!-- Key Specs Quick View -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+          <div class="text-2xl mb-1">📏</div>
+          <div class="text-xs text-gray-500">Rozměry</div>
+          <div class="font-bold">220×70×30 cm</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+          <div class="text-2xl mb-1">⚖️</div>
+          <div class="text-xs text-gray-500">Celk. nosnost</div>
+          <div class="font-bold">875 kg</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+          <div class="text-2xl mb-1">📚</div>
+          <div class="text-xs text-gray-500">Počet polic</div>
+          <div class="font-bold">5 ks</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+          <div class="text-2xl mb-1">🎨</div>
+          <div class="text-xs text-gray-500">Povrch</div>
+          <div class="font-bold">Lakovaný</div>
+        </div>
+      </div>
+
+      <!-- Quantity & Add to Cart -->
+      <div class="flex gap-4 mb-6">
+        <div class="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
+          <button onclick="changeQty(-1)" class="px-4 py-3 hover:bg-gray-100 text-xl font-bold">−</button>
+          <input type="number" id="qty" value="1" min="1" class="w-16 text-center border-x-2 py-3 text-lg font-medium">
+          <button onclick="changeQty(1)" class="px-4 py-3 hover:bg-gray-100 text-xl font-bold">+</button>
+        </div>
+        <button onclick="addToCart()" class="flex-1 bg-primary-500 hover:bg-primary-600 text-white py-4 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] shadow-lg shadow-primary-200 flex items-center justify-center gap-3">
+          <span class="text-2xl">🛒</span>
+          <span>Do košíku</span>
+        </button>
+      </div>
 
       <!-- Trust Badges -->
-      <div class="flex flex-wrap gap-3 mb-8">
-        <div class="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg text-sm">
-          <span>✓</span> 7 let záruka
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex items-center gap-3 bg-green-50 rounded-xl p-3">
+          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-xl">🚚</div>
+          <div>
+            <div class="font-medium text-sm">Doprava od 99 Kč</div>
+            <div class="text-xs text-gray-500">Expedujeme ihned</div>
+          </div>
         </div>
-        <div class="flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm">
-          <span>✓</span> Doprava od 99 Kč
+        <div class="flex items-center gap-3 bg-blue-50 rounded-xl p-3">
+          <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">🛡️</div>
+          <div>
+            <div class="font-medium text-sm">Záruka 7 let</div>
+            <div class="text-xs text-gray-500">Na celý regál</div>
+          </div>
         </div>
-        <div class="flex items-center gap-2 bg-purple-50 text-purple-700 px-4 py-2 rounded-lg text-sm">
-          <span>✓</span> Expedice do 24h
+        <div class="flex items-center gap-3 bg-purple-50 rounded-xl p-3">
+          <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-xl">↩️</div>
+          <div>
+            <div class="font-medium text-sm">14 dní na vrácení</div>
+            <div class="text-xs text-gray-500">Bez udání důvodu</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 bg-orange-50 rounded-xl p-3">
+          <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-xl">🔧</div>
+          <div>
+            <div class="font-medium text-sm">Snadná montáž</div>
+            <div class="text-xs text-gray-500">Za 10 minut bez nářadí</div>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Description -->
-      <div class="prose prose-gray max-w-none">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">Popis produktu</h2>
-        <p class="text-gray-600 mb-4">
-          <strong>Regál 220×70×30 cm bílá</strong> je kvalitní lakovaný kovový regál ideální do domácnosti, kanceláře nebo skladu.
-          S celkovou nosností <strong>875 kg</strong> a <strong>5 nastavitelnými policemi</strong>
-          pojme vše, co potřebujete uložit.
-        </p>
-        <p class="text-gray-600 mb-4">
-          Rozměry <strong>220 × 70 × 30 cm</strong> (V×Š×H) zajišťují optimální využití prostoru.
-          Lakovaný povrch v bílá barvě krásně doplní interiér.
+  <!-- Tabs Section -->
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-12">
+    <div class="border-b flex overflow-x-auto">
+      <button onclick="showTab('description')" class="tab-btn px-6 py-4 font-medium text-gray-600 hover:text-primary-500 whitespace-nowrap tab-active" data-tab="description">📝 Popis</button>
+      <button onclick="showTab('specs')" class="tab-btn px-6 py-4 font-medium text-gray-600 hover:text-primary-500 whitespace-nowrap" data-tab="specs">📋 Parametry</button>
+      <button onclick="showTab('dimensions')" class="tab-btn px-6 py-4 font-medium text-gray-600 hover:text-primary-500 whitespace-nowrap" data-tab="dimensions">📐 Rozměry</button>
+      <button onclick="showTab('assembly')" class="tab-btn px-6 py-4 font-medium text-gray-600 hover:text-primary-500 whitespace-nowrap" data-tab="assembly">🔧 Montáž</button>
+      <button onclick="showTab('reviews')" class="tab-btn px-6 py-4 font-medium text-gray-600 hover:text-primary-500 whitespace-nowrap" data-tab="reviews">⭐ Recenze (127)</button>
+      <button onclick="showTab('faq')" class="tab-btn px-6 py-4 font-medium text-gray-600 hover:text-primary-500 whitespace-nowrap" data-tab="faq">❓ Dotazy</button>
+    </div>
+
+    <div class="p-6 lg:p-8">
+
+      <!-- Description Tab -->
+      <div id="tab-description" class="tab-content">
+        <h2 class="text-2xl font-bold mb-4">Profesionální kovový regál pro náročné použití</h2>
+        <p class="text-lg text-gray-600 mb-6">
+          Hledáte spolehlivé úložné řešení, které zvládne i těžší předměty a zároveň bude vypadat elegantně?
+          Náš regál 220×70×30 cm je přesně to, co potřebujete. Díky celkové nosnosti
+          <strong>875 kg</strong> a <strong>5 nastavitelným policím</strong> pojme vše od knih přes nářadí až po těžké krabice.
         </p>
 
-        <h3 class="text-lg font-bold text-gray-900 mt-6 mb-3">Vlastnosti</h3>
-        <ul class="list-disc list-inside text-gray-600 space-y-1">
-          <li>Nosnost na polici: 175 kg</li>
-          <li>Bezšroubová montáž - sestavíte za 10 minut</li>
-          <li>Nastavitelná výška polic</li>
-          <li>Robustní ocelová konstrukce</li>
-          <li>Záruka 7 let</li>
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+          <div class="flex gap-4 bg-gray-50 rounded-xl p-5">
+            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">💪</div>
+            <div>
+              <h3 class="font-bold mb-1">Vysoká nosnost 175 kg/polici</h3>
+              <p class="text-sm text-gray-600">Každá z 5 polic unese až 175 kg. Celkem tedy 875 kg na celý regál.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 bg-gray-50 rounded-xl p-5">
+            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">⚡</div>
+            <div>
+              <h3 class="font-bold mb-1">Bezšroubová montáž za 10 minut</h3>
+              <p class="text-sm text-gray-600">Systém zapadacích spojek nevyžaduje šrouby ani nářadí.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 bg-gray-50 rounded-xl p-5">
+            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">🎨</div>
+            <div>
+              <h3 class="font-bold mb-1">Odolný lakovaný povrch</h3>
+              <p class="text-sm text-gray-600">Kvalitní povrchová úprava chrání před korozí a zaručuje dlouhou životnost.</p>
+            </div>
+          </div>
+          <div class="flex gap-4 bg-gray-50 rounded-xl p-5">
+            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">📏</div>
+            <div>
+              <h3 class="font-bold mb-1">Nastavitelná výška polic</h3>
+              <p class="text-sm text-gray-600">Police můžete nastavit po 5 cm podle potřeby.</p>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-bold mb-3">Pro koho je tento regál vhodný?</h3>
+        <ul class="space-y-2 text-gray-600 mb-6">
+          <li class="flex items-start gap-2"><span class="text-primary-500">✓</span> <strong>Garáž a dílnu</strong> – uložte nářadí, barvy, chemii i náhradní díly</li>
+          <li class="flex items-start gap-2"><span class="text-primary-500">✓</span> <strong>Spíž a sklep</strong> – konzervace, zavařeniny, víno a potraviny na jednom místě</li>
+          <li class="flex items-start gap-2"><span class="text-primary-500">✓</span> <strong>Kancelář a archiv</strong> – šanony, dokumenty a kancelářské potřeby</li>
+          <li class="flex items-start gap-2"><span class="text-primary-500">✓</span> <strong>Šatnu a komoru</strong> – boxy s oblečením, boty, sezónní věci</li>
+          <li class="flex items-start gap-2"><span class="text-primary-500">✓</span> <strong>Sklad e-shopu</strong> – rychlý přístup ke zboží a přehledná organizace</li>
         </ul>
+
+        <div class="bg-gray-50 rounded-xl p-6">
+          <h3 class="font-bold text-lg mb-4 flex items-center gap-2">📦 Co je v balení</h3>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-sm font-bold">4×</span><span>Sloupky (stojny) 220 cm</span></div>
+            <div class="flex items-center gap-3"><span class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-sm font-bold">5×</span><span>Police 70×30 cm</span></div>
+            <div class="flex items-center gap-3"><span class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-sm font-bold">20×</span><span>Spojovací příčky</span></div>
+            <div class="flex items-center gap-3"><span class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-sm font-bold">1×</span><span>Návod k montáži</span></div>
+          </div>
+        </div>
       </div>
+
+      <!-- Specifications Tab -->
+      <div id="tab-specs" class="tab-content hidden">
+        <h2 class="text-2xl font-bold mb-6">Technické parametry</h2>
+
+        <!-- Dimension Visualization -->
+        <div class="bg-gradient-to-br from-orange-50 to-primary-50 rounded-2xl p-6 mb-8">
+          <h3 class="font-bold text-lg mb-4">📐 Vizualizace rozměrů</h3>
+          <div class="flex flex-col lg:flex-row gap-8 items-center">
+            <div class="flex-shrink-0">
+              <svg viewBox="0 0 300 400" class="w-64 h-80">
+                <rect x="50" y="20" width="120" height="340" fill="none" stroke="#374151" stroke-width="3"></rect>
+                <line x1="50" y1="88" x2="170" y2="88" stroke="#374151" stroke-width="2"></line>
+                <line x1="50" y1="156" x2="170" y2="156" stroke="#374151" stroke-width="2"></line>
+                <line x1="50" y1="224" x2="170" y2="224" stroke="#374151" stroke-width="2"></line>
+                <line x1="50" y1="292" x2="170" y2="292" stroke="#374151" stroke-width="2"></line>
+                <line x1="25" y1="20" x2="25" y2="360" stroke="#ef4444" stroke-width="3"></line>
+                <line x1="18" y1="20" x2="32" y2="20" stroke="#ef4444" stroke-width="2"></line>
+                <line x1="18" y1="360" x2="32" y2="360" stroke="#ef4444" stroke-width="2"></line>
+                <text x="12" y="195" fill="#ef4444" font-size="14" font-weight="bold" transform="rotate(-90 12 195)">220 cm</text>
+                <line x1="50" y1="380" x2="170" y2="380" stroke="#3b82f6" stroke-width="3"></line>
+                <line x1="50" y1="373" x2="50" y2="387" stroke="#3b82f6" stroke-width="2"></line>
+                <line x1="170" y1="373" x2="170" y2="387" stroke="#3b82f6" stroke-width="2"></line>
+                <text x="85" y="398" fill="#3b82f6" font-size="14" font-weight="bold">70 cm</text>
+                <line x1="180" y1="350" x2="230" y2="320" stroke="#22c55e" stroke-width="3"></line>
+                <polygon points="230,320 220,325 222,315" fill="#22c55e"></polygon>
+                <text x="200" y="310" fill="#22c55e" font-size="14" font-weight="bold">30 cm</text>
+              </svg>
+            </div>
+            <div class="flex-1 space-y-4">
+              <div class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <span class="text-red-500 font-bold text-lg">V</span>
+                </div>
+                <div class="flex-1">
+                  <div class="text-sm text-gray-500">Výška (od podlahy po vrch)</div>
+                  <div class="text-2xl font-bold text-red-500">220 cm</div>
+                </div>
+                <div class="text-gray-400 text-sm">= 2200 mm</div>
+              </div>
+              <div class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span class="text-blue-500 font-bold text-lg">Š</span>
+                </div>
+                <div class="flex-1">
+                  <div class="text-sm text-gray-500">Šířka (mezi stojnami)</div>
+                  <div class="text-2xl font-bold text-blue-500">70 cm</div>
+                </div>
+                <div class="text-gray-400 text-sm">= 700 mm</div>
+              </div>
+              <div class="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <span class="text-green-500 font-bold text-lg">H</span>
+                </div>
+                <div class="flex-1">
+                  <div class="text-sm text-gray-500">Hloubka (od zdi)</div>
+                  <div class="text-2xl font-bold text-green-500">30 cm</div>
+                </div>
+                <div class="text-gray-400 text-sm">= 300 mm</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+          <div>
+            <h3 class="font-bold text-lg mb-4">📐 Rozměry a konstrukce</h3>
+            <table class="w-full">
+              <tbody>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Výška</td><td class="py-3 px-4 font-medium text-right">2200 mm (220 cm)</td></tr>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Šířka</td><td class="py-3 px-4 font-medium text-right">700 mm (70 cm)</td></tr>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Hloubka</td><td class="py-3 px-4 font-medium text-right">300 mm (30 cm)</td></tr>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Rozteč polic</td><td class="py-3 px-4 font-medium text-right">Nastavitelná po 50 mm</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg mb-4">⚖️ Nosnost</h3>
+            <table class="w-full">
+              <tbody>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Nosnost jedné police</td><td class="py-3 px-4 font-medium text-right">175 kg</td></tr>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Celková nosnost regálu</td><td class="py-3 px-4 font-medium text-right">875 kg</td></tr>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Počet polic</td><td class="py-3 px-4 font-medium text-right">5 ks</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg mb-4">🔩 Materiál a povrch</h3>
+            <table class="w-full">
+              <tbody>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Materiál konstrukce</td><td class="py-3 px-4 font-medium text-right">Ocelový plech</td></tr>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Povrchová úprava</td><td class="py-3 px-4 font-medium text-right">Lakovaný</td></tr>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Barva</td><td class="py-3 px-4 font-medium text-right">Bílá</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg mb-4">📦 Ostatní údaje</h3>
+            <table class="w-full">
+              <tbody>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Typ montáže</td><td class="py-3 px-4 font-medium text-right">Bezšroubová</td></tr>
+                <tr class="spec-row"><td class="py-3 px-4 text-gray-600">Záruka</td><td class="py-3 px-4 font-medium text-right">7 let</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dimensions Tab -->
+      <div id="tab-dimensions" class="tab-content hidden">
+        <h2 class="text-2xl font-bold mb-6">Rozměrový nákres</h2>
+        <div class="grid lg:grid-cols-2 gap-8">
+          <div class="bg-gray-50 rounded-xl p-8">
+            <svg viewBox="0 0 400 450" class="w-full max-w-md mx-auto">
+              <rect x="100" y="50" width="180" height="360" fill="none" stroke="#374151" stroke-width="2"></rect>
+              <line x1="100" y1="122" x2="280" y2="122" stroke="#374151" stroke-width="2"></line>
+              <line x1="100" y1="194" x2="280" y2="194" stroke="#374151" stroke-width="2"></line>
+              <line x1="100" y1="266" x2="280" y2="266" stroke="#374151" stroke-width="2"></line>
+              <line x1="100" y1="338" x2="280" y2="338" stroke="#374151" stroke-width="2"></line>
+              <line x1="60" y1="50" x2="60" y2="410" stroke="#f97316" stroke-width="2"></line>
+              <line x1="55" y1="50" x2="65" y2="50" stroke="#f97316" stroke-width="2"></line>
+              <line x1="55" y1="410" x2="65" y2="410" stroke="#f97316" stroke-width="2"></line>
+              <text x="40" y="235" fill="#374151" font-size="14" font-weight="600" transform="rotate(-90 40 235)">220 cm</text>
+              <line x1="100" y1="430" x2="280" y2="430" stroke="#f97316" stroke-width="2"></line>
+              <line x1="100" y1="425" x2="100" y2="435" stroke="#f97316" stroke-width="2"></line>
+              <line x1="280" y1="425" x2="280" y2="435" stroke="#f97316" stroke-width="2"></line>
+              <text x="175" y="448" fill="#374151" font-size="14" font-weight="600">70 cm</text>
+              <text x="320" y="235" fill="#6b7280" font-size="12">Hloubka: 30 cm</text>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg mb-4">Detailní rozměry</h3>
+            <div class="space-y-4">
+              <div class="bg-white border rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-medium">Celková výška</span>
+                  <span class="text-xl font-bold text-primary-600">220 cm</span>
+                </div>
+                <div class="text-sm text-gray-500">Od podlahy po horní hranu</div>
+              </div>
+              <div class="bg-white border rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-medium">Šířka</span>
+                  <span class="text-xl font-bold text-primary-600">70 cm</span>
+                </div>
+                <div class="text-sm text-gray-500">Vnější rozměr mezi stojnami</div>
+              </div>
+              <div class="bg-white border rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="font-medium">Hloubka</span>
+                  <span class="text-xl font-bold text-primary-600">30 cm</span>
+                </div>
+                <div class="text-sm text-gray-500">Využitelná plocha police</div>
+              </div>
+              <div class="bg-primary-50 border border-primary-200 rounded-xl p-4">
+                <div class="flex items-center gap-3">
+                  <span class="text-2xl">💡</span>
+                  <div>
+                    <div class="font-medium">Tip: Změřte si prostor</div>
+                    <div class="text-sm text-gray-600">Nechte alespoň 5 cm volného místa okolo regálu.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assembly Tab -->
+      <div id="tab-assembly" class="tab-content hidden">
+        <h2 class="text-2xl font-bold mb-6">Montáž regálu</h2>
+
+        <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+          <div class="flex items-start gap-4">
+            <span class="text-3xl">⏱️</span>
+            <div>
+              <h3 class="font-bold text-lg text-green-800">Montáž za 10 minut bez nářadí!</h3>
+              <p class="text-green-700">Díky bezšroubovému systému je sestavení regálu hračka.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="font-bold text-lg mb-4">🎬 Video návod k montáži</h3>
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="video-wrapper">
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/BBjY5IomYkk" title="Video - montáž regálu" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="font-bold text-lg mb-4">Postup montáže</h3>
+            <ol class="space-y-4">
+              <li class="flex gap-4">
+                <span class="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</span>
+                <div><div class="font-medium">Položte 2 stojny na zem</div><div class="text-sm text-gray-500">Rovnoběžně vedle sebe</div></div>
+              </li>
+              <li class="flex gap-4">
+                <span class="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</span>
+                <div><div class="font-medium">Nasaďte příčky spodní police</div><div class="text-sm text-gray-500">Zaklapněte do otvorů</div></div>
+              </li>
+              <li class="flex gap-4">
+                <span class="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</span>
+                <div><div class="font-medium">Postavte konstrukci</div><div class="text-sm text-gray-500">Přidejte zbývající stojny</div></div>
+              </li>
+              <li class="flex gap-4">
+                <span class="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">4</span>
+                <div><div class="font-medium">Vložte police</div><div class="text-sm text-gray-500">Položte na příčky</div></div>
+              </li>
+              <li class="flex gap-4">
+                <span class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">✓</span>
+                <div><div class="font-medium">Hotovo!</div><div class="text-sm text-gray-500">Zkontrolujte stabilitu</div></div>
+              </li>
+            </ol>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg mb-4">Tipy pro montáž</h3>
+            <div class="space-y-3">
+              <div class="flex items-start gap-3 bg-gray-50 rounded-lg p-4"><span class="text-xl">💡</span><p class="text-sm">Montáž provádějte ve dvou lidech.</p></div>
+              <div class="flex items-start gap-3 bg-gray-50 rounded-lg p-4"><span class="text-xl">💡</span><p class="text-sm">Použijte gumovou paličku pro doražení spojů.</p></div>
+              <div class="flex items-start gap-3 bg-gray-50 rounded-lg p-4"><span class="text-xl">💡</span><p class="text-sm">Pro stabilitu přikotvěte regál ke zdi.</p></div>
+              <div class="flex items-start gap-3 bg-gray-50 rounded-lg p-4"><span class="text-xl">💡</span><p class="text-sm">Těžké předměty umísťujte na spodní police.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Tab -->
+      <div id="tab-reviews" class="tab-content hidden">
+        <h2 class="text-2xl font-bold mb-6">Recenze zákazníků</h2>
+        <div class="flex items-center gap-4 mb-8">
+          <div class="text-5xl font-bold text-primary-600">4.8</div>
+          <div>
+            <div class="text-yellow-400 text-2xl">★★★★★</div>
+            <div class="text-gray-500">127 hodnocení</div>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-yellow-400">★★★★★</span>
+              <span class="font-medium">Pavel K.</span>
+              <span class="text-gray-400 text-sm">• před 3 dny</span>
+            </div>
+            <p class="text-gray-600">Skvělý regál za super cenu. Montáž opravdu jednoduchá, zvládl jsem sám za 15 minut.</p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-yellow-400">★★★★★</span>
+              <span class="font-medium">Marie S.</span>
+              <span class="text-gray-400 text-sm">• před týdnem</span>
+            </div>
+            <p class="text-gray-600">Regál vypadá přesně jako na fotce. Police jsou pevné a nosnost je dostatečná pro naše potřeby.</p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-yellow-400">★★★★☆</span>
+              <span class="font-medium">Tomáš H.</span>
+              <span class="text-gray-400 text-sm">• před 2 týdny</span>
+            </div>
+            <p class="text-gray-600">Kvalitní zpracování. Jediná výtka - instrukce mohly být podrobnější, ale video pomohlo.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Tab -->
+      <div id="tab-faq" class="tab-content hidden">
+        <h2 class="text-2xl font-bold mb-6">Časté dotazy</h2>
+        <div class="space-y-4 max-w-3xl">
+          <div class="faq-item border rounded-xl overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50">
+              <span class="font-medium">Jaká je skutečná nosnost police?</span>
+              <span class="faq-icon text-xl transition-transform">▼</span>
+            </button>
+            <div class="faq-answer px-5 pb-5">
+              <p class="text-gray-600">Nosnost 175 kg na polici platí při rovnoměrném rozložení zátěže.</p>
+            </div>
+          </div>
+          <div class="faq-item border rounded-xl overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50">
+              <span class="font-medium">Mohu regál použít ve vlhkém prostředí?</span>
+              <span class="faq-icon text-xl transition-transform">▼</span>
+            </button>
+            <div class="faq-answer px-5 pb-5">
+              <p class="text-gray-600">Lakovaný regál je vhodný do suchých a mírně vlhkých prostor. Pro vlhké prostředí doporučujeme zinkovanou variantu.</p>
+            </div>
+          </div>
+          <div class="faq-item border rounded-xl overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50">
+              <span class="font-medium">Jak dlouho trvá doručení?</span>
+              <span class="faq-icon text-xl transition-transform">▼</span>
+            </button>
+            <div class="faq-answer px-5 pb-5">
+              <p class="text-gray-600">Produkt je skladem, expedujeme ihned. Doručení trvá obvykle 2-3 pracovní dny.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <!-- Related Products -->
-  <section class="mt-16">
-    <h2 class="text-2xl font-bold text-gray-900 mb-6">Podobné produkty</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      
-        <a href="regal-150x70x30-bila.html" class="product-card bg-white rounded-xl overflow-hidden shadow-sm">
-          <div class="relative">
-            <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/v/v6903779a99ff1-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerny-pravy-15070304700black1.jpeg" alt="Regál 150×70×30 cm bílý" class="w-full aspect-square object-contain p-4 bg-gray-50">
-            <span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">-75%</span>
+  <section class="mb-12">
+    <h2 class="text-2xl font-bold mb-6">🔗 Podobné produkty</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <a href="regal-180x90x40-bila.html" class="product-card bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-lg transition-all block">
+        <div class="relative">
+          <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg" alt="Regál 180×90×40 cm bílá" class="product-image w-full p-4">
+          <span class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">-75%</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-medium text-sm mb-2 group-hover:text-primary-500">Regál 180×90×40 cm bílá</h3>
+          <div class="flex items-baseline gap-2">
+            <span class="text-xl font-bold text-primary-600">779 Kč</span>
+            <span class="text-sm text-gray-400 line-through">3116 Kč</span>
           </div>
-          <div class="p-4">
-            <h3 class="font-medium text-sm line-clamp-2 mb-2">Regál 150×70×30 cm bílý</h3>
-            <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-primary-600">599 Kč</span>
-              <span class="text-sm text-gray-400 line-through">2396 Kč</span>
-            </div>
+        </div>
+      </a>
+      <a href="regal-220x70x45-bila.html" class="product-card bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-lg transition-all block">
+        <div class="relative">
+          <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg" alt="Regál 220×70×45 cm bílá" class="product-image w-full p-4">
+          <span class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">-75%</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-medium text-sm mb-2 group-hover:text-primary-500">Regál 220×70×45 cm bílá</h3>
+          <div class="flex items-baseline gap-2">
+            <span class="text-xl font-bold text-primary-600">819 Kč</span>
+            <span class="text-sm text-gray-400 line-through">3276 Kč</span>
           </div>
-        </a>
-        <a href="regal-180x90x40-bila.html" class="product-card bg-white rounded-xl overflow-hidden shadow-sm">
-          <div class="relative">
-            <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg" alt="Regál 180×90×40 cm bílý" class="w-full aspect-square object-contain p-4 bg-gray-50">
-            <span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">-75%</span>
+        </div>
+      </a>
+      <a href="regal-220x70x50-cervena.html" class="product-card bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-lg transition-all block">
+        <div class="relative">
+          <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/c/c690377c0d46a4-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerveny-pravy-18090405875red1.jpeg" alt="Regál 220×70×50 cm červená" class="product-image w-full p-4">
+          <span class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">-75%</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-medium text-sm mb-2 group-hover:text-primary-500">Regál 220×70×50 cm červená</h3>
+          <div class="flex items-baseline gap-2">
+            <span class="text-xl font-bold text-primary-600">819 Kč</span>
+            <span class="text-sm text-gray-400 line-through">3276 Kč</span>
           </div>
-          <div class="p-4">
-            <h3 class="font-medium text-sm line-clamp-2 mb-2">Regál 180×90×40 cm bílý</h3>
-            <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-primary-600">739 Kč</span>
-              <span class="text-sm text-gray-400 line-through">2956 Kč</span>
-            </div>
+        </div>
+      </a>
+      <a href="regal-180x70x30-bila.html" class="product-card bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-lg transition-all block">
+        <div class="relative">
+          <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/6/6690a777ad6edc-1-18090405875white1.jpeg" alt="Regál 180×70×30 cm bílá" class="product-image w-full p-4">
+          <span class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">-75%</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-medium text-sm mb-2 group-hover:text-primary-500">Regál 180×70×30 cm bílá</h3>
+          <div class="flex items-baseline gap-2">
+            <span class="text-xl font-bold text-primary-600">749 Kč</span>
+            <span class="text-sm text-gray-400 line-through">2996 Kč</span>
           </div>
-        </a>
-        <a href="regal-220x90x45-černa.html" class="product-card bg-white rounded-xl overflow-hidden shadow-sm">
-          <div class="relative">
-            <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg" alt="Regál 220×90×45 cm černý" class="w-full aspect-square object-contain p-4 bg-gray-50">
-            <span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">-75%</span>
-          </div>
-          <div class="p-4">
-            <h3 class="font-medium text-sm line-clamp-2 mb-2">Regál 220×90×45 cm černý</h3>
-            <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-primary-600">899 Kč</span>
-              <span class="text-sm text-gray-400 line-through">3596 Kč</span>
-            </div>
-          </div>
-        </a>
-        <a href="regal-150x40x45-bila.html" class="product-card bg-white rounded-xl overflow-hidden shadow-sm">
-          <div class="relative">
-            <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg" alt="Regál 150×40×45 cm bílá" class="w-full aspect-square object-contain p-4 bg-gray-50">
-            <span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">-75%</span>
-          </div>
-          <div class="p-4">
-            <h3 class="font-medium text-sm line-clamp-2 mb-2">Regál 150×40×45 cm bílá</h3>
-            <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-primary-600">659 Kč</span>
-              <span class="text-sm text-gray-400 line-through">2636 Kč</span>
-            </div>
-          </div>
-        </a>
+        </div>
+      </a>
     </div>
   </section>
 
-  <!-- Internal Links -->
-  <section class="mt-12 bg-white rounded-xl p-6 shadow-sm">
-    <h2 class="text-lg font-bold text-gray-900 mb-4">Další kategorie</h2>
-    <div class="flex flex-wrap gap-3">
-      <a href="regaly-do-garaze.html" class="px-4 py-2 bg-gray-100 hover:bg-primary-100 rounded-lg text-sm font-medium">Regály do garáže</a>
-      <a href="regaly-do-sklepa.html" class="px-4 py-2 bg-gray-100 hover:bg-primary-100 rounded-lg text-sm font-medium">Regály do sklepa</a>
-      <a href="zinkove-regaly.html" class="px-4 py-2 bg-gray-100 hover:bg-primary-100 rounded-lg text-sm font-medium">Zinkové regály</a>
-      <a href="slovnik.html" class="px-4 py-2 bg-gray-100 hover:bg-primary-100 rounded-lg text-sm font-medium">Slovník pojmů</a>
-      <a href="jak-vybrat-regal-do-garaze.html" class="px-4 py-2 bg-gray-100 hover:bg-primary-100 rounded-lg text-sm font-medium">Jak vybrat regál</a>
-    </div>
-  </section>
 </main>
 
-<!-- FOOTER -->
-<footer class="bg-gray-900 text-gray-400 py-12 mt-16">
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-12 mt-12">
   <div class="container mx-auto px-4">
     <div class="grid md:grid-cols-4 gap-8 mb-8">
       <div>
-        <div class="flex items-center gap-2 mb-4">
-          <div class="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
-            <span class="text-white text-xl">🏭</span>
-          </div>
-          <span class="text-white font-bold text-xl">Bazarovyregal.cz</span>
-        </div>
-        <p class="text-sm">Specialista na kovové regály. Likvidace skladu s nejlepšími cenami v ČR.</p>
+        <div class="text-xl font-bold mb-4">Bazarovyregal<span class="text-primary-500">.cz</span></div>
+        <p class="text-gray-400 text-sm">Největší slevy na regály. Pouze nové a nerozbalené zboží.</p>
       </div>
       <div>
-        <h4 class="text-white font-bold mb-4">Kategorie</h4>
-        <ul class="space-y-2 text-sm">
-          <li><a href="regaly-do-garaze.html" class="hover:text-primary-500">Regály do garáže</a></li>
-          <li><a href="regaly-do-sklepa.html" class="hover:text-primary-500">Regály do sklepa</a></li>
-          <li><a href="zinkove-regaly.html" class="hover:text-primary-500">Zinkové regály</a></li>
-          <li><a href="katalog.html" class="hover:text-primary-500">Všechny regály</a></li>
+        <h4 class="font-bold mb-4">Kategorie</h4>
+        <ul class="space-y-2 text-gray-400 text-sm">
+          <li><a href="regaly-do-garaze.html" class="hover:text-primary-400">Regály do garáže</a></li>
+          <li><a href="regaly-do-sklepa.html" class="hover:text-primary-400">Regály do sklepa</a></li>
+          <li><a href="zinkove-regaly.html" class="hover:text-primary-400">Zinkové regály</a></li>
         </ul>
       </div>
       <div>
-        <h4 class="text-white font-bold mb-4">Informace</h4>
-        <ul class="space-y-2 text-sm">
-          <li><a href="blog.html" class="hover:text-primary-500">Blog</a></li>
-          <li><a href="slovnik.html" class="hover:text-primary-500">Slovník pojmů</a></li>
-          <li><a href="o-nas.html" class="hover:text-primary-500">O nás</a></li>
-          <li><a href="faq.html" class="hover:text-primary-500">FAQ</a></li>
+        <h4 class="font-bold mb-4">Informace</h4>
+        <ul class="space-y-2 text-gray-400 text-sm">
+          <li><a href="o-nas.html" class="hover:text-primary-400">O nás</a></li>
+          <li><a href="faq.html" class="hover:text-primary-400">FAQ</a></li>
+          <li><a href="kontakt.html" class="hover:text-primary-400">Kontakt</a></li>
         </ul>
       </div>
       <div>
-        <h4 class="text-white font-bold mb-4">Kontakt</h4>
-        <p class="text-sm">info@bazarovyregal.cz</p>
-        <p class="text-sm mt-2">Po-Pá: 8:00 - 16:00</p>
+        <h4 class="font-bold mb-4">Kontakt</h4>
+        <ul class="space-y-2 text-gray-400 text-sm">
+          <li>✉️ info@bazarovyregal.cz</li>
+        </ul>
       </div>
     </div>
-    <div class="border-t border-gray-800 pt-8 text-center text-sm">
-      <p>© 2025 Bazarovyregal.cz - Všechna práva vyhrazena</p>
+    <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
+      © 2026 Bazarovyregal.cz - Všechna práva vyhrazena
     </div>
   </div>
 </footer>
+
+<script>
+// Sticky bar
+window.addEventListener('scroll', () => {
+  const stickyBar = document.getElementById('stickyBar');
+  if (window.scrollY > 500) {
+    stickyBar.classList.add('visible');
+  } else {
+    stickyBar.classList.remove('visible');
+  }
+});
+
+// Quantity
+function changeQty(delta) {
+  const input = document.getElementById('qty');
+  input.value = Math.max(1, parseInt(input.value) + delta);
+}
+
+// Add to Cart - redirects to vyprodej-regalu.cz
+function addToCart() {
+  const qty = document.getElementById('qty').value;
+  const url = `https://www.vyprodej-regalu.cz/p/regal-2200x700x300-mm-lakovany-5-policovy-nosnost-875-kg-bily?addtocart=1&quantity=${qty}&return=cart&utm_source=bazarovyregal&utm_medium=affiliate&utm_campaign=detail`;
+  window.open(url, '_blank');
+}
+
+// Tabs
+function showTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+  document.getElementById('tab-' + tabId).classList.remove('hidden');
+  document.querySelector(`[data-tab="${tabId}"]`).classList.add('tab-active');
+}
+
+// FAQ
+function toggleFaq(btn) {
+  btn.closest('.faq-item').classList.toggle('open');
+}
+</script>
 
 </body>
 </html>
