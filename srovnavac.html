@@ -2,6 +2,8 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
+  <link rel="canonical" href="https://bazarovyregal.cz/srovnavac.html">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Srovnávač regálů - Porovnejte až 4 regály | Bazarovyregal.cz</title>
   <meta name="description" content="Porovnejte parametry, ceny a vlastnosti regálů vedle sebe. Najděte ideální regál pro vaše potřeby.">
@@ -80,6 +82,14 @@
   ]
 }
   </script>
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://vyprodej-regalucz.s26.cdn-upgates.com">
+  <link rel="dns-prefetch" href="https://www.youtube.com">
+  <meta name="theme-color" content="#f97316">
 </head>
 <body class="bg-gray-50">
 
@@ -387,7 +397,7 @@ function renderComparison(items) {
   const rows = [
     {
       label: 'Obrázek',
-      values: items.map(p => `<img src="${p.image}" alt="${p.name}" class="product-image w-32 h-32 mx-auto bg-gray-100 rounded-lg">`),
+      values: items.map(p => `<img src="${p.image}" loading="lazy" alt="${p.name}" class="product-image w-32 h-32 mx-auto bg-gray-100 rounded-lg">`),
       type: 'image'
     },
     {

@@ -2,6 +2,8 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
+  <link rel="canonical" href="https://bazarovyregal.cz/katalog.html">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Všechny regály - 102 produktů skladem | Bazarovyregal.cz</title>
   <meta name="description" content="Kompletní nabídka kovových regálů. 102 typů skladem, doprava od 99 Kč. Filtry podle barvy, rozměrů, nosnosti. Likvidace skladu - slevy až 50%.">
@@ -35,6 +37,14 @@
     .pulse-dot { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
   </style>
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://vyprodej-regalucz.s26.cdn-upgates.com">
+  <link rel="dns-prefetch" href="https://www.youtube.com">
+  <meta name="theme-color" content="#f97316">
 </head>
 <body class="bg-gray-50">
 
@@ -541,7 +551,7 @@ function renderGridCard(p) {
     <div class="product-card bg-white rounded-xl overflow-hidden shadow-sm">
       <div class="relative">
         <a href="${productUrl}">
-          <img src="${p.image}" alt="${p.name}" class="w-full aspect-square object-contain p-4 bg-gray-50">
+          <img src="${p.image}" loading="lazy" alt="${p.name}" class="w-full aspect-square object-contain p-4 bg-gray-50">
         </a>
         <div class="absolute top-2 left-2 flex flex-col gap-1">
           <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">-${discount}%</span>
@@ -575,7 +585,7 @@ function renderListCard(p) {
     <div class="product-card bg-white rounded-xl overflow-hidden shadow-sm flex">
       <div class="w-48 flex-shrink-0 relative">
         <a href="${productUrl}">
-          <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain p-4 bg-gray-50">
+          <img src="${p.image}" loading="lazy" alt="${p.name}" class="w-full h-full object-contain p-4 bg-gray-50">
         </a>
         <span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">-${discount}%</span>
       </div>
@@ -796,7 +806,7 @@ function handleSearch(event) {
           <span class="bg-green-600 text-white text-xs px-2 py-0.5 rounded">Ověřená Kvalita</span>
           <span class="bg-teal-500 text-white text-xs px-2 py-0.5 rounded">Záruka 7 let</span>
         </div>
-        <img src="${topProduct.image}" alt="${topProduct.name}" class="w-full aspect-square object-contain bg-white rounded-lg mb-3">
+        <img src="${topProduct.image}" loading="lazy" alt="${topProduct.name}" class="w-full aspect-square object-contain bg-white rounded-lg mb-3">
         <h4 class="font-medium text-sm line-clamp-2 mb-1">${topProduct.name}</h4>
         <div class="text-green-600 text-xs mb-2">Skladem</div>
         <div class="mb-3">
@@ -817,7 +827,7 @@ function handleSearch(event) {
     <a href="${getProductUrl(p)}" class="flex gap-2 p-2 hover:bg-gray-50 rounded-lg group">
       <div class="relative flex-shrink-0">
         <span class="absolute -top-1 -left-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">Akce</span>
-        <img src="${p.image}" alt="${p.name}" class="w-16 h-16 object-contain bg-gray-100 rounded">
+        <img src="${p.image}" loading="lazy" alt="${p.name}" class="w-16 h-16 object-contain bg-gray-100 rounded">
       </div>
       <div class="flex-1 min-w-0">
         <div class="text-xs font-medium line-clamp-2 group-hover:text-primary-500 mb-1">${p.name}</div>
@@ -848,7 +858,7 @@ function renderDefaultSearch() {
           <span class="bg-green-600 text-white text-xs px-2 py-0.5 rounded">Ověřená Kvalita</span>
           <span class="bg-teal-500 text-white text-xs px-2 py-0.5 rounded">Záruka 7 let</span>
         </div>
-        <img src="${topProduct.image}" alt="${topProduct.name}" class="w-full aspect-square object-contain bg-white rounded-lg mb-3">
+        <img src="${topProduct.image}" loading="lazy" alt="${topProduct.name}" class="w-full aspect-square object-contain bg-white rounded-lg mb-3">
         <h4 class="font-medium text-sm line-clamp-2 mb-1">${topProduct.name}</h4>
         <div class="text-green-600 text-xs mb-2">Skladem</div>
         <div class="mb-3">
@@ -866,7 +876,7 @@ function renderDefaultSearch() {
     <a href="${getProductUrl(p)}" class="flex gap-2 p-2 hover:bg-gray-50 rounded-lg group">
       <div class="relative flex-shrink-0">
         <span class="absolute -top-1 -left-1 bg-green-600 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">Ověřená Kvalita</span>
-        <img src="${p.image}" alt="${p.name}" class="w-16 h-16 object-contain bg-gray-100 rounded">
+        <img src="${p.image}" loading="lazy" alt="${p.name}" class="w-16 h-16 object-contain bg-gray-100 rounded">
       </div>
       <div class="flex-1 min-w-0">
         <div class="text-xs font-medium line-clamp-2 group-hover:text-primary-500 mb-1">${p.name}</div>
@@ -933,7 +943,7 @@ function showNotification(product) {
   const notification = document.createElement('div');
   notification.className = 'notification-toast bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 max-w-sm';
   notification.innerHTML = `
-    <img src="${product.image}" alt="" class="w-12 h-12 object-contain bg-gray-100 rounded">
+    <img src="${product.image}" loading="lazy" alt="" class="w-12 h-12 object-contain bg-gray-100 rounded">
     <div>
       <div class="text-sm font-medium">Přidáno do košíku</div>
       <div class="text-xs text-gray-500">${product.name}</div>
@@ -958,7 +968,7 @@ function showLivePurchase() {
   const notification = document.createElement('div');
   notification.className = 'notification-toast bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 max-w-sm border-l-4 border-green-500';
   notification.innerHTML = `
-    <img src="${product.image}" alt="" class="w-12 h-12 object-contain bg-gray-100 rounded">
+    <img src="${product.image}" loading="lazy" alt="" class="w-12 h-12 object-contain bg-gray-100 rounded">
     <div>
       <div class="text-sm"><strong>${name}</strong> z města <strong>${city}</strong></div>
       <div class="text-xs text-gray-500">právě koupil(a) ${product.name}</div>
