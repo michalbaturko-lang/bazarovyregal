@@ -318,9 +318,28 @@
       </div>
 
       <!-- Main Image -->
-      <div class="relative bg-white rounded-2xl p-6 shadow-sm mb-4">
-        <img id="mainImage" src="https://vyprodej-regalucz.s26.cdn-upgates.com/o/o690df135051a1-01-1801605041200bo2.jpg" loading="lazy" alt="Regál 1800x1200x500 mm lakovaný 5-policový, nosnost 1050 kg - profesionální" class="product-image w-full">
+      
+      <!-- New Gallery Layout: Big Left, Thumbnails Right -->
+      <div class="flex gap-3">
+        <!-- Main Image - Left (Large) -->
+        <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm">
+          <img id="mainImage" src="https://vyprodej-regalucz.s26.cdn-upgates.com/o/o690df135051a1-01-1801605041200bo2.jpg" loading="lazy" alt="Regál 1800x1200x500 mm lakovaný 5-policový, nosnost 1050 kg - profesionální" class="product-image w-full h-auto max-h-[500px] object-contain cursor-zoom-in" onclick="openLightbox(this.src)">
+        </div>
+
+        <!-- Thumbnails - Right (Vertical Stack) -->
+        <div class="flex flex-col gap-2 w-24">
+          <button onclick="changeImage('https://vyprodej-regalucz.s26.cdn-upgates.com/o/o690df135051a1-01-1801605041200bo2.jpg')" class="thumbnail-btn aspect-square border-2 border-primary-500 rounded-lg overflow-hidden p-1 bg-white hover:shadow-md transition-all">
+            <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/o/o690df135051a1-01-1801605041200bo2.jpg" alt="Produktová fotka" class="thumbnail w-full h-full object-contain">
+          </button>
+          <button onclick="changeImage('/lifestyle_photos/garage_zinkovany.png')" class="thumbnail-btn aspect-square border-2 border-gray-200 hover:border-primary-300 rounded-lg overflow-hidden p-1 bg-white hover:shadow-md transition-all">
+            <img src="/lifestyle_photos/garage_zinkovany.png" alt="Regál v garáži" class="thumbnail w-full h-full object-cover">
+          </button>
+          <button onclick="changeImage('/lifestyle_photos/basement_zinkovany.png')" class="thumbnail-btn aspect-square border-2 border-gray-200 hover:border-primary-300 rounded-lg overflow-hidden p-1 bg-white hover:shadow-md transition-all">
+            <img src="/lifestyle_photos/basement_zinkovany.png" alt="Regál ve sklepě" class="thumbnail w-full h-full object-cover">
+          </button>
+        </div>
       </div>
+
 
       <!-- Video -->
       <div class="bg-white rounded-2xl shadow-sm overflow-hidden p-4">

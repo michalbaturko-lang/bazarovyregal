@@ -318,18 +318,28 @@
       </div>
 
       <!-- Main Image -->
-      <div class="relative bg-white rounded-2xl p-6 shadow-sm mb-4">
-        <img id="mainImage" src="https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg" loading="lazy" alt="Regál 1500x600x300 mm lakovaný 4-policový, nosnost 700 kg - černá" class="product-image w-full">
+      
+      <!-- New Gallery Layout: Big Left, Thumbnails Right -->
+      <div class="flex gap-3">
+        <!-- Main Image - Left (Large) -->
+        <div class="flex-1 bg-white rounded-2xl p-4 shadow-sm">
+          <img id="mainImage" src="https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg" loading="lazy" alt="Regál 1500x600x300 mm lakovaný 4-policový, nosnost 700 kg - černá" class="product-image w-full h-auto max-h-[500px] object-contain cursor-zoom-in" onclick="openLightbox(this.src)">
+        </div>
+
+        <!-- Thumbnails - Right (Vertical Stack) -->
+        <div class="flex flex-col gap-2 w-24">
+          <button onclick="changeImage('https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg')" class="thumbnail-btn aspect-square border-2 border-primary-500 rounded-lg overflow-hidden p-1 bg-white hover:shadow-md transition-all">
+            <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg" alt="Produktová fotka" class="thumbnail w-full h-full object-contain">
+          </button>
+          <button onclick="changeImage('/lifestyle_photos/office_cerny.png')" class="thumbnail-btn aspect-square border-2 border-gray-200 hover:border-primary-300 rounded-lg overflow-hidden p-1 bg-white hover:shadow-md transition-all">
+            <img src="/lifestyle_photos/office_cerny.png" alt="Černý regál v kanceláři" class="thumbnail w-full h-full object-cover">
+          </button>
+          <button onclick="changeImage('/lifestyle_photos/living_room_cerny.png')" class="thumbnail-btn aspect-square border-2 border-gray-200 hover:border-primary-300 rounded-lg overflow-hidden p-1 bg-white hover:shadow-md transition-all">
+            <img src="/lifestyle_photos/living_room_cerny.png" alt="Černý regál v obývacím pokoji" class="thumbnail w-full h-full object-cover">
+          </button>
+        </div>
       </div>
-      <!-- Thumbnail Gallery -->
-      <div class="flex gap-2 mt-4">
-        <button onclick="changeImage('https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg')" class="thumbnail-btn w-20 h-20 border-2 border-primary-500 rounded-lg overflow-hidden p-1 bg-white">
-          <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/l/l690377af7480a-1-regal-1800x900x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18090405875black1.jpeg" alt="Produktová fotka" class="thumbnail w-full h-full object-contain">
-        </button>
-        <button onclick="changeImage('/lifestyle_photos/living_room_cerny.png')" class="thumbnail-btn w-20 h-20 border-2 border-gray-200 hover:border-primary-300 rounded-lg overflow-hidden p-1 bg-white">
-          <img src="/lifestyle_photos/living_room_cerny.png" alt="Černý regál jako knihovna v útulném obývacím pokoji" class="thumbnail w-full h-full object-cover">
-        </button>
-      </div>
+
 
 
       <!-- Video -->
