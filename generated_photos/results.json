@@ -1,154 +1,50 @@
 [
   {
     "scene": "garage_couple_tools",
-    "status": "no_url",
-    "data": {
-      "id": "019c27b2-de4c-72b8-b50d-56c27f301bb1",
-      "type": "text-to-image",
-      "ai_model": "nano-banana-pro",
-      "prompt": "A single sleek, modern METAL shelf with minimalist MDF boards rests against a well-organized garage wall, illuminated by soft natural daylight. The floor gleams with polished concrete, complemented by neatly arranged tools, toolboxes, and car tires stored on the shelf. Two young adults in casual clothes discuss projects, vibrant sunlight streaming in through a large window, creating a serene atmosphere.\n\nCRITICAL REQUIREMENTS:\n- The shelf MUST be METAL with MDF shelves - blue metal frame with orange MDF boards\n- Ultra photorealistic, 8K resolution, professional photography quality\n- Natural lighting with soft shadows and realistic reflections\n- Sharp details, high clarity, professional depth of field\n- Ultra-realistic facial features, skin texture, natural expressions on the people\n- Finely detailed textures on all surfaces",
-      "status": "SUCCEEDED",
-      "progress": 100,
-      "created_at": 1770192559714,
-      "started_at": 1770192559799,
-      "finished_at": 1770192576559,
-      "expires_at": 1770451776559,
-      "image_urls": [
-        "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b2-de4c-72b8-b50d-56c27f301bb1_0.png?Expires=1770451776&Signature=amRvXGzW9~BivyV6rJYUPCKW9toPahhJ7zIdoiW2n0lksIxIXZ6D5fYDXs~PajQaAGGa~bASYYLvXMjaEvrq0E6B7tm1ZCbYcY0dZFX6t~T8ib3DpP-itBiU-M0DmgWJzCHSRkP880J~HpX88l5HQghYjnV17gaaVuvm0aTJHTamT9lQCa-3P2h4MkGBg0oo~ptf46Y9yrcBV6taJQ8eCGUH~7GOqtWz8YoB9PWN78oWO5SEtVRZbvIp0qZpwdXSfvzCMEHQemrfqDdgJc2pexu8detzb2~asEXN0fZXlR2zkfm66bSAOBqIYtKLbWkPqA61HkMT1Y3XUJFpGssVbg__&Key-Pair-Id=KL5I0C8H7HX83"
-      ]
-    }
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b7-9fc2-7611-a612-ef66ee261407_0.png?Expires=1770452088&Signature=DaFJLTrTyyXl36wv4TAwMOMQlQ0Onv0gWwTr4cTEps5NsH~a2fkuJHb7tMlw-Ii2MB6fXNiSyOHIXQpxeoQ7QFfeOqoQqyqmC32L2Tk67O03dds~rbQDGRXLIi1OAUWCPjbp9YVrcc~2t9dCRoa2Qyso9TAr1jNoHf~WRyjFyrrD1~QZ3Ky-B5sBz8Um7adInTEr-0b3PPB3ouOZq6gi4kgyPtYzW~HFtjQXleyFzLKmjiR8kSCFkHuT0nfFHh5nm9upXvbOjt0Dhcg6dKqh2VF8AYBrLGxqQo4Flxl2tFJw6KJVOw66C0psk6ChOyodlMrNVkNGVTLq4n3qG8XJmQ__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos/garage_couple_tools.png"
   },
   {
     "scene": "garage_man_organizing",
-    "status": "no_url",
-    "data": {
-      "id": "019c27b3-4a44-7507-acaf-a4aedeb6f228",
-      "type": "text-to-image",
-      "ai_model": "nano-banana-pro",
-      "prompt": "A sturdy galvanized METAL storage shelf with MDF boards in a clean modern garage. The zinc-coated shelf holds organized plastic storage bins, power tools, and automotive supplies. Clean polished concrete floor, bright overhead LED lighting mixed with natural light from garage windows. A man in his 30s wearing casual jeans and t-shirt organizes items on the shelf, looking focused.\n\nCRITICAL REQUIREMENTS:\n- GALVANIZED/ZINC metal shelf with light wood MDF boards\n- Ultra photorealistic, 8K resolution, professional photography\n- Natural lighting, soft shadows, realistic reflections\n- Ultra-realistic facial features and natural expression\n- Professional interior photography quality",
-      "status": "SUCCEEDED",
-      "progress": 100,
-      "created_at": 1770192587348,
-      "started_at": 1770192587391,
-      "finished_at": 1770192603914,
-      "expires_at": 1770451803914,
-      "image_urls": [
-        "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b3-4a44-7507-acaf-a4aedeb6f228_0.png?Expires=1770451803&Signature=BoIf8SG3wBW6AZ-cELbHaXnJv3YW-dY3aoKYOmEibFZ7Hm65RJQaqd7FUz2MP71XeYENtte9uMm-AnqzSTpZf2tL~D~FVBfOnx6ZXipywYsBEUVMldBog8LDnW8E4bn4ILAYGF9vMxP6VDlmVJ2SRjXpHphgYjOaAOvWY9GWC~VgLfy1FU21cD~mjUFnDjJzrvlDbcbUeiErlVxgqvNezgnIzf37UG9SOJ3zE7bleBW7pjiqyax~~Rfb0ikYm~LmMQexWBu3UCbUAa3lW-KTdkDSy0NBowD-anpHgP~1Ogvt0usS6cSCByq-g~86wy1E-1oZFvekTd9gWS6dLjgTgQ__&Key-Pair-Id=KL5I0C8H7HX83"
-      ]
-    }
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b8-0df6-761d-9a6b-49685ceed915_0.png?Expires=1770452117&Signature=PJe3UmkhQi1dtpYcG0FalNcOsxmWCWXkXPw3-BgaP7KFqw1Af3NsXuWNMYrXJ689Y28tEFdxNL~56Y3saYnY9kRJV6zlW83nUzGjQZVS4tgREH~Cv4hqw3s3WsNWIvpSXVz9m-86R24ywwhI7ACsWhSb0jCApG6bualirXxZ0EMTwImftnA-WYvaUjCuyZjNmR8GeyD496F4T6Icm9FcwyJ3UQwnYVGun40zMB7yZLDQO1hvTHUk-bXUjQpBQqZvX6oR2VsXn6lD98g9l-a5IQ6AHy8ygRVYu7PB9~ryrXRxJTMU50wR99OMot-Z-ROE7POND5kRoAE9XnZJl0qWKg__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos/garage_man_organizing.png"
   },
   {
     "scene": "basement_couple_storage",
-    "status": "no_url",
-    "data": {
-      "id": "019c27b3-b66d-7530-b1e0-e10de99f5662",
-      "type": "text-to-image",
-      "ai_model": "nano-banana-pro",
-      "prompt": "A clean organized basement storage room with a galvanized METAL shelf unit. The zinc-coated shelf holds labeled storage boxes, seasonal decorations, and camping equipment. Neutral light concrete walls, bright ceiling LED lights. A young couple in casual weekend clothes sorting through items together, talking and smiling naturally.\n\nCRITICAL REQUIREMENTS:\n- GALVANIZED/ZINC metal shelf with MDF boards\n- Ultra photorealistic rendering, 8K quality\n- Bright, well-lit environment\n- Natural facial expressions, realistic skin textures\n- Professional lifestyle photography style",
-      "status": "SUCCEEDED",
-      "progress": 100,
-      "created_at": 1770192615035,
-      "started_at": 1770192615123,
-      "finished_at": 1770192630674,
-      "expires_at": 1770451830674,
-      "image_urls": [
-        "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b3-b66d-7530-b1e0-e10de99f5662_0.png?Expires=1770451830&Signature=o37hLMb9f5MYgeQ7vl~r2hQTnayiJSJEEhsHgDR6XQADGtUKr2ze~ZRKy2HZ2fJEaORpic5ko9eUsJ3HxoHpVReicHijFBTMjCrqKQQfnB1VHHUP~HC9p0gOfotX2TwCAGQVUaOX-FIwyZ0sfXyIOrV0kr6zBbiG59EiuP8PPB4WOpFQStTycjT42ZyWH-NgDAbIcmRLRkmqdA5uNuYSaq-CTLk6bCxggdS5LeOLi5-ikeRUeZl1dXEcAIg8JCwXoYUy0a3oHXO7f5mnK6PT9n1EGchKFOqsvZtxwKF8Qh~wUnKCpgrffYN9SvFyIe0MoWHeQFPpeqzyJoyW4cihEg__&Key-Pair-Id=KL5I0C8H7HX83"
-      ]
-    }
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b8-7bee-7e00-9c02-5685e834e341_0.png?Expires=1770452147&Signature=NjbCgYBoe0~glVQVxRt-xbbPIMciPB5PMxhWE4qSBNKKvbNeLqEsTwF6H~DxI58l0MNgXt0XdEeywmUSPVaVSShZ01~VhXRko6-EOetU3VFHZZGGA61QqXw9GHJbBFHGXAqq8fZDNDp0w1zzkjU7190lHhvOOTRWqCMV6ABTpHOBGZ5-HnGI4QzIsQV1fJ6IH0kbtpTB570dnNlzOxrSSCtGDiTo~rB~CgBUXt5AxKLY7sRflXihD-P4ePDSGoq9-XYqntVQ~7-pGX1LLVnzWRmOWrGaiU0PSn78qPH9uo6cl2apAdtMMCRMQc7wmUArI3ymhK4cuI63BoYLOx-bjg__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos/basement_couple_storage.png"
   },
   {
     "scene": "home_office_woman",
-    "status": "no_url",
-    "data": {
-      "id": "019c27b4-22be-72d7-88fb-a153745d66fb",
-      "type": "text-to-image",
-      "ai_model": "nano-banana-pro",
-      "prompt": "A sleek BLACK METAL shelf with light MDF boards in a bright modern home office. The shelf displays books, folders, decorative plants in white pots, and stylish office supplies. Large window with natural daylight, minimalist wooden desk nearby, Scandinavian interior design. A young professional woman in smart casual outfit works at the desk while the shelf provides organized storage behind her.\n\nCRITICAL REQUIREMENTS:\n- BLACK metal frame with light MDF shelf boards\n- Ultra photorealistic, 8K, professional interior photography\n- Soft natural lighting through window\n- Modern minimalist aesthetic\n- Realistic textures and materials",
-      "status": "SUCCEEDED",
-      "progress": 100,
-      "created_at": 1770192642764,
-      "started_at": 1770192643202,
-      "finished_at": 1770192664064,
-      "expires_at": 1770451864064,
-      "image_urls": [
-        "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b4-22be-72d7-88fb-a153745d66fb_0.png?Expires=1770451864&Signature=IGOEI5gBSbl~20Misj6XsVhP69v-GVCcvmygMZLvjr74echQ37JHOkkMIfhPqgWBL8gJahi18jKl3GBG~4J1U2f0~SqdYRrLQlWHxijggGae~uFg7vbN4B7wq-3vw9BjJReZVCFt7P52sWcycU9l9wcEZByT5Cq61ipGBUR2g45lDguq6CphSTFXDTr8neLWRLEDkPXqyA43GmOZrxAYwrB65j4NukzAMWSxdgaxzSULTMltJ0INpIYLgNpIWHuhvlEJ5tz3wxQsFUQBVsC~RSd9ng5Py8JIvOkYvkVUOmd7Hqdn3R450-HRlmx-y2oaoBvmFc0~uDD3YmSf6TiOxw__&Key-Pair-Id=KL5I0C8H7HX83"
-      ]
-    }
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b8-e9fa-735b-b55c-d7d0a7e89f8a_0.png?Expires=1770452174&Signature=YIZ2Wt5HZs1sGjpSiCJ8oOZPBGbJ~4w98TJ8PpIMUymLowcKsvoXC4n4N5HazR0NKoudU6sbm40VVVUcJqaArRmeRXpavGXcOuZQ7zP-ccEYsNUjWMl39cF2IK18u8ioEDKpEbN2YfBJhufWmzHsV1zSm1J8bzLokJxUrGmOYyctdMR-cwR5yAdkfE0S~OvwqPWfa7aIrCMzSymL7nPtfG7JZWiIm~eLt5TWtrLJT-HhKvexhbOOwlsNW3TiOaZLIN2mTwtk8fWUkx8Sw4csn0HtRi~4nIeVdwWjWEeDiCYIL067ZfpKJkUwbU4im2XCOo-35dGwLZoQkTogIOk8Ow__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos/home_office_woman.png"
   },
   {
     "scene": "workshop_professionals",
-    "status": "no_url",
-    "data": {
-      "id": "019c27b4-8e9e-7584-ab86-995b9afcb887",
-      "type": "text-to-image",
-      "ai_model": "nano-banana-pro",
-      "prompt": "A heavy-duty BLUE AND ORANGE METAL industrial storage rack in a professional automotive workshop. The robust shelf is loaded with heavy machinery parts, metal toolboxes, spray paint cans, and equipment. A technician in blue work clothes and safety glasses discusses with a colleague holding a tablet. Dramatic overhead industrial lighting creates professional atmosphere.\n\nCRITICAL REQUIREMENTS:\n- BLUE metal frame with ORANGE MDF shelf boards - industrial look\n- Ultra photorealistic, commercial photography style, 8K\n- Authentic workshop environment\n- Natural skin textures, realistic facial expressions\n- Professional lighting with some dramatic shadows",
-      "status": "SUCCEEDED",
-      "progress": 100,
-      "created_at": 1770192670378,
-      "started_at": 1770192671292,
-      "finished_at": 1770192688177,
-      "expires_at": 1770451888177,
-      "image_urls": [
-        "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b4-8e9e-7584-ab86-995b9afcb887_0.png?Expires=1770451888&Signature=H7rmEvuMi32JIIr-dbB6ZKohmrQ5FwVqcfhovcnonwarV82A94lZnR6NI0211mfojMOyyNOCU2s2IojITVJOI1kqwNMRuXBBg9gdUaLgQuE2xD4aBIcoj9Na0vtjxgOBbH-BTzD7JKQvrxgs5j84GOlrDjcxfiluRtlbYEUjrZFGv5U3kvhwm7wpEBf5QJ-G00zVPKwEzhKmuCmkK-ONoELgMv-xbpDOvVSNxnEVRFGawMBagf35CWk2~3QVhFO5YrrgEJ5eEEL1kaidr98foJVAwa3CRwI0oADnKfdBfPCu7RZmc3FxLSqn9oIuodkcf2lpVbSmaktB6KER6jfJLw__&Key-Pair-Id=KL5I0C8H7HX83"
-      ]
-    }
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b9-5779-7367-af3f-eba65e8dac28_0.png?Expires=1770452203&Signature=DvYtv3BVBOxmWUuZrXdNAIFArSwkxegaV~BvCWlMlO9Et16rSP8EYjZeCJiwOjQLV5ml9z5m1k9A89QgFlBhjHBupCucGumpdhwWp5fL1VhBNnIlgxhJebn4wV95Qt7~C7aX1iufufnfxxpfTYr5XgNM-l3NlqhjUX0TvaCnY4TWcOlXtTlpndSHjzGDYphFUVc4di5SzOi65gNavnVhWFrRNAFAdZ8bTTctW6y5W~sccwleCbGu1LpPX8H160~Epj1EEbkWZ8c~P0IkGQsv1iIq0QGKofxeU1dOsCimYwM6i0~3es8GCs3NtPdyn2AwtHFYogqQHIa0~aAIEwN8jA__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos/workshop_professionals.png"
   },
   {
     "scene": "kitchen_pantry_family",
-    "status": "no_url",
-    "data": {
-      "id": "019c27b4-fb2a-72f7-973c-222004652cb1",
-      "type": "text-to-image",
-      "ai_model": "nano-banana-pro",
-      "prompt": "A WHITE METAL kitchen pantry shelf with light MDF boards in a bright modern kitchen. The shelf is neatly organized with canned foods, glass jars of spices, pasta containers, cereal boxes, and kitchen supplies. White marble countertop visible, modern pendant lights above. A mother arranges items while her young daughter helps hand her a jar, both smiling warmly.\n\nCRITICAL REQUIREMENTS:\n- WHITE metal frame with light MDF shelf boards\n- Ultra photorealistic food photography style, 8K\n- Bright, inviting kitchen atmosphere\n- Natural window lighting\n- Realistic family interaction, genuine expressions",
-      "status": "SUCCEEDED",
-      "progress": 100,
-      "created_at": 1770192698185,
-      "started_at": 1770192698194,
-      "finished_at": 1770192714201,
-      "expires_at": 1770451914201,
-      "image_urls": [
-        "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b4-fb2a-72f7-973c-222004652cb1_0.png?Expires=1770451914&Signature=cdK4XG-jWBDXZ93GMBQYvT~5cBXx8krbXYQEFcxRXU5rrlNNYgvj8rFjgbIxj~7gcDGL-2d8hlCKiLNlbai6OdzJ~MMJxeteyfgHKO03BVLw0ihowG5DFp4EYO1COmoq3YKPN5tEG7tMaL-ah00SCBYcfCfw3pg35TRBHdxi1W-jMR-F47f0AB0kQxsvs9JZU6KTUtMXHbbrRKVF3aHJw~E9vJ3-7MeT82dKKgrDuGuZ0h5t7A7MgRLt4jPu~XZm52tAJmYpKY73X9DpBDn4scsBxzw5ebNmkYZ09jsrBYtegrFvoelryo6RvhCG6i861or5UsCRWzUwKGKqHuPNvw__&Key-Pair-Id=KL5I0C8H7HX83"
-      ]
-    }
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b9-c544-76a6-a469-b5bd9219c54d_0.png?Expires=1770452229&Signature=ZNPJA9iKWWt-H5yAuuPL72P~O718FRorQ-GJKX05bgcmOdGdEW5Vi-wYJX1P7VwwhipIQr0YEBBHSlNOlkYBPZ8s8Pk9xeDBrHUwnB6jU4KzrcG0m~ozNoDR67sroBHcxQdNGIPE05og21B3DW8RcY0b4Yyj~d9q7povK~yC6ZiZl9thnyAEAXtUtg24nJ8qlGF~-7wnXvSnvjxog5~wP3tavF6QP0vowBaY9QgiAAyFOuMLB5I98cmLdv-wzFP9tZSLNGvIYC5QPCnEQeAOD9R8-EYrZ3Gzd75qvWouGjEbBMy1lgVz1F6fsS7dI7sER-sjvDoSyCLxK987L9MJhQ__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos/kitchen_pantry_family.png"
   },
   {
     "scene": "living_room_couple",
-    "status": "no_url",
-    "data": {
-      "id": "019c27b5-67ad-7db7-9d30-10af8892edfd",
-      "type": "text-to-image",
-      "ai_model": "nano-banana-pro",
-      "prompt": "A modern BLACK METAL bookshelf with MDF shelves in a cozy contemporary living room. The shelf displays hardcover books, vinyl records, decorative objects, and green plants. Warm soft ambient lighting from floor lamp, comfortable gray sofa nearby. A young couple relaxing, man reading on couch while woman browses items on the shelf. Evening atmosphere.\n\nCRITICAL REQUIREMENTS:\n- BLACK metal frame with light MDF boards\n- Ultra photorealistic interior photography, 8K\n- Warm, cozy lighting atmosphere\n- Realistic fabric textures on sofa\n- Natural couple interaction",
-      "status": "SUCCEEDED",
-      "progress": 100,
-      "created_at": 1770192725962,
-      "started_at": 1770192726087,
-      "finished_at": 1770192743950,
-      "expires_at": 1770451943950,
-      "image_urls": [
-        "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b5-67ad-7db7-9d30-10af8892edfd_0.png?Expires=1770451943&Signature=fDT7N8tEYUgMF33ys2~Hr5K1OGTSmFyYPb9g82ig1sSEmxlJYKZTgi9XRQ4gtCXOCSiZVXSpcfBwJTXUsrzrRhDlQ9mift19TgxHCHV4QT-dnIVhnVQ852ZA3SsCtAMA716Y6GTglFIKtDgwsXbF85ntBMShHfVlJ4iUajGKaTIMxKzB3wOWOg2AEG99dLXfsvCt~dKzIoH8NJgkF9LgNMFSs7WsC~G8nYDsbePn1~yVHUw2BQaN4SgxOlUM0oj7hRBwxQWSHl56svnrRaIgBRUMpV4ehaza0Xk1VM~d4m2tj4XGUoxCC3xyeIm-Hv4dHXdKn1doVtKZLRISMW~V-Q__&Key-Pair-Id=KL5I0C8H7HX83"
-      ]
-    }
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27ba-3397-7380-a20a-213010462b7e_0.png?Expires=1770452259&Signature=XQ-NPUF~UVPhBWpEG4lo73U~v80W-GfdI5DFV3surRHKIAufGWqbOfmIlBUqwKquItkiFo5cmord4R5dM3G1kYD5uYkUw6K-QxxPl3V-~I0uoSNhkT1GFTog2AwoH7uFiAACmvq77scGJFXMBoP2N4Tki0oDwAsLk6kE0SZqfJ6AWfiNVGQUYUtKdDugMIz-lR~SFiHYilMVmzjUntjTAIA8KI3c5gTdLvDvn2o03QMj4ToP8S3OQdcLX~vdz5I0DdQkL-5L5P9ExKVy1c0rZvD7DNISbGe5GrsSSAnlnrKu5~LJB9nTerBVhPXNnWICO0BXPcmFFMEpHuYL9sZ3qg__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos/living_room_couple.png"
   },
   {
     "scene": "warehouse_workers",
-    "status": "no_url",
-    "data": {
-      "id": "019c27b5-d38f-7303-a05d-3512431bb4fa",
-      "type": "text-to-image",
-      "ai_model": "nano-banana-pro",
-      "prompt": "Multiple BLUE AND ORANGE METAL industrial shelving units arranged in rows in a clean modern warehouse. Organized inventory boxes with barcode labels, pallets of goods. Two warehouse workers in company polo shirts checking inventory with handheld scanners. High ceiling with industrial LED lighting, clean epoxy concrete floors, large skylights letting in natural light.\n\nCRITICAL REQUIREMENTS:\n- BLUE metal frames with ORANGE shelf boards - professional warehouse look\n- Ultra photorealistic commercial photography, 8K\n- Clean, organized logistics environment\n- Professional workers in realistic uniforms\n- Bright, well-lit industrial space",
-      "status": "SUCCEEDED",
-      "progress": 100,
-      "created_at": 1770192753564,
-      "started_at": 1770192754150,
-      "finished_at": 1770192773621,
-      "expires_at": 1770451973621,
-      "image_urls": [
-        "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27b5-d38f-7303-a05d-3512431bb4fa_0.png?Expires=1770451973&Signature=dCgS3ksse6MW1BcvIqllBbGQ9Qe4-Ykgp86ytDMTdzslOK94DWkPA~UWiGQvNPeXNTcnvdfqlVQwNwV1r4hGZTaO8rxloLOx089UPFc0Ih4mTkXba5QUckPRIhyJqN0S4e9AssL6cq0NtmxpTvSKJURlqQSkn51iHyXbvntlAf0cDWX~mu4YJaz7h43G0UNlqkG5veRdyv6aOLvUxeGB8QoYhIHbNjl0pz7yuUy0L45alyqwm8MXiKYJ7EXLksDwt8cD0bV8be0crSXLsQfo8xdGQlFUW-YBPPRzGq48Y2ThdPr8HaAF7mq7DEVovuJMdtkaOTQOTydBdTvPIplcsw__&Key-Pair-Id=KL5I0C8H7HX83"
-      ]
-    }
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27ba-a197-7382-8704-fe6579129315_0.png?Expires=1770452284&Signature=STAdITioFid71cFMvkqsYRh63sMGBi3SzFVwjdZfUMVFlYNsPBOWwAdlbyynw0ZgC9t6KY5HP-vWz~6AakTDmWHtW2xGaPD~87vSaV4YPjURQyuE0Zfk2~2BwvB1NkjOY2svV5vRl2n-eGGIoa9NzfwijWpx5t-sjNFi2mn~aVZxY~x9fbwB~BW5TUG8GGiv176kpjNdrGG2s0T8CV0z1YTbd38M7sALWbPIxdcIm94Ty2WYyEnpBDLj8YMKqiBJONMfVviStx3DNR8351VXCRTFqAt6UbKGXW54JJ1OqyGiWFPWlABo-UsnuwtjO5hiu4UHC8aJP3uA6A3i8Ur1dg__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos/warehouse_workers.png"
   }
 ]
