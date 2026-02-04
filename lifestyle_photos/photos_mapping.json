@@ -1,0 +1,96 @@
+{
+  "description": "Lifestyle fotografie regálů pro Bazarovyregal.cz",
+  "generated": "2026-02-04",
+  "photos": [
+    {
+      "file": "garage_modro_oranzovy.png",
+      "product_color": "modro-oranzovy",
+      "scene": "garage",
+      "scene_cs": "Garáž",
+      "description_cs": "Modro-oranžový průmyslový regál v moderní garáži s nářadím",
+      "suitable_for": ["heavy-duty", "industrial", "garage", "workshop"]
+    },
+    {
+      "file": "workshop_modro_oranzovy.png",
+      "product_color": "modro-oranzovy",
+      "scene": "workshop",
+      "scene_cs": "Dílna",
+      "description_cs": "Modro-oranžový regál v profesionální autodílně",
+      "suitable_for": ["heavy-duty", "industrial", "workshop", "professional"]
+    },
+    {
+      "file": "warehouse_modro_oranzovy.png",
+      "product_color": "modro-oranzovy",
+      "scene": "warehouse",
+      "scene_cs": "Sklad",
+      "description_cs": "Modro-oranžové regály ve skladu s pracovníky",
+      "suitable_for": ["heavy-duty", "industrial", "warehouse", "logistics"]
+    },
+    {
+      "file": "garage_zinkovany.png",
+      "product_color": "zinkovany",
+      "scene": "garage",
+      "scene_cs": "Garáž",
+      "description_cs": "Zinkovaný regál v garáži s organizovaným nářadím",
+      "suitable_for": ["garage", "storage", "tools"]
+    },
+    {
+      "file": "basement_zinkovany.png",
+      "product_color": "zinkovany",
+      "scene": "basement",
+      "scene_cs": "Sklep",
+      "description_cs": "Zinkovaný regál ve sklepě pro sezónní úložný prostor",
+      "suitable_for": ["basement", "storage", "seasonal"]
+    },
+    {
+      "file": "office_cerny.png",
+      "product_color": "cerny",
+      "scene": "home_office",
+      "scene_cs": "Domácí kancelář",
+      "description_cs": "Černý regál v moderní domácí kanceláři",
+      "suitable_for": ["office", "books", "modern", "scandinavian"]
+    },
+    {
+      "file": "living_room_cerny.png",
+      "product_color": "cerny",
+      "scene": "living_room",
+      "scene_cs": "Obývací pokoj",
+      "description_cs": "Černý regál jako knihovna v útulném obývacím pokoji",
+      "suitable_for": ["living_room", "books", "vinyl", "decoration"]
+    },
+    {
+      "file": "kitchen_bily.png",
+      "product_color": "bily",
+      "scene": "kitchen",
+      "scene_cs": "Kuchyň",
+      "description_cs": "Bílý regál v kuchyni pro organizaci potravin",
+      "suitable_for": ["kitchen", "pantry", "food_storage"]
+    }
+  ],
+  "color_mapping": {
+    "modro-oranzovy": {
+      "name_cs": "Modro-oranžový",
+      "frame_color": "blue",
+      "shelf_color": "orange",
+      "use_case": "industrial"
+    },
+    "zinkovany": {
+      "name_cs": "Zinkovaný",
+      "frame_color": "silver/galvanized",
+      "shelf_color": "natural MDF",
+      "use_case": "universal"
+    },
+    "cerny": {
+      "name_cs": "Černý",
+      "frame_color": "black",
+      "shelf_color": "natural MDF",
+      "use_case": "home/office"
+    },
+    "bily": {
+      "name_cs": "Bílý",
+      "frame_color": "white",
+      "shelf_color": "natural MDF",
+      "use_case": "kitchen/home"
+    }
+  }
+}

@@ -288,20 +288,37 @@ def main():
             completed = wait_for_completion(task_id)
 
             if completed:
-                # Get output image URL
-                output_url = completed.get("output", [None])[0]
+                # Debug: show all keys in response
+                print(f"\n   📋 Response keys: {list(completed.keys())}")
 
-                if not output_url:
-                    output_url = completed.get("image_url")
-                if not output_url:
-                    outputs = completed.get("outputs", [])
-                    if outputs:
-                        output_url = outputs[0]
+                # Try to find output URL in various possible fields
+                output_url = None
+
+                # Check common field names for image output
+                possible_fields = ['output', 'outputs', 'image_url', 'image_urls',
+                                   'result_url', 'generated_image', 'generated_images',
+                                   'thumbnail_url', 'preview_url', 'download_url']
+
+                for field in possible_fields:
+                    value = completed.get(field)
+                    if value:
+                        print(f"   Found '{field}': {str(value)[:150]}")
+                        if isinstance(value, str) and 'http' in value:
+                            output_url = value
+                            break
+                        elif isinstance(value, list) and value:
+                            first = value[0]
+                            if isinstance(first, str) and 'http' in first:
+                                output_url = first
+                                break
+                            elif isinstance(first, dict):
+                                output_url = first.get('url') or first.get('image_url') or first.get('download_url')
+                                if output_url:
+                                    break
 
                 if output_url:
                     filename = f"{scene['id']}.png"
                     filepath = download_image(output_url, filename)
-
                     results.append({
                         "scene": scene["id"],
                         "status": "success",
@@ -309,7 +326,9 @@ def main():
                         "file": filepath
                     })
                 else:
-                    print(f"   No output URL in: {json.dumps(completed, indent=2)[:500]}")
+                    # Print full response for debugging
+                    print(f"\n   ❌ No output URL found!")
+                    print(f"   Full response:\n{json.dumps(completed, indent=2)}")
                     results.append({
                         "scene": scene["id"],
                         "status": "no_url",

@@ -1,0 +1,49 @@
+[
+  {
+    "scene": "garage_modro_oranzovy",
+    "status": "task_failed"
+  },
+  {
+    "scene": "workshop_modro_oranzovy",
+    "status": "task_failed"
+  },
+  {
+    "scene": "warehouse_modro_oranzovy",
+    "status": "task_failed"
+  },
+  {
+    "scene": "garage_zinkovany",
+    "product": "zinkovany",
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27c8-8528-7039-b799-70102b7c19b2_0.png?Expires=1770453200&Signature=csfDQ4W0hJ63cKxgz15L4s6AmIjREsoRkd24M0viYZhVxdcn20kRMkVBgiUS0B8k1p1VGTaiHyYCBdRGAux~j2gPV4aEXetinGrwyHW~NwGwM~eb3RTO392IPtQQnWMOpQQlydRZ17sYbsQnJm~oZKXwPZMr3q2VrUGjSSxoUi1FLHZx40ksw2WC7rintK3m-XaQnnl9wHOT9mQoktuXO9wVWaKhdtKM6sD3143EYEFZk7wHRABQT63KDREQaX3-ZzfHjzBgq0MDmItlkni9vrRXO86t-u1YDnw-6SbSN3uLunijP2qTOg83lSrjl3nSVUBdHN3zoch8WnA7-45W5Q__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos_v2/garage_zinkovany.png"
+  },
+  {
+    "scene": "basement_zinkovany",
+    "product": "zinkovany",
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27c8-f74a-75c9-a2b6-052c230239f9_0.png?Expires=1770453226&Signature=gc5H-laQ~rKIQxoBDbTRJjOKlOdBjAayxPJAyTV7LWDIeWl7atOovVVgPwiXPJ-vDh8bP9QEm89cLlTlpuy0SPNHdU~tLBMjTDH~MYa~qC2Fxuq3Lhy1xryNWOqQXhPyK0RnSvx8~bAFaF5YXZ7~PvuoFTRlj0mFmDg4Anf4f3PDkyBNamkpADhgAr6yKgHKDNd3r4LQ3foya5BFWUx3v-P7QdRqWmj5ZcWWKjuHbLkus8jU8in70WGHtQMTDyqiagDYk0BKZsmzNQueyDcClHF9WeABYKkfvEeKKGxYIr7EPYpd7~dklTyE1odcAzrnT821rHipvdZT8ZFwOQq~MA__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos_v2/basement_zinkovany.png"
+  },
+  {
+    "scene": "office_cerny",
+    "product": "cerny",
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27c9-69d6-7049-bffe-8b40e2603c11_0.png?Expires=1770453255&Signature=bjMTMFhfYRagXqX-GpLy2odTjTGzD8cdLhpgAdsvf9lgr1lNjAML9~LoEceA1sNxDQ-DfVFE0Zb~fQ1BXXuz6un2PpURaLbet~p8lLGknPUUvDoSz4NAWjcZVoKl2oPtEz9nzqQeq~-iDVFCft84XPXsdcN3Ij3Z7RO0s33I42qw5DV2q3U55VHZzD7BpymUdtIR5Mex9K6pmgdAIWR0PJCKKkSmVScDDMrJKadgta00~YuYO6emyh6fd-72gqlvNNhEmQ3dzxvDCY823kSdq8yUPmTu0ZSZtn0VJFzkXPxzPa6YvEHVY8uNkk04AuEsNKnox5wQV0a~KCZiHOc0aQ__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos_v2/office_cerny.png"
+  },
+  {
+    "scene": "living_room_cerny",
+    "product": "cerny",
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27c9-dd81-75ff-afde-4d2e161a753c_0.png?Expires=1770453287&Signature=Jx~EHSn-T-dtVJPVc0r~vC2vcJ9bCpbS9RUpecMZRTnD1SkbOSwtUbHJqmQvkzWrp4zS5fAEMthcejYB1HntAwjpyTQhpmDtRA22ahoeagHWo6UmRInYvAR8psniLeEJ9YrHdvOZ-MUzxXhp7jFmgaZNvszPKPXKgMo9CqteKfMiT8tNU0Z9DwurRIDHIgBa778WTwcnBRUAlQ5WGAY~uxGohCs5b3L0w9A30~KyyIatGgB3yeTAjqKcfbuSPN142ny9Iw~lJMDdd~0QtDIOPns5NUiWfb--IQCRJ4qHvHti2Kxi4up2qRs5MEy4oRIJDK6IwuBFnr9EzoE-qAyPdg__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos_v2/living_room_cerny.png"
+  },
+  {
+    "scene": "kitchen_bily",
+    "product": "bily",
+    "status": "success",
+    "url": "https://assets.meshy.ai/a1912f22-c080-422e-a800-26e086d8e07c/uploads/image_019c27ca-502a-7059-a987-e6988880a1df_0.png?Expires=1770453317&Signature=jWNLV1GOZM8H3SoNW9znC8wpCRCMz6q7nPsx0mHR5M3RGEo-tDYdWoZO7IJnaF9HXDGk1tuLnatNN7b5WXsRd96Exg7E97B9xzFL791dV43BFMpEvhN3FNrnAvhyIHalnopA0I6JWwOmTUXL24VJv51Ab8wOIyeqhoOuPAdptjfQTCXFKFP~VZSPdXSmCkwOO1WkzJmVexem7Zb44cqeUHN0P8cPFG7oV8uQxUrB7x6ZDtJVXenSjDYnaYlQqdYNPgUKa0H69UATimnK3F49XbRngEd958pkJOcO~Gz8fE~gF~83XcRQIF5qe1OeN~Gjm8y5~Lft4sZGUyr10zW86Q__&Key-Pair-Id=KL5I0C8H7HX83",
+    "file": "generated_photos_v2/kitchen_bily.png"
+  }
+]

@@ -321,6 +321,16 @@
       <div class="relative bg-white rounded-2xl p-6 shadow-sm mb-4">
         <img id="mainImage" src="https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/9/e/9eef5f9f2ad8880b75926a3eae58485b-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny-pravy-15070304700red1.jpeg" loading="lazy" alt="Regál 2200x1200x450 mm lakovaný 5-policový, nosnost 875 kg - červená" class="product-image w-full">
       </div>
+      <!-- Thumbnail Gallery -->
+      <div class="flex gap-2 mt-4">
+        <button onclick="changeImage('https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/9/e/9eef5f9f2ad8880b75926a3eae58485b-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny-pravy-15070304700red1.jpeg')" class="thumbnail-btn w-20 h-20 border-2 border-primary-500 rounded-lg overflow-hidden p-1 bg-white">
+          <img src="https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/9/e/9eef5f9f2ad8880b75926a3eae58485b-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerveny-pravy-15070304700red1.jpeg" alt="Produktová fotka" class="thumbnail w-full h-full object-contain">
+        </button>
+        <button onclick="changeImage('/lifestyle_photos/warehouse_modro_oranzovy.png')" class="thumbnail-btn w-20 h-20 border-2 border-gray-200 hover:border-primary-300 rounded-lg overflow-hidden p-1 bg-white">
+          <img src="/lifestyle_photos/warehouse_modro_oranzovy.png" alt="Modro-oranžové regály ve skladu" class="thumbnail w-full h-full object-cover">
+        </button>
+      </div>
+
 
       <!-- Video -->
       <div class="bg-white rounded-2xl shadow-sm overflow-hidden p-4">
@@ -951,6 +961,17 @@ function showTab(tabId) {
 // FAQ
 function toggleFaq(btn) {
   btn.closest('.faq-item').classList.toggle('open');
+}
+
+// Image gallery
+function changeImage(src) {
+  document.getElementById('mainImage').src = src;
+  document.querySelectorAll('.thumbnail-btn').forEach(btn => {
+    btn.classList.remove('border-primary-500');
+    btn.classList.add('border-gray-200');
+  });
+  event.currentTarget.classList.remove('border-gray-200');
+  event.currentTarget.classList.add('border-primary-500');
 }
 </script>
 
