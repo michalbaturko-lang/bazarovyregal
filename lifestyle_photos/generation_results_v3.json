@@ -1,0 +1,42 @@
+[
+  {
+    "scene": "workshop_zinkovany",
+    "status": "task_error"
+  },
+  {
+    "scene": "bedroom_cerny",
+    "status": "task_error"
+  },
+  {
+    "scene": "bathroom_bily",
+    "status": "task_error"
+  },
+  {
+    "scene": "laundry_bily",
+    "status": "task_error"
+  },
+  {
+    "scene": "garage_modra",
+    "status": "task_error"
+  },
+  {
+    "scene": "workshop_modra",
+    "status": "task_error"
+  },
+  {
+    "scene": "basement_modra",
+    "status": "task_error"
+  },
+  {
+    "scene": "garage_cervena",
+    "status": "task_error"
+  },
+  {
+    "scene": "workshop_cervena",
+    "status": "task_error"
+  },
+  {
+    "scene": "utility_cervena",
+    "status": "task_error"
+  }
+]
