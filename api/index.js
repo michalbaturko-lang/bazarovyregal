@@ -26,5 +26,9 @@ app.use('/api/funnels', require('../server/routes/funnels'));
 app.use('/api/dashboard', require('../server/routes/dashboard'));
 app.use('/api/segments', require('../server/routes/segments'));
 app.use('/api/heatmaps', require('../server/routes/heatmaps'));
+app.use('/api/users', require('../server/routes/users'));
+app.use('/api/projects', require('../server/routes/projects'));
+app.use('/api/notes', require('../server/routes/notes'));
+app.use('/api/export', require('../server/routes/export'));
 
 module.exports = app;
