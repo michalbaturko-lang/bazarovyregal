@@ -1,7 +1,76 @@
 #!/usr/bin/env python3
 """Shared HTML template for all pSEO pages."""
 
+import json as _json
 from pseo_config import BASE_URL, IMAGES, PRODUCTS
+
+
+def build_schema_json(slug, title, meta_desc, h1, breadcrumb_category, playbook_type="", products=None):
+    """Generate JSON-LD structured data for a pSEO page."""
+    canonical = f"{BASE_URL}/{slug}.html"
+    schemas = []
+
+    # BreadcrumbList - every page gets this
+    schemas.append({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Úvod", "item": f"{BASE_URL}/index.html"},
+            {"@type": "ListItem", "position": 2, "name": breadcrumb_category, "item": f"{BASE_URL}/katalog.html"},
+            {"@type": "ListItem", "position": 3, "name": h1},
+        ]
+    })
+
+    # FAQPage - for pages with FAQ sections
+    if playbook_type in ("locations", "personas", "glossary", "comparisons", "curation",
+                          "templates", "conversions", "translations", "integrations",
+                          "examples", "profiles", "directory"):
+        schemas.append({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": title,
+            "description": meta_desc,
+            "url": canonical,
+            "inLanguage": "cs",
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "Bazarovyregal.cz",
+                "url": BASE_URL
+            },
+            "publisher": {
+                "@type": "Organization",
+                "name": "Bazarovyregal.cz",
+                "url": BASE_URL,
+                "email": "info@bazarovyregal.cz"
+            }
+        })
+
+    # Product offers for conversion pages
+    if playbook_type == "conversions" and products:
+        offers = []
+        for p in products[:6]:
+            offers.append({
+                "@type": "Offer",
+                "name": p["name"],
+                "price": p["price"],
+                "priceCurrency": "CZK",
+                "availability": "https://schema.org/InStock",
+                "url": f"{BASE_URL}/{p['url']}"
+            })
+        if offers:
+            schemas.append({
+                "@context": "https://schema.org",
+                "@type": "OfferCatalog",
+                "name": h1,
+                "description": meta_desc,
+                "itemListElement": offers
+            })
+
+    # Build script tags
+    tags = ""
+    for s in schemas:
+        tags += f'\n    <script type="application/ld+json">{_json.dumps(s, ensure_ascii=False)}</script>'
+    return tags
 
 def get_product_cards(products, count=4):
     html = '<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">'

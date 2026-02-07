@@ -9,8 +9,8 @@ import sys
 import json
 from datetime import datetime
 
-from pseo_config import BASE_URL, EXISTING_PAGES
-from pseo_html_template import wrap_page
+from pseo_config import BASE_URL, EXISTING_PAGES, PRODUCTS
+from pseo_html_template import wrap_page, build_schema_json
 
 # Import all playbook generators
 from pseo_playbooks_part1 import generate_location_pages, generate_persona_pages, generate_glossary_pages
@@ -54,9 +54,19 @@ def validate_pages(pages):
 
 
 def generate_html_files(pages, output_dir):
-    """Generate HTML files from page data."""
+    """Generate HTML files from page data with JSON-LD schema."""
     generated = []
     for p in pages:
+        # Auto-generate schema markup
+        schema = build_schema_json(
+            slug=p["slug"],
+            title=p["title"],
+            meta_desc=p["meta_desc"],
+            h1=p["h1"],
+            breadcrumb_category=p.get("breadcrumb_category", "Regaly"),
+            playbook_type=p.get("playbook_type", ""),
+            products=PRODUCTS if p.get("playbook_type") == "conversions" else None,
+        )
         html = wrap_page(
             slug=p["slug"],
             title=p["title"],
@@ -64,7 +74,7 @@ def generate_html_files(pages, output_dir):
             h1=p["h1"],
             body_html=p["body_html"],
             breadcrumb_category=p.get("breadcrumb_category", "Regaly"),
-            schema_json=p.get("schema_json", ""),
+            schema_json=schema,
             canonical_url=p.get("canonical_url", ""),
         )
         filepath = os.path.join(output_dir, f"{p['slug']}.html")
@@ -151,6 +161,85 @@ def generate_report(valid, skipped, generated, existing_count, added_count):
             print(f"    {slug}: {reason}")
 
     print("\n" + "=" * 60)
+
+
+def _generate_hub_page(valid_pages, output_dir):
+    """Generate vsechny-regaly.html - a hub page linking to all pSEO pages for crawling."""
+    # Group pages by playbook type
+    by_type = {}
+    type_labels = {
+        "locations": "Regály podle města",
+        "personas": "Regály podle cílové skupiny",
+        "glossary": "Slovník pojmů",
+        "comparisons": "Srovnání regálů",
+        "curation": "TOP žebříčky a doporučení",
+        "templates": "Šablony a průvodci",
+        "examples": "Příklady použití",
+        "directory": "Regály podle parametrů",
+        "profiles": "Produktové řady",
+        "conversions": "Nákup a objednávka",
+        "translations": "Slovensko",
+        "integrations": "Příslušenství a doplňky",
+    }
+
+    for p in valid_pages:
+        t = p.get("playbook_type", "other")
+        if t not in by_type:
+            by_type[t] = []
+        by_type[t].append(p)
+
+    sections_html = ""
+    for ptype in ["curation", "comparisons", "directory", "locations", "personas",
+                   "templates", "examples", "conversions", "glossary", "profiles",
+                   "translations", "integrations"]:
+        if ptype not in by_type:
+            continue
+        label = type_labels.get(ptype, ptype)
+        links = ""
+        for p in by_type[ptype]:
+            links += f'<li><a href="{p["slug"]}.html" class="text-primary-600 hover:underline hover:text-primary-700">{p["h1"]}</a></li>\n'
+        sections_html += f'''
+        <section class="mb-10">
+            <h2 class="text-2xl font-bold mb-4">{label}</h2>
+            <ul class="space-y-2 list-disc list-inside text-gray-700">{links}</ul>
+        </section>
+        '''
+
+    body_html = f'''
+    <p class="text-xl text-gray-600 mb-8">Kompletní přehled všech stránek o kovových regálech.
+    Najděte přesně to, co hledáte – podle města, účelu, rozměru nebo ceny.</p>
+
+    <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+        <p class="text-green-700"><strong>{len(valid_pages)} stránek</strong> s informacemi o kovových regálech.
+        Regály od 549 Kč, doprava od 99 Kč, záruka 7 let.</p>
+    </div>
+
+    {sections_html}
+    '''
+
+    schema = build_schema_json(
+        slug="vsechny-regaly",
+        title="Všechny regály – kompletní přehled | Bazarovyregal.cz",
+        meta_desc="Kompletní přehled všech kovových regálů. Regály podle města, účelu, rozměru, ceny. 112+ stránek s informacemi.",
+        h1="Všechny regály – kompletní přehled stránek",
+        breadcrumb_category="Přehled",
+        playbook_type="directory",
+    )
+
+    html = wrap_page(
+        slug="vsechny-regaly",
+        title="Všechny regály – kompletní přehled | Bazarovyregal.cz",
+        meta_desc="Kompletní přehled všech kovových regálů. Regály podle města, účelu, rozměru, ceny. 112+ stránek s informacemi.",
+        h1="Všechny regály – kompletní přehled stránek",
+        body_html=body_html,
+        breadcrumb_category="Přehled",
+        schema_json=schema,
+    )
+
+    filepath = os.path.join(output_dir, "vsechny-regaly.html")
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(html)
+    print("  Written: vsechny-regaly.html")
 
 
 def main():
@@ -240,6 +329,14 @@ def main():
 
     # Report
     generate_report(valid, skipped, generated, existing_count, added_count)
+
+    # Generate hub page (vsechny-regaly) for crawling/indexing
+    print("\nGenerating hub page (vsechny-regaly.html)...")
+    _generate_hub_page(valid, output_dir)
+    # Add hub page to sitemap
+    _, hub_added = update_sitemap(generated + ["vsechny-regaly"], output_dir)
+    if hub_added:
+        print(f"  Added {hub_added} hub URL(s) to sitemap")
 
     # Write manifest JSON for tracking
     manifest = {
