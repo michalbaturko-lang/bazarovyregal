@@ -1,0 +1,18 @@
+{
+  "name": "session-recorder",
+  "version": "1.0.0",
+  "description": "Self-hosted session recording & analytics tool (Smartlook alternative)",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "init-db": "node server/init-db.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
