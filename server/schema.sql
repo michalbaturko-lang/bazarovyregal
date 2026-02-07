@@ -115,11 +115,23 @@ ALTER TABLE segments  ENABLE ROW LEVEL SECURITY;
 
 -- Allow service role full access (bypasses RLS by default, but
 -- explicit policies ensure clarity for non-service-role clients).
-CREATE POLICY IF NOT EXISTS "service_role_all_projects"  ON projects  FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "service_role_all_sessions"  ON sessions  FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "service_role_all_events"    ON events    FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "service_role_all_funnels"   ON funnels   FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "service_role_all_segments"  ON segments  FOR ALL USING (true) WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_projects') THEN
+    CREATE POLICY "service_role_all_projects" ON projects FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_sessions') THEN
+    CREATE POLICY "service_role_all_sessions" ON sessions FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_events') THEN
+    CREATE POLICY "service_role_all_events" ON events FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_funnels') THEN
+    CREATE POLICY "service_role_all_funnels" ON funnels FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_segments') THEN
+    CREATE POLICY "service_role_all_segments" ON segments FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
 
 -- -----------------------------------------------------------
 -- Default project
