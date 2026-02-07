@@ -1,59 +1,29 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "dashboard/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "tracker/tracker.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "tracker/consent-banner.js",
-      "use": "@vercel/static"
-    }
+  "rewrites": [
+    { "source": "/tracker.js", "destination": "/tracker/tracker.js" },
+    { "source": "/consent-banner.js", "destination": "/tracker/consent-banner.js" },
+    { "source": "/api/:path*", "destination": "/api/index.js" },
+    { "source": "/login", "destination": "/dashboard/login.html" },
+    { "source": "/login.html", "destination": "/dashboard/login.html" },
+    { "source": "/css/:path*", "destination": "/dashboard/css/:path*" },
+    { "source": "/js/:path*", "destination": "/dashboard/js/:path*" },
+    { "source": "/", "destination": "/dashboard/index.html" }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/tracker.js",
-      "dest": "/tracker/tracker.js"
+      "source": "/tracker.js",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
     },
     {
-      "src": "/consent-banner.js",
-      "dest": "/tracker/consent-banner.js"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/css/(.*)",
-      "dest": "/dashboard/css/$1"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/dashboard/js/$1"
-    },
-    {
-      "src": "/(.*\\.html)",
-      "dest": "/dashboard/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/dashboard/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dashboard/$1"
+      "source": "/api/:path*",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
     }
-  ],
-  "env": {
-    "SUPABASE_URL": "${SUPABASE_URL}",
-    "SUPABASE_SERVICE_KEY": "${SUPABASE_SERVICE_KEY}"
-  }
+  ]
 }

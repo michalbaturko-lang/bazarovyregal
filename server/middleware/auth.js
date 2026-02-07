@@ -30,8 +30,8 @@ function authMiddleware(req, res, next) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // Otherwise serve login page
-  res.sendFile(require('path').join(__dirname, '..', '..', 'dashboard', 'login.html'));
+  // Redirect to login page
+  res.redirect('/login');
 }
 
 // Login endpoint
