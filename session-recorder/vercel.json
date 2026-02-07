@@ -45,7 +45,7 @@
     }
   ],
   "env": {
-    "SUPABASE_URL": "@supabase-url",
-    "SUPABASE_SERVICE_KEY": "@supabase-service-key"
+    "SUPABASE_URL": "${SUPABASE_URL}",
+    "SUPABASE_SERVICE_KEY": "${SUPABASE_SERVICE_KEY}"
   }
 }
