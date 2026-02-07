@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-02-07T12:21:28.690746",
-  "total_pages": 95,
+  "generated_at": "2026-02-07T12:30:56.022066",
+  "total_pages": 112,
   "pages": [
     {
       "slug": "kovove-regaly-praha",
@@ -476,6 +476,91 @@
       "slug": "profil-zinkovane-regaly",
       "type": "profiles",
       "title": "Zinkovaná řada – odolnost vlhkosti | Bazarovyregal.cz"
+    },
+    {
+      "slug": "koupit-kovovy-regal-online",
+      "type": "conversions",
+      "title": "Koupit kovový regál online – nejnižší ceny na trhu | Bazarovyregal.cz"
+    },
+    {
+      "slug": "levne-kovove-regaly-vyprodej",
+      "type": "conversions",
+      "title": "Levné kovové regály – výprodej skladu od 549 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-akce-sleva",
+      "type": "conversions",
+      "title": "Kovové regály v akci – aktuální slevy a nabídky | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-s-dopravou-zdarma",
+      "type": "conversions",
+      "title": "Kovové regály s výhodnou dopravou – od 99 Kč po celé ČR | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-se-zarukou",
+      "type": "conversions",
+      "title": "Kovové regály se zárukou 7 let – kvalita ověřena tisíci zákazníky | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-pro-firmy-velkoobchod",
+      "type": "conversions",
+      "title": "Regály pro firmy – velkoobchodní ceny, množstevní slevy | Bazarovyregal.cz"
+    },
+    {
+      "slug": "objednat-regal-bez-registrace",
+      "type": "conversions",
+      "title": "Objednat regál rychle – bez registrace, expedice ihned | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regale-slovensko",
+      "type": "translations",
+      "title": "Kovové regále – dodávka na Slovensko | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regale-do-garaze-slovensko",
+      "type": "translations",
+      "title": "Regále do garáže – dodávka na Slovensko | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regale-do-pivnice-slovensko",
+      "type": "translations",
+      "title": "Regále do pivnice – zinkované, odolné vlhkosti | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-bratislava",
+      "type": "translations",
+      "title": "Kovové regále Bratislava – dodávka do 3–5 dní | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-kosice",
+      "type": "translations",
+      "title": "Kovové regále Košice – dodávka do 4–5 dní | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-a-ulozne-boxy-system",
+      "type": "integrations",
+      "title": "Regály + úložné boxy – kompletní organizační systém | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-kotveni-ke-zdi",
+      "type": "integrations",
+      "title": "Kotvení regálů ke zdi – návod a doporučení | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-a-stitky-organizace",
+      "type": "integrations",
+      "title": "Organizační systém – regály + štítky + kategorizace | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-modularni-system-rozsireni",
+      "type": "integrations",
+      "title": "Modulární systém – jak rozšířit regálový systém | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-do-pronajateho-prostoru",
+      "type": "integrations",
+      "title": "Regály do pronajatého prostoru – bez vrtání, snadná demontáž | Bazarovyregal.cz"
     }
   ]
 }

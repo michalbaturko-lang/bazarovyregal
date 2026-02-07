@@ -16,6 +16,7 @@ from pseo_html_template import wrap_page
 from pseo_playbooks_part1 import generate_location_pages, generate_persona_pages, generate_glossary_pages
 from pseo_playbooks_part2 import generate_comparison_pages, generate_curation_pages, generate_template_pages
 from pseo_playbooks_part3 import generate_example_pages, generate_directory_pages, generate_profile_pages
+from pseo_playbooks_part4 import generate_conversion_pages, generate_translation_pages, generate_integration_pages
 
 
 def validate_pages(pages):
@@ -161,49 +162,64 @@ def main():
     # Collect all pages from all playbooks
     all_pages = []
 
-    print("\n[1/9] Generating Location pages...")
+    print("\n[1/12] Generating Location pages...")
     pages = generate_location_pages()
-    print(f"       -> {len(pages)} pages")
+    print(f"        -> {len(pages)} pages")
     all_pages.extend(pages)
 
-    print("[2/9] Generating Persona pages...")
+    print("[2/12] Generating Persona pages...")
     pages = generate_persona_pages()
-    print(f"       -> {len(pages)} pages")
+    print(f"        -> {len(pages)} pages")
     all_pages.extend(pages)
 
-    print("[3/9] Generating Glossary pages...")
+    print("[3/12] Generating Glossary pages...")
     pages = generate_glossary_pages()
-    print(f"       -> {len(pages)} pages")
+    print(f"        -> {len(pages)} pages")
     all_pages.extend(pages)
 
-    print("[4/9] Generating Comparison pages...")
+    print("[4/12] Generating Comparison pages...")
     pages = generate_comparison_pages()
-    print(f"       -> {len(pages)} pages")
+    print(f"        -> {len(pages)} pages")
     all_pages.extend(pages)
 
-    print("[5/9] Generating Curation pages...")
+    print("[5/12] Generating Curation pages...")
     pages = generate_curation_pages()
-    print(f"       -> {len(pages)} pages")
+    print(f"        -> {len(pages)} pages")
     all_pages.extend(pages)
 
-    print("[6/9] Generating Template pages...")
+    print("[6/12] Generating Template pages...")
     pages = generate_template_pages()
-    print(f"       -> {len(pages)} pages")
+    print(f"        -> {len(pages)} pages")
     all_pages.extend(pages)
 
-    print("[7/9] Generating Example pages...")
+    print("[7/12] Generating Example pages...")
     pages = generate_example_pages()
-    print(f"       -> {len(pages)} pages")
+    print(f"        -> {len(pages)} pages")
     all_pages.extend(pages)
 
-    print("[8/9] Generating Directory pages...")
+    print("[8/12] Generating Directory pages...")
     pages = generate_directory_pages()
-    print(f"       -> {len(pages)} pages")
+    print(f"        -> {len(pages)} pages")
     all_pages.extend(pages)
 
-    print("[9/9] Generating Profile pages...")
+    print("[9/12] Generating Profile pages...")
     pages = generate_profile_pages()
     print(f"       -> {len(pages)} pages")
+    all_pages.extend(pages)
+
+    print("[10/12] Generating Conversion pages...")
+    pages = generate_conversion_pages()
+    print(f"        -> {len(pages)} pages")
+    all_pages.extend(pages)
+
+    print("[11/12] Generating Translation pages...")
+    pages = generate_translation_pages()
+    print(f"        -> {len(pages)} pages")
+    all_pages.extend(pages)
+
+    print("[12/12] Generating Integration pages...")
+    pages = generate_integration_pages()
+    print(f"        -> {len(pages)} pages")
     all_pages.extend(pages)
 
     print(f"\nTotal raw pages: {len(all_pages)}")

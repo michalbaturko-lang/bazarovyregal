@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bazarovyregal.vercel.app/sitemap.xml
+Sitemap: https://www.bazarovyregal.cz/sitemap.xml
