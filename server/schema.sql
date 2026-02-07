@@ -1,5 +1,5 @@
 -- ==========================================================================
--- Session Recorder — PostgreSQL / Supabase schema
+-- Regal Master Look — PostgreSQL / Supabase schema
 -- Translated from the original SQLite schema in init-db.js
 -- ==========================================================================
 

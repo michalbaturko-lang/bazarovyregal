@@ -33,7 +33,7 @@ app.get('*', (req, res) => {
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
-    console.log(`SessionLens running at http://localhost:${PORT}`);
+    console.log(`Regal Master Look running at http://localhost:${PORT}`);
   });
 }
 

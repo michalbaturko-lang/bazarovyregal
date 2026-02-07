@@ -1,7 +1,7 @@
 {
-  "name": "session-recorder",
+  "name": "regal-master-look",
   "version": "1.0.0",
-  "description": "Self-hosted session recording & analytics tool (Smartlook alternative)",
+  "description": "Regal Master Look - Self-hosted analytics tool (Smartlook alternative)",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
