@@ -1,10 +1,9 @@
 'use strict';
 
-const { Router } = require('express');
+const express = require('express');
+const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const db = require('../db');
-
-const router = Router();
+const supabase = require('../supabase');
 
 // ============================================================================
 // POST /api/funnels — Create a funnel definition
@@ -33,7 +32,7 @@ router.post('/', async (req, res) => {
     const id = uuidv4();
     const now = new Date().toISOString();
 
-    const { error: insertError } = await db.query('funnels')
+    const { error: insertError } = await supabase.from('funnels')
       .insert({
         id,
         project_id: projectId,
@@ -44,7 +43,7 @@ router.post('/', async (req, res) => {
       });
     if (insertError) throw insertError;
 
-    const { data: funnel, error: fetchError } = await db.query('funnels')
+    const { data: funnel, error: fetchError } = await supabase.from('funnels')
       .select('*')
       .eq('id', id)
       .single();
@@ -54,7 +53,7 @@ router.post('/', async (req, res) => {
     res.status(201).json({ funnel });
   } catch (err) {
     console.error('[funnels] POST / error:', err);
-    res.status(500).json({ error: 'Failed to create funnel' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -65,7 +64,7 @@ router.get('/', async (req, res) => {
   try {
     const { project_id = 'default' } = req.query;
 
-    const { data: funnels, error } = await db.query('funnels')
+    const { data: funnels, error } = await supabase.from('funnels')
       .select('*')
       .eq('project_id', project_id)
       .order('created_at', { ascending: false });
@@ -75,7 +74,7 @@ router.get('/', async (req, res) => {
     res.json({ funnels: funnels || [] });
   } catch (err) {
     console.error('[funnels] GET / error:', err);
-    res.status(500).json({ error: 'Failed to list funnels' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -88,7 +87,7 @@ router.get('/:id', async (req, res) => {
     const { date_from, date_to } = req.query;
 
     // Fetch the funnel definition
-    const { data: funnel, error: funnelError } = await db.query('funnels')
+    const { data: funnel, error: funnelError } = await supabase.from('funnels')
       .select('*')
       .eq('id', id)
       .single();
@@ -100,7 +99,7 @@ router.get('/:id', async (req, res) => {
     const steps = funnel.steps; // already parsed from JSONB
 
     // Fetch qualifying session IDs
-    let sessionQuery = db.query('sessions')
+    let sessionQuery = supabase.from('sessions')
       .select('id')
       .eq('project_id', funnel.project_id);
 
@@ -164,7 +163,7 @@ router.get('/:id', async (req, res) => {
 
         if (step.type === 'url') {
           // Check if the session visited the given URL
-          const { data: rows, error: qErr } = await db.query('events')
+          const { data: rows, error: qErr } = await supabase.from('events')
             .select('session_id')
             .in('session_id', batch)
             .ilike('url', `%${step.value}%`);
@@ -178,7 +177,7 @@ router.get('/:id', async (req, res) => {
 
           if (!isNaN(eventTypeNum)) {
             // Match by event type number
-            const { data: rows, error: qErr } = await db.query('events')
+            const { data: rows, error: qErr } = await supabase.from('events')
               .select('session_id')
               .in('session_id', batch)
               .eq('type', eventTypeNum);
@@ -190,7 +189,7 @@ router.get('/:id', async (req, res) => {
           } else {
             // Match custom events by name in the JSONB data field
             // Supabase filter: data->>'name' = step.value
-            const { data: rows, error: qErr } = await db.query('events')
+            const { data: rows, error: qErr } = await supabase.from('events')
               .select('session_id')
               .in('session_id', batch)
               .eq('type', 14)
@@ -236,7 +235,7 @@ router.get('/:id', async (req, res) => {
     });
   } catch (err) {
     console.error('[funnels] GET /:id error:', err);
-    res.status(500).json({ error: 'Failed to calculate funnel results' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -248,7 +247,7 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { name, steps } = req.body;
 
-    const { data: existing, error: findError } = await db.query('funnels')
+    const { data: existing, error: findError } = await supabase.from('funnels')
       .select('*')
       .eq('id', id)
       .single();
@@ -274,7 +273,7 @@ router.put('/:id', async (req, res) => {
     const updatedName = name !== undefined ? name.trim() : existing.name;
     const updatedSteps = steps !== undefined ? steps : existing.steps;
 
-    const { error: updateError } = await db.query('funnels')
+    const { error: updateError } = await supabase.from('funnels')
       .update({
         name: updatedName,
         steps: updatedSteps,
@@ -283,7 +282,7 @@ router.put('/:id', async (req, res) => {
       .eq('id', id);
     if (updateError) throw updateError;
 
-    const { data: funnel, error: fetchError } = await db.query('funnels')
+    const { data: funnel, error: fetchError } = await supabase.from('funnels')
       .select('*')
       .eq('id', id)
       .single();
@@ -292,7 +291,7 @@ router.put('/:id', async (req, res) => {
     res.json({ funnel });
   } catch (err) {
     console.error('[funnels] PUT /:id error:', err);
-    res.status(500).json({ error: 'Failed to update funnel' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -303,7 +302,7 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { data: existing, error: findError } = await db.query('funnels')
+    const { data: existing, error: findError } = await supabase.from('funnels')
       .select('id')
       .eq('id', id)
       .single();
@@ -312,7 +311,7 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Funnel not found' });
     }
 
-    const { error: deleteError } = await db.query('funnels')
+    const { error: deleteError } = await supabase.from('funnels')
       .delete()
       .eq('id', id);
     if (deleteError) throw deleteError;
@@ -320,7 +319,7 @@ router.delete('/:id', async (req, res) => {
     res.json({ success: true, message: 'Funnel deleted' });
   } catch (err) {
     console.error('[funnels] DELETE /:id error:', err);
-    res.status(500).json({ error: 'Failed to delete funnel' });
+    res.status(500).json({ error: err.message });
   }
 });
 

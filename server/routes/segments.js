@@ -1,10 +1,9 @@
 'use strict';
 
-const { Router } = require('express');
+const express = require('express');
+const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const db = require('../db');
-
-const router = Router();
+const supabase = require('../supabase');
 
 // ============================================================================
 // GET /api/segments — List segments for a project
@@ -13,7 +12,7 @@ router.get('/', async (req, res) => {
   try {
     const { project_id = 'default' } = req.query;
 
-    const { data: segments, error } = await db.query('segments')
+    const { data: segments, error } = await supabase.from('segments')
       .select('*')
       .eq('project_id', project_id)
       .order('created_at', { ascending: false });
@@ -23,7 +22,7 @@ router.get('/', async (req, res) => {
     res.json({ segments: segments || [] });
   } catch (err) {
     console.error('[segments] GET / error:', err);
-    res.status(500).json({ error: 'Failed to list segments' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -43,7 +42,7 @@ router.post('/', async (req, res) => {
 
     const id = uuidv4();
 
-    const { error: insertError } = await db.query('segments')
+    const { error: insertError } = await supabase.from('segments')
       .insert({
         id,
         project_id: projectId,
@@ -52,7 +51,7 @@ router.post('/', async (req, res) => {
       });
     if (insertError) throw insertError;
 
-    const { data: segment, error: fetchError } = await db.query('segments')
+    const { data: segment, error: fetchError } = await supabase.from('segments')
       .select('*')
       .eq('id', id)
       .single();
@@ -61,7 +60,7 @@ router.post('/', async (req, res) => {
     res.status(201).json({ segment });
   } catch (err) {
     console.error('[segments] POST / error:', err);
-    res.status(500).json({ error: 'Failed to create segment' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -72,7 +71,7 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { data: segment, error } = await db.query('segments')
+    const { data: segment, error } = await supabase.from('segments')
       .select('*')
       .eq('id', id)
       .single();
@@ -85,7 +84,7 @@ router.get('/:id', async (req, res) => {
     res.json({ segment });
   } catch (err) {
     console.error('[segments] GET /:id error:', err);
-    res.status(500).json({ error: 'Failed to get segment' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -97,7 +96,7 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { name, filters } = req.body;
 
-    const { data: existing, error: findError } = await db.query('segments')
+    const { data: existing, error: findError } = await supabase.from('segments')
       .select('*')
       .eq('id', id)
       .single();
@@ -113,7 +112,7 @@ router.put('/:id', async (req, res) => {
     const updatedName = name !== undefined ? name.trim() : existing.name;
     const updatedFilters = filters !== undefined ? filters : existing.filters;
 
-    const { error: updateError } = await db.query('segments')
+    const { error: updateError } = await supabase.from('segments')
       .update({
         name: updatedName,
         filters: updatedFilters,
@@ -121,7 +120,7 @@ router.put('/:id', async (req, res) => {
       .eq('id', id);
     if (updateError) throw updateError;
 
-    const { data: segment, error: fetchError } = await db.query('segments')
+    const { data: segment, error: fetchError } = await supabase.from('segments')
       .select('*')
       .eq('id', id)
       .single();
@@ -130,7 +129,7 @@ router.put('/:id', async (req, res) => {
     res.json({ segment });
   } catch (err) {
     console.error('[segments] PUT /:id error:', err);
-    res.status(500).json({ error: 'Failed to update segment' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -141,7 +140,7 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { data: existing, error: findError } = await db.query('segments')
+    const { data: existing, error: findError } = await supabase.from('segments')
       .select('id')
       .eq('id', id)
       .single();
@@ -150,7 +149,7 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Segment not found' });
     }
 
-    const { error: deleteError } = await db.query('segments')
+    const { error: deleteError } = await supabase.from('segments')
       .delete()
       .eq('id', id);
     if (deleteError) throw deleteError;
@@ -158,7 +157,7 @@ router.delete('/:id', async (req, res) => {
     res.json({ success: true, message: 'Segment deleted' });
   } catch (err) {
     console.error('[segments] DELETE /:id error:', err);
-    res.status(500).json({ error: 'Failed to delete segment' });
+    res.status(500).json({ error: err.message });
   }
 });
 

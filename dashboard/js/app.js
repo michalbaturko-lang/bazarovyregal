@@ -62,6 +62,12 @@ const App = (() => {
     Object.values(state.chartInstances).forEach(c => { try { c.destroy(); } catch(_){} });
     state.chartInstances = {};
 
+    // Destroy active SessionPlayer if navigating away from session detail
+    if (window._activeSessionPlayer) {
+      try { window._activeSessionPlayer.destroy(); } catch (_) {}
+      window._activeSessionPlayer = null;
+    }
+
     // Update active sidebar link
     document.querySelectorAll('[data-nav]').forEach(el => {
       const navTarget = el.getAttribute('data-nav');
