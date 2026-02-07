@@ -188,6 +188,10 @@ const App = (() => {
         headers: { ...defaultHeaders, ...options.headers },
         body: options.body ? JSON.stringify(options.body) : undefined,
       });
+      if (res.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP ${res.status}`);
@@ -437,7 +441,25 @@ const App = (() => {
   /* ------------------------------------------------------------------
      Init
   ------------------------------------------------------------------ */
-  function init() {
+  async function checkAuth() {
+    try {
+      const res = await fetch('/api/auth/check');
+      const data = await res.json();
+      if (!data.authenticated) {
+        window.location.href = '/login';
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Auth check failed:', err);
+      window.location.href = '/login';
+      return false;
+    }
+  }
+
+  async function init() {
+    const authed = await checkAuth();
+    if (!authed) return;
     window.addEventListener('hashchange', handleRouteChange);
     initDateRange();
     handleRouteChange();

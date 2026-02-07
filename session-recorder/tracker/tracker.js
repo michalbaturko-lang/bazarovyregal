@@ -285,6 +285,7 @@
     _retryQueue: [],
     _sampled: true,
     _initialized: false,
+    _recording: false,
     _pageUrl: '',
 
 
@@ -299,6 +300,7 @@
         maskSelectors:  options.maskSelectors || [],
         sampleRate:     typeof options.sampleRate === 'number' ? options.sampleRate : 1.0,
         respectDNT:     options.respectDNT !== undefined ? !!options.respectDNT : false,
+        requireConsent: options.requireConsent !== undefined ? !!options.requireConsent : false,
         batchSize:      options.batchSize || 50,
         flushInterval:  options.flushInterval || 5000,
         maxRetries:     options.maxRetries || 3
@@ -326,7 +328,26 @@
       // Session management
       this._initSession();
 
-      // Start recording
+      // GDPR consent check – if requireConsent is enabled, only start
+      // recording when the user has previously granted consent.
+      if (config.requireConsent) {
+        var consent = null;
+        try { consent = localStorage.getItem('rml_consent'); } catch (e) { /* blocked */ }
+        if (consent === 'granted') {
+          this._startRecording();
+        }
+        // Otherwise wait for grantConsent() to be called
+      } else {
+        // Legacy behaviour – start immediately
+        this._startRecording();
+      }
+    },
+
+    /** Begin (or resume) recording – sets up observers, listeners, timers. */
+    _startRecording: function () {
+      if (this._recording) return;
+      this._recording = true;
+
       this._emitSessionStart();
       this._takeDOMSnapshot();
       this._observeMutations();
@@ -336,6 +357,27 @@
       this._bindErrors();
       this._bindVisibility();
       this._bindNavigation();
+    },
+
+    /** Stop recording – flush remaining data, tear down observers & listeners. */
+    _stopRecording: function () {
+      if (!this._recording) return;
+      this._recording = false;
+
+      this._flush(true);
+      if (this._flushTimer) { clearInterval(this._flushTimer); this._flushTimer = null; }
+      if (this._observer) { this._observer.disconnect(); this._observer = null; }
+      for (var i = 0; i < this._listeners.length; i++) {
+        var l = this._listeners[i];
+        l.cleanup ? l.cleanup() : l.target && l.target.removeEventListener(l.event, l.handler, l.options);
+      }
+      for (var j = 0; j < this._pendingClicks.length; j++) {
+        if (this._pendingClicks[j].timer) clearTimeout(this._pendingClicks[j].timer);
+      }
+      this._listeners = [];
+      this._pendingClicks = [];
+      this._buffer = [];
+      this._clickLog = [];
     },
 
 
@@ -867,6 +909,29 @@
     destroy: function () { Recorder.destroy(); },
     getSessionId: function () { return Recorder.getSessionId(); },
 
+    // GDPR consent helpers
+
+    /** Grant consent – persists choice and starts recording if not already active. */
+    grantConsent: function () {
+      try { localStorage.setItem('rml_consent', 'granted'); } catch (e) { /* blocked */ }
+      if (Recorder._initialized && !Recorder._recording) {
+        Recorder._startRecording();
+      }
+    },
+
+    /** Revoke consent – persists choice, stops recording and clears buffered data. */
+    revokeConsent: function () {
+      try { localStorage.setItem('rml_consent', 'revoked'); } catch (e) { /* blocked */ }
+      if (Recorder._initialized) {
+        Recorder._stopRecording();
+      }
+    },
+
+    /** Check whether the user has previously granted consent. */
+    hasConsent: function () {
+      try { return localStorage.getItem('rml_consent') === 'granted'; } catch (e) { return false; }
+    },
+
     _EVT: EVT
   };
 
@@ -890,6 +955,9 @@
         }
         if (current.hasAttribute('data-respect-dnt')) {
           opts.respectDNT = current.getAttribute('data-respect-dnt') !== 'false';
+        }
+        if (current.hasAttribute('data-require-consent')) {
+          opts.requireConsent = current.getAttribute('data-require-consent') !== 'false';
         }
         Recorder.init(opts);
       }
