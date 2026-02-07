@@ -42,6 +42,10 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/notes', require('./routes/notes'));
 app.use('/api/export', require('./routes/export'));
+app.use('/api/journeys', require('./routes/journeys'));
+app.use('/api/ecommerce', require('./routes/ecommerce'));
+app.use('/api/behavioral', require('./routes/behavioral'));
+app.use('/api/insights', require('./routes/insights'));
 
 // Serve dashboard (local dev only)
 app.use(express.static(path.join(__dirname, '..', 'dashboard')));
