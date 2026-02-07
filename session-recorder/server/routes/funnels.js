@@ -2,16 +2,15 @@
 
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
-const getDatabase = require('../db');
+const db = require('../db');
 
 const router = Router();
 
 // ============================================================================
 // POST /api/funnels — Create a funnel definition
 // ============================================================================
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const db = getDatabase();
     const { name, projectId = 'default', steps } = req.body;
 
     if (!name || !name.trim()) {
@@ -34,21 +33,24 @@ router.post('/', (req, res) => {
     const id = uuidv4();
     const now = new Date().toISOString();
 
-    db.prepare(`
-      INSERT INTO funnels (id, project_id, name, steps, created_at, updated_at)
-      VALUES (@id, @project_id, @name, @steps, @created_at, @updated_at)
-    `).run({
-      id,
-      project_id: projectId,
-      name: name.trim(),
-      steps: JSON.stringify(steps),
-      created_at: now,
-      updated_at: now,
-    });
+    const { error: insertError } = await db.query('funnels')
+      .insert({
+        id,
+        project_id: projectId,
+        name: name.trim(),
+        steps,           // JSONB — pass as object directly
+        created_at: now,
+        updated_at: now,
+      });
+    if (insertError) throw insertError;
 
-    const funnel = db.prepare('SELECT * FROM funnels WHERE id = ?').get(id);
-    funnel.steps = JSON.parse(funnel.steps);
+    const { data: funnel, error: fetchError } = await db.query('funnels')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (fetchError) throw fetchError;
 
+    // steps is already parsed from JSONB
     res.status(201).json({ funnel });
   } catch (err) {
     console.error('[funnels] POST / error:', err);
@@ -59,22 +61,18 @@ router.post('/', (req, res) => {
 // ============================================================================
 // GET /api/funnels — List funnels for a project
 // ============================================================================
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const db = getDatabase();
     const { project_id = 'default' } = req.query;
 
-    const funnels = db.prepare(
-      'SELECT * FROM funnels WHERE project_id = ? ORDER BY created_at DESC'
-    ).all(project_id);
+    const { data: funnels, error } = await db.query('funnels')
+      .select('*')
+      .eq('project_id', project_id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
 
-    // Parse JSON steps for each funnel
-    const parsed = funnels.map((f) => ({
-      ...f,
-      steps: JSON.parse(f.steps),
-    }));
-
-    res.json({ funnels: parsed });
+    // steps is already parsed from JSONB
+    res.json({ funnels: funnels || [] });
   } catch (err) {
     console.error('[funnels] GET / error:', err);
     res.status(500).json({ error: 'Failed to list funnels' });
@@ -84,40 +82,35 @@ router.get('/', (req, res) => {
 // ============================================================================
 // GET /api/funnels/:id — Get funnel with calculated results
 // ============================================================================
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const db = getDatabase();
     const { id } = req.params;
     const { date_from, date_to } = req.query;
 
-    const funnel = db.prepare('SELECT * FROM funnels WHERE id = ?').get(id);
-    if (!funnel) {
+    // Fetch the funnel definition
+    const { data: funnel, error: funnelError } = await db.query('funnels')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (funnelError || !funnel) {
       return res.status(404).json({ error: 'Funnel not found' });
     }
 
-    const steps = JSON.parse(funnel.steps);
+    const steps = funnel.steps; // already parsed from JSONB
 
-    // Build date filter conditions for the session query
-    const dateConditions = ['s.project_id = @project_id'];
-    const dateParams = { project_id: funnel.project_id };
+    // Fetch qualifying session IDs
+    let sessionQuery = db.query('sessions')
+      .select('id')
+      .eq('project_id', funnel.project_id);
 
-    if (date_from) {
-      dateConditions.push('s.started_at >= @date_from');
-      dateParams.date_from = date_from;
-    }
-    if (date_to) {
-      dateConditions.push('s.started_at <= @date_to');
-      dateParams.date_to = date_to;
-    }
+    if (date_from) sessionQuery = sessionQuery.gte('started_at', date_from);
+    if (date_to)   sessionQuery = sessionQuery.lte('started_at', date_to);
 
-    const dateWhere = dateConditions.join(' AND ');
+    const { data: sessionRows, error: sessError } = await sessionQuery;
+    if (sessError) throw sessError;
 
-    // Get all qualifying session IDs
-    const sessionRows = db.prepare(
-      `SELECT s.id FROM sessions s WHERE ${dateWhere}`
-    ).all(dateParams);
-
-    const allSessionIds = sessionRows.map((r) => r.id);
+    const allSessionIds = (sessionRows || []).map((r) => r.id);
     const totalSessions = allSessionIds.length;
 
     if (totalSessions === 0) {
@@ -130,7 +123,6 @@ router.get('/:id', (req, res) => {
         dropoff: 0,
       }));
 
-      funnel.steps = steps;
       return res.json({
         funnel,
         results: {
@@ -142,8 +134,8 @@ router.get('/:id', (req, res) => {
     }
 
     // For each step, compute which sessions match (in order).
-    // A session matches step N if it matched step N-1 AND has the required
-    // URL visit or event type after the timestamp of step N-1's match.
+    // A session qualifies for step N only if it qualified for step N-1 and
+    // has the required URL visit or event type.
     let qualifyingSessionIds = new Set(allSessionIds);
     const stepResults = [];
 
@@ -163,49 +155,49 @@ router.get('/:id', (req, res) => {
         continue;
       }
 
-      // Process in batches to avoid extremely long IN clauses
+      // Process in batches to avoid very large IN clauses
       const sessionIdArray = Array.from(qualifyingSessionIds);
       const BATCH_SIZE = 500;
 
       for (let b = 0; b < sessionIdArray.length; b += BATCH_SIZE) {
         const batch = sessionIdArray.slice(b, b + BATCH_SIZE);
-        const placeholders = batch.map(() => '?').join(',');
 
         if (step.type === 'url') {
           // Check if the session visited the given URL
-          const rows = db.prepare(`
-            SELECT DISTINCT session_id FROM events
-            WHERE session_id IN (${placeholders})
-              AND url LIKE ?
-          `).all(...batch, `%${step.value}%`);
+          const { data: rows, error: qErr } = await db.query('events')
+            .select('session_id')
+            .in('session_id', batch)
+            .ilike('url', `%${step.value}%`);
+          if (qErr) throw qErr;
 
-          for (const row of rows) {
+          for (const row of (rows || [])) {
             nextQualifying.add(row.session_id);
           }
         } else if (step.type === 'event') {
-          // Check if the session has a custom event matching the value
-          // The value is matched against the event data or the event type number
           const eventTypeNum = parseInt(step.value, 10);
-          if (!isNaN(eventTypeNum)) {
-            const rows = db.prepare(`
-              SELECT DISTINCT session_id FROM events
-              WHERE session_id IN (${placeholders})
-                AND type = ?
-            `).all(...batch, eventTypeNum);
 
-            for (const row of rows) {
+          if (!isNaN(eventTypeNum)) {
+            // Match by event type number
+            const { data: rows, error: qErr } = await db.query('events')
+              .select('session_id')
+              .in('session_id', batch)
+              .eq('type', eventTypeNum);
+            if (qErr) throw qErr;
+
+            for (const row of (rows || [])) {
               nextQualifying.add(row.session_id);
             }
           } else {
-            // Match custom events by name in the JSON data
-            const rows = db.prepare(`
-              SELECT DISTINCT session_id FROM events
-              WHERE session_id IN (${placeholders})
-                AND type = 14
-                AND json_extract(data, '$.name') = ?
-            `).all(...batch, step.value);
+            // Match custom events by name in the JSONB data field
+            // Supabase filter: data->>'name' = step.value
+            const { data: rows, error: qErr } = await db.query('events')
+              .select('session_id')
+              .in('session_id', batch)
+              .eq('type', 14)
+              .eq('data->>name', step.value);
+            if (qErr) throw qErr;
 
-            for (const row of rows) {
+            for (const row of (rows || [])) {
               nextQualifying.add(row.session_id);
             }
           }
@@ -234,8 +226,6 @@ router.get('/:id', (req, res) => {
       ? parseFloat(((lastStepCount / totalSessions) * 100).toFixed(2))
       : 0;
 
-    funnel.steps = steps;
-
     res.json({
       funnel,
       results: {
@@ -253,19 +243,19 @@ router.get('/:id', (req, res) => {
 // ============================================================================
 // PUT /api/funnels/:id — Update a funnel
 // ============================================================================
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
-    const db = getDatabase();
     const { id } = req.params;
     const { name, steps } = req.body;
 
-    const existing = db.prepare('SELECT * FROM funnels WHERE id = ?').get(id);
-    if (!existing) {
+    const { data: existing, error: findError } = await db.query('funnels')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (findError || !existing) {
       return res.status(404).json({ error: 'Funnel not found' });
     }
-
-    const updatedName = name !== undefined ? name.trim() : existing.name;
-    const updatedSteps = steps !== undefined ? JSON.stringify(steps) : existing.steps;
 
     if (steps !== undefined) {
       if (!Array.isArray(steps) || steps.length === 0) {
@@ -281,13 +271,23 @@ router.put('/:id', (req, res) => {
       }
     }
 
-    db.prepare(`
-      UPDATE funnels SET name = ?, steps = ?, updated_at = datetime('now')
-      WHERE id = ?
-    `).run(updatedName, updatedSteps, id);
+    const updatedName = name !== undefined ? name.trim() : existing.name;
+    const updatedSteps = steps !== undefined ? steps : existing.steps;
 
-    const funnel = db.prepare('SELECT * FROM funnels WHERE id = ?').get(id);
-    funnel.steps = JSON.parse(funnel.steps);
+    const { error: updateError } = await db.query('funnels')
+      .update({
+        name: updatedName,
+        steps: updatedSteps,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+    if (updateError) throw updateError;
+
+    const { data: funnel, error: fetchError } = await db.query('funnels')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (fetchError) throw fetchError;
 
     res.json({ funnel });
   } catch (err) {
@@ -299,17 +299,23 @@ router.put('/:id', (req, res) => {
 // ============================================================================
 // DELETE /api/funnels/:id — Delete a funnel
 // ============================================================================
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    const db = getDatabase();
     const { id } = req.params;
 
-    const existing = db.prepare('SELECT id FROM funnels WHERE id = ?').get(id);
-    if (!existing) {
+    const { data: existing, error: findError } = await db.query('funnels')
+      .select('id')
+      .eq('id', id)
+      .single();
+
+    if (findError || !existing) {
       return res.status(404).json({ error: 'Funnel not found' });
     }
 
-    db.prepare('DELETE FROM funnels WHERE id = ?').run(id);
+    const { error: deleteError } = await db.query('funnels')
+      .delete()
+      .eq('id', id);
+    if (deleteError) throw deleteError;
 
     res.json({ success: true, message: 'Funnel deleted' });
   } catch (err) {
