@@ -117,7 +117,7 @@ router.get('/live', async (req, res) => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
 
     const { data: activeSessions, error } = await supabase.from('sessions')
-      .select('*')
+      .select('id, visitor_id, url, started_at, ended_at, browser, os, device_type, country, identified_user_name, identified_user_email, page_count, event_count, duration, has_rage_clicks, has_errors, language')
       .eq('project_id', project_id)
       .or(`ended_at.gte.${fiveMinutesAgo},and(ended_at.is.null,started_at.gte.${fiveMinutesAgo})`)
       .order('ended_at', { ascending: false, nullsFirst: false })
@@ -125,9 +125,40 @@ router.get('/live', async (req, res) => {
 
     if (error) throw error;
 
+    const sessions = activeSessions || [];
+
+    // Compute summary stats for active sessions
+    const uniquePages = new Set();
+    let totalDuration = 0;
+    let totalEvents = 0;
+    const countryCounts = {};
+
+    for (const s of sessions) {
+      if (s.url) uniquePages.add(s.url);
+      totalDuration += s.duration || 0;
+      totalEvents += s.event_count || 0;
+      if (s.country) {
+        countryCounts[s.country] = (countryCounts[s.country] || 0) + 1;
+      }
+    }
+
+    const avgDuration = sessions.length > 0 ? Math.floor(totalDuration / sessions.length) : 0;
+
+    // Estimate events per minute based on active sessions
+    const eventsPerMinute = sessions.length > 0
+      ? Math.round(totalEvents / Math.max(1, totalDuration / 60))
+      : 0;
+
     res.json({
-      active_sessions: activeSessions || [],
-      count: (activeSessions || []).length,
+      active_sessions: sessions,
+      count: sessions.length,
+      stats: {
+        active_count: sessions.length,
+        unique_pages: uniquePages.size,
+        avg_duration: avgDuration,
+        events_per_minute: eventsPerMinute,
+        country_breakdown: countryCounts,
+      },
     });
   } catch (err) {
     console.error('[dashboard] GET /live error:', err);

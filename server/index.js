@@ -37,6 +37,7 @@ app.use('/api/events', require('./routes/events'));
 app.use('/api/funnels', require('./routes/funnels'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/segments', require('./routes/segments'));
+app.use('/api/heatmaps', require('./routes/heatmaps'));
 
 // Serve dashboard (local dev only)
 app.use(express.static(path.join(__dirname, '..', 'dashboard')));

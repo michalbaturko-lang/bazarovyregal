@@ -136,6 +136,34 @@ END $$;
 -- -----------------------------------------------------------
 -- Default project
 -- -----------------------------------------------------------
+-- -----------------------------------------------------------
+-- Session notes
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS session_notes (
+  id TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+  project_id TEXT NOT NULL,
+  content TEXT NOT NULL,
+  author TEXT DEFAULT 'admin',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_notes_session ON session_notes(session_id);
+
+-- -----------------------------------------------------------
+-- RLS for session_notes
+-- -----------------------------------------------------------
+ALTER TABLE session_notes ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_session_notes') THEN
+    CREATE POLICY "service_role_all_session_notes" ON session_notes FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+-- -----------------------------------------------------------
+-- Default project
+-- -----------------------------------------------------------
 INSERT INTO projects (id, name, domain)
 VALUES ('default', 'Default Project', 'localhost')
 ON CONFLICT (id) DO NOTHING;

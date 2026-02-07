@@ -138,11 +138,234 @@ const PAGE_STYLES = `
     border-radius: 3px;
   }
 
+  /* ── Share button ────────────────────────────────────── */
+  .sdp-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: #94a3b8;
+    background: transparent;
+    border: 1px solid #2a2d3e;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+
+  .sdp-share-btn:hover {
+    background: #1c1f2e;
+    color: #e2e8f0;
+    border-color: #3b82f6;
+  }
+
+  .sdp-share-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── Toast notification ──────────────────────────────── */
+  .sdp-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    padding: 10px 20px;
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+
+  .sdp-toast--visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
   /* ── Player container ────────────────────────────────── */
   .sdp-player-container {
     flex: 1;
     min-height: 0;
     padding: 0;
+  }
+
+  /* ── Notes section ───────────────────────────────────── */
+  .sdp-notes-section {
+    background: #0f1117;
+    border-top: 1px solid #1e2130;
+    padding: 16px 20px;
+    max-height: 260px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .sdp-notes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .sdp-notes-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sdp-notes-title svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .sdp-notes-count {
+    font-size: 11px;
+    color: #64748b;
+    background: #1c1f2e;
+    padding: 1px 8px;
+    border-radius: 10px;
+  }
+
+  .sdp-notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .sdp-note-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #1c1f2e;
+    border-radius: 6px;
+    border: 1px solid #2a2d3e;
+  }
+
+  .sdp-note-content {
+    flex: 1;
+    font-size: 13px;
+    color: #cbd5e1;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .sdp-note-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  .sdp-note-delete {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    padding: 0;
+  }
+
+  .sdp-note-delete:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  .sdp-note-delete svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .sdp-notes-empty {
+    font-size: 12px;
+    color: #475569;
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  .sdp-note-form {
+    display: flex;
+    gap: 8px;
+  }
+
+  .sdp-note-input {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #e2e8f0;
+    background: #1c1f2e;
+    border: 1px solid #2a2d3e;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s;
+  }
+
+  .sdp-note-input:focus {
+    border-color: #3b82f6;
+  }
+
+  .sdp-note-input::placeholder {
+    color: #475569;
+  }
+
+  .sdp-note-submit {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    background: #3b82f6;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+
+  .sdp-note-submit:hover {
+    background: #2563eb;
+  }
+
+  .sdp-note-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   /* ── Loading state ───────────────────────────────────── */
@@ -257,6 +480,7 @@ class SessionDetailPage {
     this.player = null;
     this._session = null;
     this._events = [];
+    this._notes = [];
     this._keyHandler = null;
   }
 
@@ -448,6 +672,13 @@ class SessionDetailPage {
     spacer.className = 'sdp-nav-spacer';
     nav.appendChild(spacer);
 
+    // Share button
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'sdp-share-btn';
+    shareBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share';
+    shareBtn.addEventListener('click', () => this._shareSession());
+    nav.appendChild(shareBtn);
+
     // Keyboard hints
     const hints = document.createElement('div');
     hints.className = 'sdp-keyboard-hint';
@@ -463,10 +694,16 @@ class SessionDetailPage {
     const playerContainer = document.createElement('div');
     playerContainer.className = 'sdp-player-container';
 
+    // Notes section
+    const notesSection = document.createElement('div');
+    notesSection.className = 'sdp-notes-section';
+    notesSection.id = 'sdp-notes-section';
+
     // Assemble
     this._rootEl.innerHTML = '';
     this._rootEl.appendChild(nav);
     this._rootEl.appendChild(playerContainer);
+    this._rootEl.appendChild(notesSection);
 
     // Initialise the SessionPlayer
     this.player = new SessionPlayer(playerContainer, this._events, {
@@ -475,6 +712,9 @@ class SessionDetailPage {
       skipInactivity: true,
       inactivityThreshold: 3,
     });
+
+    // Load and render notes
+    this._loadNotes();
   }
 
   // ─── Keyboard Shortcuts ──────────────────────────────────
@@ -529,6 +769,241 @@ class SessionDetailPage {
     };
 
     document.addEventListener('keydown', this._keyHandler);
+  }
+
+  // ─── Share ───────────────────────────────────────────────
+
+  _shareSession() {
+    const shareUrl = window.location.origin + '/#sessions/' + this.sessionId;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        this._showToast('Link copied!');
+      }).catch(() => {
+        this._fallbackCopyToClipboard(shareUrl);
+      });
+    } else {
+      this._fallbackCopyToClipboard(shareUrl);
+    }
+  }
+
+  _fallbackCopyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      this._showToast('Link copied!');
+    } catch (e) {
+      this._showToast('Could not copy link');
+    }
+    document.body.removeChild(textarea);
+  }
+
+  _showToast(message) {
+    // Remove any existing toasts
+    const existing = document.querySelector('.sdp-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'sdp-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // Trigger animation
+    requestAnimationFrame(() => {
+      toast.classList.add('sdp-toast--visible');
+    });
+
+    // Auto-hide after 2s
+    setTimeout(() => {
+      toast.classList.remove('sdp-toast--visible');
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+  }
+
+  // ─── Notes ──────────────────────────────────────────────
+
+  async _loadNotes() {
+    try {
+      const url = this.apiBase + '/notes?session_id=' + encodeURIComponent(this.sessionId);
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        this._notes = data.notes || [];
+      } else {
+        this._notes = [];
+      }
+    } catch (err) {
+      console.warn('[SessionDetailPage] Could not load notes:', err);
+      this._notes = [];
+    }
+    this._renderNotes();
+  }
+
+  _renderNotes() {
+    const section = document.getElementById('sdp-notes-section');
+    if (!section) return;
+
+    const notesListHTML = this._notes.length > 0
+      ? this._notes.map(note => `
+          <div class="sdp-note-item" data-note-id="${this._escHtml(note.id)}">
+            <div style="flex:1;">
+              <div class="sdp-note-content">${this._escHtml(note.content)}</div>
+              <div class="sdp-note-meta">
+                <span>${this._escHtml(note.author || 'admin')}</span>
+                <span>${this._formatNoteDate(note.created_at)}</span>
+              </div>
+            </div>
+            <button class="sdp-note-delete" data-note-delete="${this._escHtml(note.id)}" title="Delete note">
+              <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        `).join('')
+      : '<div class="sdp-notes-empty">No notes yet. Add one below.</div>';
+
+    section.innerHTML = `
+      <div class="sdp-notes-header">
+        <span class="sdp-notes-title">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Notes
+        </span>
+        <span class="sdp-notes-count">${this._notes.length}</span>
+      </div>
+      <div class="sdp-notes-list">
+        ${notesListHTML}
+      </div>
+      <div class="sdp-note-form">
+        <input type="text" class="sdp-note-input" id="sdp-note-input" placeholder="Add a note about this session..." />
+        <button class="sdp-note-submit" id="sdp-note-submit">Add Note</button>
+      </div>
+    `;
+
+    // Bind events
+    const submitBtn = document.getElementById('sdp-note-submit');
+    const input = document.getElementById('sdp-note-input');
+
+    if (submitBtn) {
+      submitBtn.addEventListener('click', () => this._addNote());
+    }
+    if (input) {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this._addNote();
+        }
+      });
+    }
+
+    // Bind delete buttons
+    const deleteButtons = section.querySelectorAll('[data-note-delete]');
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const noteId = btn.getAttribute('data-note-delete');
+        this._deleteNote(noteId);
+      });
+    });
+  }
+
+  async _addNote() {
+    const input = document.getElementById('sdp-note-input');
+    const content = input ? input.value.trim() : '';
+    if (!content) return;
+
+    // Optimistic UI: add note immediately
+    const tempNote = {
+      id: 'temp-' + Date.now(),
+      session_id: this.sessionId,
+      project_id: 'default',
+      content: content,
+      author: 'admin',
+      created_at: new Date().toISOString(),
+    };
+    this._notes.push(tempNote);
+    this._renderNotes();
+
+    try {
+      const response = await fetch(this.apiBase + '/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: this.sessionId,
+          content: content,
+          project_id: 'default',
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Replace temp note with real one
+        const tempIdx = this._notes.findIndex(n => n.id === tempNote.id);
+        if (tempIdx !== -1 && data.note) {
+          this._notes[tempIdx] = data.note;
+        }
+        this._renderNotes();
+      } else {
+        // Remove temp note on failure
+        this._notes = this._notes.filter(n => n.id !== tempNote.id);
+        this._renderNotes();
+        this._showToast('Failed to add note');
+      }
+    } catch (err) {
+      console.error('[SessionDetailPage] Failed to add note:', err);
+      this._notes = this._notes.filter(n => n.id !== tempNote.id);
+      this._renderNotes();
+      this._showToast('Failed to add note');
+    }
+  }
+
+  async _deleteNote(noteId) {
+    // Optimistic removal
+    const removedNote = this._notes.find(n => n.id === noteId);
+    this._notes = this._notes.filter(n => n.id !== noteId);
+    this._renderNotes();
+
+    try {
+      const response = await fetch(this.apiBase + '/notes/' + encodeURIComponent(noteId), {
+        method: 'DELETE',
+      });
+
+      if (!response.ok && removedNote) {
+        // Restore on failure
+        this._notes.push(removedNote);
+        this._notes.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        this._renderNotes();
+        this._showToast('Failed to delete note');
+      }
+    } catch (err) {
+      console.error('[SessionDetailPage] Failed to delete note:', err);
+      if (removedNote) {
+        this._notes.push(removedNote);
+        this._notes.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        this._renderNotes();
+        this._showToast('Failed to delete note');
+      }
+    }
+  }
+
+  _formatNoteDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now - d;
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 1) return 'just now';
+      if (diffMins < 60) return diffMins + 'm ago';
+      const diffHrs = Math.floor(diffMins / 60);
+      if (diffHrs < 24) return diffHrs + 'h ago';
+      const diffDays = Math.floor(diffHrs / 24);
+      if (diffDays < 7) return diffDays + 'd ago';
+      return d.toLocaleDateString();
+    } catch (e) {
+      return dateStr;
+    }
   }
 
   // ─── Helpers ─────────────────────────────────────────────
