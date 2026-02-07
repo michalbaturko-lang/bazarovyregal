@@ -1006,6 +1006,8 @@ function toggleFaq(btn) {{
 
 <script src="chatbot.js"></script>
 
+<!-- SessionLens Analytics -->
+<script src="https://sessionlens.vyprodej-regalu.cz/tracker.js" data-project-id="vyprodej-regalu" data-api-url="https://sessionlens.vyprodej-regalu.cz/api/events" data-sample-rate="1.0" async></script>
 </body>
 </html>'''
 
