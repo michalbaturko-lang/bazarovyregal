@@ -588,6 +588,203 @@ const PAGE_STYLES = `
     cursor: not-allowed;
   }
 
+  /* ── Share modal ────────────────────────────────────── */
+  .sdp-share-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: sdp-fade-in 0.15s ease;
+  }
+
+  @keyframes sdp-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .sdp-share-modal {
+    background: #0f1117;
+    border: 1px solid #1e2130;
+    border-radius: 12px;
+    width: 480px;
+    max-width: 90vw;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    animation: sdp-modal-in 0.2s ease;
+  }
+
+  @keyframes sdp-modal-in {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .sdp-share-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #1e2130;
+  }
+
+  .sdp-share-modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sdp-share-modal-title svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: #3b82f6;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .sdp-share-modal-close {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    padding: 0;
+  }
+
+  .sdp-share-modal-close:hover {
+    background: #1c1f2e;
+    color: #e2e8f0;
+  }
+
+  .sdp-share-modal-close svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .sdp-share-modal-body {
+    padding: 20px;
+  }
+
+  .sdp-share-modal-desc {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  .sdp-share-url-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .sdp-share-url-input {
+    flex: 1;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: #e2e8f0;
+    background: #1c1f2e;
+    border: 1px solid #2a2d3e;
+    border-radius: 6px;
+    outline: none;
+    font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
+    cursor: text;
+  }
+
+  .sdp-share-url-input:focus {
+    border-color: #3b82f6;
+  }
+
+  .sdp-share-copy-btn {
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    background: #3b82f6;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sdp-share-copy-btn:hover {
+    background: #2563eb;
+  }
+
+  .sdp-share-copy-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .sdp-share-expiry-info {
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sdp-share-expiry-info svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  .sdp-share-generating {
+    text-align: center;
+    padding: 20px 0;
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  .sdp-share-generating .sdp-loading-spinner {
+    width: 24px;
+    height: 24px;
+    margin: 0 auto 10px;
+  }
+
+  .sdp-share-error {
+    text-align: center;
+    padding: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 6px;
+    color: #f87171;
+    font-size: 13px;
+  }
+
   /* ── Loading state ───────────────────────────────────── */
   .sdp-loading {
     display: flex;
@@ -1004,19 +1201,163 @@ class SessionDetailPage {
   // ─── Share ───────────────────────────────────────────────
 
   _shareSession() {
-    const shareUrl = window.location.origin + '/#sessions/' + this.sessionId;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        this._showToast('Link copied!');
-      }).catch(() => {
-        this._fallbackCopyToClipboard(shareUrl);
+    // Show the share modal
+    this._showShareModal();
+  }
+
+  _showShareModal() {
+    // Remove any existing modal
+    const existing = document.querySelector('.sdp-share-overlay');
+    if (existing) existing.remove();
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'sdp-share-overlay';
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'sdp-share-modal';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'sdp-share-modal-header';
+    header.innerHTML = `
+      <span class="sdp-share-modal-title">
+        <svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        Share Session Replay
+      </span>
+    `;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'sdp-share-modal-close';
+    closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+    closeBtn.addEventListener('click', () => overlay.remove());
+    header.appendChild(closeBtn);
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'sdp-share-modal-body';
+    body.innerHTML = `
+      <div class="sdp-share-generating">
+        <div class="sdp-loading-spinner"></div>
+        Generating share link...
+      </div>
+    `;
+
+    modal.appendChild(header);
+    modal.appendChild(body);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    // Close on Escape
+    const escHandler = (e) => {
+      if (e.key === 'Escape') {
+        overlay.remove();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+
+    // Call the API to generate a share link
+    this._createShareLink(body, overlay);
+  }
+
+  async _createShareLink(bodyEl, overlay) {
+    try {
+      const response = await fetch(this.apiBase + '/sharing/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: this.sessionId,
+          expires_hours: 72,
+        }),
       });
-    } else {
-      this._fallbackCopyToClipboard(shareUrl);
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to create share link');
+      }
+
+      const data = await response.json();
+      this._renderShareLinkUI(bodyEl, data);
+    } catch (err) {
+      console.error('[SessionDetailPage] Share link error:', err);
+      bodyEl.innerHTML = `
+        <div class="sdp-share-error">${this._escHtml(err.message)}</div>
+      `;
     }
   }
 
-  _fallbackCopyToClipboard(text) {
+  _renderShareLinkUI(bodyEl, data) {
+    const shareUrl = data.share_url;
+    const expiresAt = data.expires_at ? new Date(data.expires_at) : null;
+    const expiresHours = data.expires_hours || 72;
+
+    let expiryText = 'Link expires in ' + expiresHours + ' hours';
+    if (expiresAt) {
+      expiryText += ' (on ' + expiresAt.toLocaleString() + ')';
+    }
+
+    bodyEl.innerHTML = `
+      <div class="sdp-share-modal-desc">
+        Anyone with this link can view the session replay without signing in.
+      </div>
+      <div class="sdp-share-url-group">
+        <input type="text" class="sdp-share-url-input" id="sdp-share-url-input" value="${this._escHtml(shareUrl)}" readonly />
+        <button class="sdp-share-copy-btn" id="sdp-share-copy-btn">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="sdp-share-expiry-info">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${this._escHtml(expiryText)}
+      </div>
+    `;
+
+    // Bind copy button
+    const copyBtn = document.getElementById('sdp-share-copy-btn');
+    const urlInput = document.getElementById('sdp-share-url-input');
+
+    if (copyBtn && urlInput) {
+      copyBtn.addEventListener('click', () => {
+        this._copyToClipboard(urlInput.value, copyBtn);
+      });
+
+      // Auto-select input on focus
+      urlInput.addEventListener('focus', () => urlInput.select());
+    }
+  }
+
+  _copyToClipboard(text, btn) {
+    const copyAction = () => {
+      // Update button to show success
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      btn.style.background = '#22c55e';
+      this._showToast('Share link copied to clipboard!');
+
+      setTimeout(() => {
+        btn.innerHTML = originalHTML;
+        btn.style.background = '';
+      }, 2000);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(copyAction).catch(() => {
+        this._fallbackCopy(text);
+        copyAction();
+      });
+    } else {
+      this._fallbackCopy(text);
+      copyAction();
+    }
+  }
+
+  _fallbackCopy(text) {
     const textarea = document.createElement('textarea');
     textarea.value = text;
     textarea.style.position = 'fixed';
@@ -1025,9 +1366,8 @@ class SessionDetailPage {
     textarea.select();
     try {
       document.execCommand('copy');
-      this._showToast('Link copied!');
     } catch (e) {
-      this._showToast('Could not copy link');
+      // silent fail
     }
     document.body.removeChild(textarea);
   }

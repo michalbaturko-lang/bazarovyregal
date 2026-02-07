@@ -7,6 +7,7 @@
     { "source": "/login.html", "destination": "/dashboard/login.html" },
     { "source": "/css/:path*", "destination": "/dashboard/css/:path*" },
     { "source": "/js/:path*", "destination": "/dashboard/js/:path*" },
+    { "source": "/shared", "destination": "/dashboard/shared.html" },
     { "source": "/", "destination": "/dashboard/index.html" }
   ],
   "headers": [

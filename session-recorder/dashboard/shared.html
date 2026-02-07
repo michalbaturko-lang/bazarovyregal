@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shared Session Replay - Regal Master Look</title>
+
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/player-theme.css" />
+
+  <style>
+    /* ── Base ───────────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0c10;
+      color: #e2e8f0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ── Scrollbar ─────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    /* ── Shared page layout ────────────────────────────────── */
+    .shared-root {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100%;
+    }
+
+    /* ── Header bar ────────────────────────────────────────── */
+    .shared-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      height: 52px;
+      background: #0f1117;
+      border-bottom: 1px solid #1e2130;
+      flex-shrink: 0;
+    }
+
+    .shared-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .shared-logo svg {
+      width: 28px;
+      height: 28px;
+      color: #3b82f6;
+    }
+
+    .shared-logo-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #e2e8f0;
+      letter-spacing: -0.3px;
+    }
+
+    .shared-divider {
+      width: 1px;
+      height: 20px;
+      background: #2a2d3e;
+    }
+
+    .shared-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #60a5fa;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .shared-badge svg {
+      width: 12px;
+      height: 12px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .shared-spacer {
+      flex: 1;
+    }
+
+    /* ── Session metadata ──────────────────────────────────── */
+    .shared-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .shared-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .shared-meta-item svg {
+      width: 13px;
+      height: 13px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .shared-meta-value {
+      color: #94a3b8;
+    }
+
+    /* ── Expiry info ───────────────────────────────────────── */
+    .shared-expiry {
+      font-size: 11px;
+      color: #475569;
+      padding: 3px 8px;
+      background: #1c1f2e;
+      border-radius: 6px;
+    }
+
+    /* ── Player area ───────────────────────────────────────── */
+    .shared-player-area {
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Loading state ─────────────────────────────────────── */
+    .shared-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 16px;
+      color: #64748b;
+    }
+
+    .shared-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #1c1f2e;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: shared-spin 0.8s linear infinite;
+    }
+
+    @keyframes shared-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .shared-loading-text {
+      font-size: 14px;
+    }
+
+    /* ── Error state ───────────────────────────────────────── */
+    .shared-error {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 12px;
+      color: #64748b;
+    }
+
+    .shared-error-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .shared-error-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: #ef4444;
+    }
+
+    .shared-error-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .shared-error-message {
+      font-size: 13px;
+      color: #94a3b8;
+      max-width: 440px;
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shared-root" id="shared-root">
+    <div class="shared-loading">
+      <div class="shared-spinner"></div>
+      <div class="shared-loading-text">Loading shared session...</div>
+    </div>
+  </div>
+
+  <!-- Player script -->
+  <script src="js/player.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ── Extract token from URL ────────────────────────────────
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const root = document.getElementById('shared-root');
+
+    if (!token) {
+      renderError('No Share Token', 'No share token was provided in the URL. Please check the link and try again.');
+      return;
+    }
+
+    // ── Fetch shared session data ─────────────────────────────
+    fetchSharedSession(token);
+
+    async function fetchSharedSession(shareToken) {
+      try {
+        const response = await fetch('/api/sharing/' + encodeURIComponent(shareToken));
+
+        if (!response.ok) {
+          const data = await response.json().catch(function () { return {}; });
+          var msg = data.error || 'Failed to load session';
+
+          if (response.status === 410) {
+            renderError('Link Expired', 'This share link has expired and is no longer available. Please request a new share link from the session owner.');
+          } else if (response.status === 404) {
+            renderError('Link Not Found', 'This share link was not found. It may have been revoked or the URL is incorrect.');
+          } else {
+            renderError('Error', msg);
+          }
+          return;
+        }
+
+        const data = await response.json();
+        renderPlayer(data);
+      } catch (err) {
+        console.error('[SharedReplay] Fetch error:', err);
+        renderError('Connection Error', 'Could not connect to the server. Please check your network connection and try again.');
+      }
+    }
+
+    // ── Render the player ─────────────────────────────────────
+    function renderPlayer(data) {
+      var session = data.session;
+      var events = data.events || [];
+      var share = data.share || {};
+
+      if (!events.length) {
+        renderError('No Events', 'This session has no recorded events to replay.');
+        return;
+      }
+
+      // Format duration
+      var duration = session.duration || 0;
+      var dMin = Math.floor(duration / 60);
+      var dSec = duration % 60;
+      var durationStr = dMin + 'm ' + dSec + 's';
+
+      // Format expiry
+      var expiryStr = '';
+      if (share.expires_at) {
+        var expiryDate = new Date(share.expires_at);
+        var now = new Date();
+        var diffMs = expiryDate - now;
+        if (diffMs > 0) {
+          var diffHrs = Math.floor(diffMs / 3600000);
+          if (diffHrs > 24) {
+            expiryStr = 'Expires in ' + Math.floor(diffHrs / 24) + 'd ' + (diffHrs % 24) + 'h';
+          } else {
+            expiryStr = 'Expires in ' + diffHrs + 'h';
+          }
+        }
+      }
+
+      // Build header
+      root.innerHTML = '';
+
+      var header = document.createElement('div');
+      header.className = 'shared-header';
+
+      // Logo
+      header.innerHTML =
+        '<a class="shared-logo" href="/">' +
+          '<svg viewBox="0 0 40 40" fill="none">' +
+            '<circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="2.5" opacity="0.3"/>' +
+            '<circle cx="20" cy="20" r="10" stroke="currentColor" stroke-width="2.5"/>' +
+            '<circle cx="20" cy="20" r="4" fill="currentColor"/>' +
+          '</svg>' +
+          '<span class="shared-logo-text">Regal Master Look</span>' +
+        '</a>' +
+        '<div class="shared-divider"></div>' +
+        '<span class="shared-badge">' +
+          '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>' +
+          'Shared Replay' +
+        '</span>' +
+        '<div class="shared-spacer"></div>';
+
+      // Meta info
+      var meta = document.createElement('div');
+      meta.className = 'shared-meta';
+
+      // Duration
+      if (duration > 0) {
+        var durItem = document.createElement('span');
+        durItem.className = 'shared-meta-item';
+        durItem.innerHTML =
+          '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+          '<span class="shared-meta-value">' + escHtml(durationStr) + '</span>';
+        meta.appendChild(durItem);
+      }
+
+      // Browser
+      if (session.browser) {
+        var brItem = document.createElement('span');
+        brItem.className = 'shared-meta-item';
+        brItem.innerHTML =
+          '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>' +
+          '<span class="shared-meta-value">' + escHtml(session.browser) + '</span>';
+        meta.appendChild(brItem);
+      }
+
+      // OS
+      if (session.os) {
+        var osItem = document.createElement('span');
+        osItem.className = 'shared-meta-item';
+        osItem.innerHTML =
+          '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>' +
+          '<span class="shared-meta-value">' + escHtml(session.os) + '</span>';
+        meta.appendChild(osItem);
+      }
+
+      // Device
+      if (session.device_type) {
+        var devItem = document.createElement('span');
+        devItem.className = 'shared-meta-item';
+        devItem.innerHTML =
+          '<svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>' +
+          '<span class="shared-meta-value">' + escHtml(session.device_type) + '</span>';
+        meta.appendChild(devItem);
+      }
+
+      // URL
+      if (session.url) {
+        var urlItem = document.createElement('span');
+        urlItem.className = 'shared-meta-item';
+        urlItem.innerHTML =
+          '<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>' +
+          '<span class="shared-meta-value" title="' + escHtml(session.url) + '">' + escHtml(truncateUrl(session.url, 40)) + '</span>';
+        meta.appendChild(urlItem);
+      }
+
+      header.appendChild(meta);
+
+      // Expiry badge
+      if (expiryStr) {
+        var expiryEl = document.createElement('span');
+        expiryEl.className = 'shared-expiry';
+        expiryEl.textContent = expiryStr;
+        header.appendChild(expiryEl);
+      }
+
+      root.appendChild(header);
+
+      // Player container
+      var playerArea = document.createElement('div');
+      playerArea.className = 'shared-player-area';
+      root.appendChild(playerArea);
+
+      // Initialise the SessionPlayer
+      if (typeof SessionPlayer !== 'undefined') {
+        var player = new SessionPlayer(playerArea, events, {
+          session: session,
+          speed: 1,
+          skipInactivity: true,
+          inactivityThreshold: 3,
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+          if (!player) return;
+
+          switch (e.key) {
+            case ' ':
+              e.preventDefault();
+              player.toggle();
+              break;
+            case 'ArrowLeft':
+              e.preventDefault();
+              player.seekTo(Math.max(0, player._elapsedAtPause - 5000));
+              break;
+            case 'ArrowRight':
+              e.preventDefault();
+              player.seekTo(Math.min(player._totalDuration, player._elapsedAtPause + 5000));
+              break;
+            case '1': player.setSpeed(1); break;
+            case '2': player.setSpeed(2); break;
+            case '3': player.setSpeed(4); break;
+            case '4': player.setSpeed(8); break;
+            case 'f':
+            case 'F':
+              e.preventDefault();
+              player._toggleFullscreen();
+              break;
+          }
+        });
+      } else {
+        playerArea.innerHTML =
+          '<div class="shared-error">' +
+            '<div class="shared-error-title">Player Not Available</div>' +
+            '<div class="shared-error-message">The session player script could not be loaded. Please try refreshing the page.</div>' +
+          '</div>';
+      }
+    }
+
+    // ── Render error ──────────────────────────────────────────
+    function renderError(title, message) {
+      root.innerHTML =
+        '<div class="shared-header">' +
+          '<a class="shared-logo" href="/">' +
+            '<svg viewBox="0 0 40 40" fill="none">' +
+              '<circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="2.5" opacity="0.3"/>' +
+              '<circle cx="20" cy="20" r="10" stroke="currentColor" stroke-width="2.5"/>' +
+              '<circle cx="20" cy="20" r="4" fill="currentColor"/>' +
+            '</svg>' +
+            '<span class="shared-logo-text">Regal Master Look</span>' +
+          '</a>' +
+          '<div class="shared-divider"></div>' +
+          '<span class="shared-badge">' +
+            '<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>' +
+            'Shared Replay' +
+          '</span>' +
+        '</div>' +
+        '<div class="shared-error">' +
+          '<div class="shared-error-icon">' +
+            '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>' +
+          '</div>' +
+          '<div class="shared-error-title">' + escHtml(title) + '</div>' +
+          '<div class="shared-error-message">' + escHtml(message) + '</div>' +
+        '</div>';
+    }
+
+    // ── Helpers ───────────────────────────────────────────────
+    function escHtml(str) {
+      if (!str) return '';
+      var div = document.createElement('div');
+      div.textContent = String(str);
+      return div.innerHTML;
+    }
+
+    function truncateUrl(url, maxLen) {
+      if (!url) return '';
+      try {
+        var u = new URL(url);
+        var display = u.hostname + u.pathname;
+        if (display.length > maxLen) {
+          return display.substring(0, maxLen - 3) + '...';
+        }
+        return display;
+      } catch (e) {
+        if (url.length > maxLen) return url.substring(0, maxLen - 3) + '...';
+        return url;
+      }
+    }
+  })();
+  </script>
+</body>
+</html>
