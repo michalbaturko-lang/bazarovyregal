@@ -12,12 +12,20 @@
     {
       "src": "tracker/tracker.js",
       "use": "@vercel/static"
+    },
+    {
+      "src": "tracker/consent-banner.js",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/tracker.js",
       "dest": "/tracker/tracker.js"
+    },
+    {
+      "src": "/consent-banner.js",
+      "dest": "/tracker/consent-banner.js"
     },
     {
       "src": "/api/(.*)",

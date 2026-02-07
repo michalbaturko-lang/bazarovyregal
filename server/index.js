@@ -19,6 +19,11 @@ app.get('/tracker.js', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'tracker', 'tracker.js'));
 });
 
+// Serve consent banner
+app.get('/consent-banner.js', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'tracker', 'consent-banner.js'));
+});
+
 // Auth routes (before auth middleware)
 app.post('/api/auth/login', loginHandler);
 app.get('/api/auth/check', checkAuthHandler);
