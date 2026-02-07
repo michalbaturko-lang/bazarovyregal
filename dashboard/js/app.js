@@ -29,7 +29,11 @@ const App = (() => {
     { pattern: /^#?sessions$/,       page: 'sessions',       params: [] },
     { pattern: /^#?funnels\/(.+)$/,  page: 'funnel-detail',  params: ['id'] },
     { pattern: /^#?funnels$/,        page: 'funnels',        params: [] },
+    { pattern: /^#?journeys$/,        page: 'journeys',       params: [] },
     { pattern: /^#?heatmaps$/,       page: 'heatmaps',       params: [] },
+    { pattern: /^#?ecommerce$/,     page: 'ecommerce',      params: [] },
+    { pattern: /^#?behavioral$/,     page: 'behavioral',     params: [] },
+    { pattern: /^#?insights$/,       page: 'insights',       params: [] },
     { pattern: /^#?settings$/,       page: 'settings',       params: [] },
   ];
 
@@ -98,8 +102,20 @@ const App = (() => {
       case 'funnel-detail':
         FunnelsPage.renderDetail(container, params.id);
         break;
+      case 'journeys':
+        JourneysPage.render(container);
+        break;
       case 'heatmaps':
         HeatmapsPage.render(container);
+        break;
+      case 'ecommerce':
+        EcommercePage.render(container);
+        break;
+      case 'behavioral':
+        BehavioralPage.render(container);
+        break;
+      case 'insights':
+        InsightsPage.render(container);
         break;
       case 'settings':
         renderSettingsPage(container);

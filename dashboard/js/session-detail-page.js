@@ -201,6 +201,226 @@ const PAGE_STYLES = `
     padding: 0;
   }
 
+  /* ── AI Analysis section ────────────────────────────────── */
+  .sdp-ai-section {
+    background: #0f1117;
+    border-top: 1px solid #1e2130;
+    padding: 16px 20px;
+    max-height: 340px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .sdp-ai-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .sdp-ai-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sdp-ai-title svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .sdp-ai-loading {
+    text-align: center;
+    padding: 16px 0;
+    color: #64748b;
+    font-size: 12px;
+  }
+
+  .sdp-ai-summary {
+    background: #1c1f2e;
+    border: 1px solid #2a2d3e;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #cbd5e1;
+    margin-bottom: 14px;
+  }
+
+  .sdp-ai-scores {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .sdp-ai-gauge {
+    flex: 1;
+    background: #1c1f2e;
+    border: 1px solid #2a2d3e;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sdp-ai-gauge-value {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .sdp-ai-gauge-label {
+    font-size: 10px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .sdp-ai-gauge-bar {
+    width: 100%;
+    height: 4px;
+    background: #2a2d3e;
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+
+  .sdp-ai-gauge-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+
+  .sdp-ai-insights-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sdp-ai-insight {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #1c1f2e;
+    border: 1px solid #2a2d3e;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .sdp-ai-insight-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .sdp-ai-insight-badge--critical {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  .sdp-ai-insight-badge--high {
+    background: rgba(249, 115, 22, 0.15);
+    color: #fb923c;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+  }
+
+  .sdp-ai-insight-badge--medium {
+    background: rgba(234, 179, 8, 0.15);
+    color: #facc15;
+    border: 1px solid rgba(234, 179, 8, 0.3);
+  }
+
+  .sdp-ai-insight-badge--low {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  .sdp-ai-insight-badge--info {
+    background: rgba(100, 116, 139, 0.15);
+    color: #94a3b8;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+  }
+
+  .sdp-ai-insight-text {
+    flex: 1;
+    color: #cbd5e1;
+    line-height: 1.4;
+  }
+
+  .sdp-ai-insight-title {
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+
+  .sdp-ai-insight-rec {
+    margin-top: 4px;
+    padding: 4px 8px;
+    background: rgba(59, 130, 246, 0.08);
+    border-radius: 4px;
+    font-size: 11px;
+    color: #93c5fd;
+  }
+
+  .sdp-ai-tabs {
+    display: flex;
+    gap: 2px;
+    background: #1c1f2e;
+    border-radius: 8px;
+    padding: 2px;
+    margin-bottom: 14px;
+  }
+
+  .sdp-ai-tab {
+    flex: 1;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    text-align: center;
+  }
+
+  .sdp-ai-tab:hover {
+    color: #94a3b8;
+  }
+
+  .sdp-ai-tab--active {
+    background: #2a2d3e;
+    color: #e2e8f0;
+  }
+
+  .sdp-ai-tab-content {
+    display: none;
+  }
+
+  .sdp-ai-tab-content--active {
+    display: block;
+  }
+
   /* ── Notes section ───────────────────────────────────── */
   .sdp-notes-section {
     background: #0f1117;
@@ -694,6 +914,12 @@ class SessionDetailPage {
     const playerContainer = document.createElement('div');
     playerContainer.className = 'sdp-player-container';
 
+    // AI Analysis section
+    const aiSection = document.createElement('div');
+    aiSection.className = 'sdp-ai-section';
+    aiSection.id = 'sdp-ai-section';
+    aiSection.innerHTML = `<div class="sdp-ai-loading">Analysing session...</div>`;
+
     // Notes section
     const notesSection = document.createElement('div');
     notesSection.className = 'sdp-notes-section';
@@ -703,7 +929,11 @@ class SessionDetailPage {
     this._rootEl.innerHTML = '';
     this._rootEl.appendChild(nav);
     this._rootEl.appendChild(playerContainer);
+    this._rootEl.appendChild(aiSection);
     this._rootEl.appendChild(notesSection);
+
+    // Load AI analysis
+    this._loadAiAnalysis();
 
     // Initialise the SessionPlayer
     this.player = new SessionPlayer(playerContainer, this._events, {
@@ -822,6 +1052,192 @@ class SessionDetailPage {
       toast.classList.remove('sdp-toast--visible');
       setTimeout(() => toast.remove(), 300);
     }, 2000);
+  }
+
+  // ─── AI Analysis ─────────────────────────────────────────
+
+  async _loadAiAnalysis() {
+    const section = document.getElementById('sdp-ai-section');
+    if (!section) return;
+
+    try {
+      const url = this.apiBase + '/insights/session/' + encodeURIComponent(this.sessionId);
+      const response = await fetch(url);
+
+      if (response.ok) {
+        const data = await response.json();
+        this._aiData = data;
+        this._renderAiAnalysis(data);
+      } else {
+        // API failed, run client-side analysis as fallback
+        this._runClientAnalysis();
+      }
+    } catch (err) {
+      console.warn('[SessionDetailPage] AI analysis API unavailable, running client-side:', err);
+      this._runClientAnalysis();
+    }
+  }
+
+  _runClientAnalysis() {
+    // Simple client-side analysis when server is unavailable
+    const events = this._events || [];
+    const session = this._session || {};
+
+    const rageClicks = events.filter(e => (e.event_type ?? e.type) === 9).length;
+    const deadClicks = events.filter(e => (e.event_type ?? e.type) === 10).length;
+    const jsErrors = events.filter(e => (e.event_type ?? e.type) === 11).length;
+    const pageViews = events.filter(e => {
+      const t = e.event_type ?? e.type;
+      return t === 1 || t === 'page_view';
+    }).length;
+
+    const engagement = Math.min(100, Math.max(0, pageViews * 10 + Math.min(30, (session.duration || 0) / 10)));
+    const frustration = Math.min(100, rageClicks * 15 + deadClicks * 8 + jsErrors * 20);
+    const conversion = Math.min(100, pageViews * 8);
+
+    const insights = [];
+    if (rageClicks > 0) {
+      insights.push({
+        severity: rageClicks >= 3 ? 'high' : 'medium',
+        title: `${rageClicks} rage click(s) detected`,
+        description: 'User clicked rapidly on elements, indicating frustration.',
+        recommendation: 'Check if clicked elements are responsive and provide feedback.',
+      });
+    }
+    if (jsErrors > 0) {
+      insights.push({
+        severity: 'high',
+        title: `${jsErrors} JavaScript error(s)`,
+        description: 'Errors occurred during the session.',
+        recommendation: 'Review the browser console for error details.',
+      });
+    }
+    if (deadClicks > 0) {
+      insights.push({
+        severity: 'medium',
+        title: `${deadClicks} dead click(s)`,
+        description: 'User clicked on non-interactive elements.',
+        recommendation: 'Make elements interactive or change their styling.',
+      });
+    }
+
+    const durationMin = Math.floor((session.duration || 0) / 60);
+    const durationSec = (session.duration || 0) % 60;
+    const summary = `This session lasted ${durationMin}m ${durationSec}s with ${pageViews} page view(s). ` +
+      (rageClicks > 0 ? `Detected ${rageClicks} rage click(s). ` : '') +
+      (jsErrors > 0 ? `${jsErrors} error(s) occurred. ` : '') +
+      (insights.length === 0 ? 'No significant issues detected.' : '');
+
+    this._aiData = {
+      insights,
+      score: { engagement: Math.round(engagement), frustration: Math.round(frustration), conversion: Math.round(conversion) },
+      summary,
+    };
+    this._renderAiAnalysis(this._aiData);
+  }
+
+  _renderAiAnalysis(data) {
+    const section = document.getElementById('sdp-ai-section');
+    if (!section) return;
+
+    const { insights = [], score = {}, summary = '' } = data;
+
+    // Gauge color helper
+    function gaugeColor(value, invert) {
+      if (invert) {
+        return value >= 60 ? '#ef4444' : value >= 30 ? '#eab308' : '#22c55e';
+      }
+      return value >= 60 ? '#22c55e' : value >= 30 ? '#eab308' : '#ef4444';
+    }
+
+    // Build scores HTML
+    const scoresHTML = `
+      <div class="sdp-ai-scores">
+        <div class="sdp-ai-gauge">
+          <div class="sdp-ai-gauge-value" style="color:${gaugeColor(score.engagement || 0, false)}">${score.engagement || 0}</div>
+          <div class="sdp-ai-gauge-label">Engagement</div>
+          <div class="sdp-ai-gauge-bar"><div class="sdp-ai-gauge-fill" style="width:${score.engagement || 0}%;background:${gaugeColor(score.engagement || 0, false)}"></div></div>
+        </div>
+        <div class="sdp-ai-gauge">
+          <div class="sdp-ai-gauge-value" style="color:${gaugeColor(score.frustration || 0, true)}">${score.frustration || 0}</div>
+          <div class="sdp-ai-gauge-label">Frustration</div>
+          <div class="sdp-ai-gauge-bar"><div class="sdp-ai-gauge-fill" style="width:${score.frustration || 0}%;background:${gaugeColor(score.frustration || 0, true)}"></div></div>
+        </div>
+        <div class="sdp-ai-gauge">
+          <div class="sdp-ai-gauge-value" style="color:${gaugeColor(score.conversion || 0, false)}">${score.conversion || 0}</div>
+          <div class="sdp-ai-gauge-label">Conversion</div>
+          <div class="sdp-ai-gauge-bar"><div class="sdp-ai-gauge-fill" style="width:${score.conversion || 0}%;background:${gaugeColor(score.conversion || 0, false)}"></div></div>
+        </div>
+      </div>
+    `;
+
+    // Build insights list
+    const insightsHTML = insights.length > 0
+      ? insights.map(insight => {
+          const sev = insight.severity || 'low';
+          return `
+            <div class="sdp-ai-insight">
+              <span class="sdp-ai-insight-badge sdp-ai-insight-badge--${sev}">${sev}</span>
+              <div class="sdp-ai-insight-text">
+                <span class="sdp-ai-insight-title">${this._escHtml(insight.title)}</span>
+                <br/><span style="color:#94a3b8">${this._escHtml(insight.description)}</span>
+                ${insight.recommendation ? `<div class="sdp-ai-insight-rec">${this._escHtml(insight.recommendation)}</div>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('')
+      : '<div style="text-align:center;padding:8px 0;color:#475569;font-size:12px;">No issues detected in this session.</div>';
+
+    section.innerHTML = `
+      <div class="sdp-ai-header">
+        <span class="sdp-ai-title">
+          <svg viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"/></svg>
+          AI Analysis
+        </span>
+        <span style="font-size:11px;color:#64748b;background:#1c1f2e;padding:1px 8px;border-radius:10px;">
+          ${insights.length} insight${insights.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
+      <!-- Tabs -->
+      <div class="sdp-ai-tabs">
+        <button class="sdp-ai-tab sdp-ai-tab--active" data-tab="summary" onclick="SessionDetailPage._switchAiTab(this, 'summary')">Summary</button>
+        <button class="sdp-ai-tab" data-tab="scores" onclick="SessionDetailPage._switchAiTab(this, 'scores')">Scores</button>
+        <button class="sdp-ai-tab" data-tab="insights" onclick="SessionDetailPage._switchAiTab(this, 'insights')">Insights (${insights.length})</button>
+      </div>
+
+      <!-- Tab: Summary -->
+      <div class="sdp-ai-tab-content sdp-ai-tab-content--active" data-tab-content="summary">
+        <div class="sdp-ai-summary">${this._escHtml(summary)}</div>
+        ${scoresHTML}
+      </div>
+
+      <!-- Tab: Scores -->
+      <div class="sdp-ai-tab-content" data-tab-content="scores">
+        ${scoresHTML}
+      </div>
+
+      <!-- Tab: Insights -->
+      <div class="sdp-ai-tab-content" data-tab-content="insights">
+        <div class="sdp-ai-insights-list">
+          ${insightsHTML}
+        </div>
+      </div>
+    `;
+  }
+
+  static _switchAiTab(btn, tabName) {
+    const section = document.getElementById('sdp-ai-section');
+    if (!section) return;
+
+    // Update tab buttons
+    section.querySelectorAll('.sdp-ai-tab').forEach(t => t.classList.remove('sdp-ai-tab--active'));
+    btn.classList.add('sdp-ai-tab--active');
+
+    // Update tab content
+    section.querySelectorAll('.sdp-ai-tab-content').forEach(c => c.classList.remove('sdp-ai-tab-content--active'));
+    const content = section.querySelector(`[data-tab-content="${tabName}"]`);
+    if (content) content.classList.add('sdp-ai-tab-content--active');
   }
 
   // ─── Notes ──────────────────────────────────────────────

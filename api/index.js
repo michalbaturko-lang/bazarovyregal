@@ -30,5 +30,9 @@ app.use('/api/users', require('../server/routes/users'));
 app.use('/api/projects', require('../server/routes/projects'));
 app.use('/api/notes', require('../server/routes/notes'));
 app.use('/api/export', require('../server/routes/export'));
+app.use('/api/journeys', require('../server/routes/journeys'));
+app.use('/api/ecommerce', require('../server/routes/ecommerce'));
+app.use('/api/behavioral', require('../server/routes/behavioral'));
+app.use('/api/insights', require('../server/routes/insights'));
 
 module.exports = app;
