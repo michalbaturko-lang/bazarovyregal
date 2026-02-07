@@ -1,15 +1,15 @@
 /**
- * Session Recorder Tracker v1.0.0
+ * Regal Master Look Tracker v1.0.0
  * Self-contained client-side session recording script.
  * Embed via <script src="/tracker/tracker.js"></script>
- * Initialize: window.SessionRecorder.init({ projectId: 'xxx' })
+ * Initialize: window.RegalMasterLook.init({ projectId: 'xxx' })
  */
 (function () {
   'use strict';
 
   // Guard against double-initialization
-  if (window.__SR_INITIALIZED__) return;
-  window.__SR_INITIALIZED__ = true;
+  if (window.__RML_INITIALIZED__) return;
+  window.__RML_INITIALIZED__ = true;
 
   // Event type codes
   var EVT = {
@@ -128,13 +128,13 @@
     }
   }
 
-  /** Check if an element or any ancestor has data-sr-ignore. */
+  /** Check if an element or any ancestor has data-rml-ignore. */
   function isIgnored(el) {
     if (!el || el.nodeType !== 1) return false;
     try {
       var node = el;
       while (node && node.nodeType === 1) {
-        if (node.hasAttribute && node.hasAttribute('data-sr-ignore')) return true;
+        if (node.hasAttribute && node.hasAttribute('data-rml-ignore')) return true;
         node = node.parentElement;
       }
     } catch (e) { /* cross-origin frame, etc. */ }
@@ -851,7 +851,7 @@
       }
       this._listeners = []; this._pendingClicks = []; this._buffer = [];
       this._clickLog = []; this._observer = null; this._flushTimer = null;
-      this._initialized = false; window.__SR_INITIALIZED__ = false;
+      this._initialized = false; window.__RML_INITIALIZED__ = false;
     },
 
     getSessionId: function () {
@@ -860,7 +860,7 @@
   };
 
   // Public API
-  window.SessionRecorder = {
+  window.RegalMasterLook = {
     init: function (options) { Recorder.init(options); },
     track: function (eventName, properties) { Recorder.track(eventName, properties); },
     identify: function (userId, traits) { Recorder.identify(userId, traits); },
