@@ -38,6 +38,10 @@ app.use('/api/funnels', require('./routes/funnels'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/segments', require('./routes/segments'));
 app.use('/api/heatmaps', require('./routes/heatmaps'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/projects', require('./routes/projects'));
+app.use('/api/notes', require('./routes/notes'));
+app.use('/api/export', require('./routes/export'));
 
 // Serve dashboard (local dev only)
 app.use(express.static(path.join(__dirname, '..', 'dashboard')));
