@@ -253,6 +253,73 @@ router.post('/', async (req, res) => {
 });
 
 // ============================================================================
+// GET /api/events/recent — Recent events across all sessions (for live feed)
+// ============================================================================
+router.get('/recent', async (req, res) => {
+  try {
+    const {
+      project_id = 'default',
+      minutes: rawMinutes = '5',
+      limit: rawLimit = '50',
+    } = req.query;
+
+    const minutes = Math.max(1, Math.min(60, parseInt(rawMinutes, 10) || 5));
+    const limit = Math.max(1, Math.min(200, parseInt(rawLimit, 10) || 50));
+    const since = new Date(Date.now() - minutes * 60 * 1000).toISOString();
+
+    // Fetch recent events — join is not directly available in Supabase JS client
+    // so we fetch events first, then enrich with session data.
+    const { data: events, error: eventsError } = await supabase.from('events')
+      .select('id, session_id, type, timestamp, data, url, created_at')
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (eventsError) throw eventsError;
+
+    const rows = events || [];
+
+    // Collect unique session IDs to fetch visitor info
+    const sessionIds = [...new Set(rows.map(e => e.session_id).filter(Boolean))];
+    let sessionMap = {};
+
+    if (sessionIds.length > 0) {
+      const { data: sessions, error: sessError } = await supabase.from('sessions')
+        .select('id, visitor_id, identified_user_name, identified_user_email, url')
+        .eq('project_id', project_id)
+        .in('id', sessionIds);
+
+      if (!sessError && sessions) {
+        for (const s of sessions) {
+          sessionMap[s.id] = s;
+        }
+      }
+    }
+
+    // Enrich events with session info
+    const enriched = rows.map(e => {
+      const sess = sessionMap[e.session_id] || {};
+      return {
+        id: e.id,
+        type: e.type,
+        timestamp: e.timestamp,
+        data: e.data,
+        url: e.url,
+        session_id: e.session_id,
+        visitor_id: sess.visitor_id || null,
+        identified_user_name: sess.identified_user_name || null,
+        created_at: e.created_at,
+      };
+    });
+
+    res.json({ events: enriched });
+  } catch (err) {
+    console.error('[events] GET /recent error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================================
 // GET /api/events — List events with filtering & pagination
 // ============================================================================
 router.get('/', async (req, res) => {

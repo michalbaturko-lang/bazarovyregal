@@ -25,5 +25,6 @@ app.use('/api/events', require('../server/routes/events'));
 app.use('/api/funnels', require('../server/routes/funnels'));
 app.use('/api/dashboard', require('../server/routes/dashboard'));
 app.use('/api/segments', require('../server/routes/segments'));
+app.use('/api/heatmaps', require('../server/routes/heatmaps'));
 
 module.exports = app;
