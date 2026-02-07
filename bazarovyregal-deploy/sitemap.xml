@@ -7105,6 +7105,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.bazarovyregal.cz/vsechny-regaly.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.bazarovyregal.cz/vychytavky-do-domacnosti.html</loc>
     <lastmod>2026-02-07</lastmod>
     <changefreq>weekly</changefreq>
@@ -7232,12 +7238,6 @@
   </url>
   <url>
     <loc>https://www.bazarovyregal.cz/zinkove-regaly.html</loc>
-    <lastmod>2026-02-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.bazarovyregal.cz/vsechny-regaly.html</loc>
     <lastmod>2026-02-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
