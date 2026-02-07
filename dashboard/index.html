@@ -313,6 +313,51 @@
           <span class="sidebar-label">Behavior</span>
         </a>
 
+        <!-- ── Integrations divider ── -->
+        <div class="px-3 pt-4 pb-1">
+          <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-600 sidebar-label">Integrations</p>
+        </div>
+
+        <!-- Webhooks -->
+        <a href="#webhooks" data-nav="webhooks"
+           class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/>
+          </svg>
+          <span class="sidebar-label">Webhooks</span>
+        </a>
+
+        <!-- Reports -->
+        <a href="#reports" data-nav="reports"
+           class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21.75 9v.906a2.25 2.25 0 01-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 001.183 1.981l6.478 3.488m8.839 2.51l-4.66-2.51m0 0l-1.023-.55a2.25 2.25 0 00-2.134 0l-1.022.55m0 0l-4.661 2.51m16.5 1.615a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V8.844a2.25 2.25 0 011.183-1.98l7.5-4.04a2.25 2.25 0 012.134 0l7.5 4.04a2.25 2.25 0 011.183 1.98V18z"/>
+          </svg>
+          <span class="sidebar-label">Reports</span>
+        </a>
+
+        <!-- API Keys -->
+        <a href="#apikeys" data-nav="apikeys"
+           class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/>
+          </svg>
+          <span class="sidebar-label">API Keys</span>
+        </a>
+
+        <!-- Billing -->
+        <a href="#billing" data-nav="billing"
+           class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/>
+          </svg>
+          <span class="sidebar-label">Billing</span>
+        </a>
+
         <!-- Settings -->
         <a href="#settings" data-nav="settings"
            class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
@@ -430,6 +475,10 @@
   <script src="js/performance-page.js"></script>
   <script src="js/scrolldepth-page.js"></script>
   <script src="js/comparison-page.js"></script>
+  <script src="js/webhooks-page.js"></script>
+  <script src="js/reports-page.js"></script>
+  <script src="js/apikeys-page.js"></script>
+  <script src="js/billing-page.js"></script>
   <script src="js/player.js"></script>
 
   <!-- Sidebar responsive behavior & loading overlay dismiss -->
@@ -491,6 +540,10 @@
         'performance': 'Performance',
         'scrolldepth': 'Scroll Depth',
         'comparison': 'Comparison',
+        'webhooks': 'Webhooks',
+        'reports': 'Reports',
+        'apikeys': 'API Keys',
+        'billing': 'Billing',
         'settings': 'Settings',
       };
 

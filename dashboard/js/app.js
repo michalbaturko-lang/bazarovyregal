@@ -39,6 +39,10 @@ const App = (() => {
     { pattern: /^#?performance$/,    page: 'performance',    params: [] },
     { pattern: /^#?scrolldepth$/,    page: 'scrolldepth',    params: [] },
     { pattern: /^#?comparison$/,     page: 'comparison',     params: [] },
+    { pattern: /^#?webhooks$/,       page: 'webhooks',       params: [] },
+    { pattern: /^#?reports$/,        page: 'reports',        params: [] },
+    { pattern: /^#?apikeys$/,        page: 'apikeys',        params: [] },
+    { pattern: /^#?billing$/,        page: 'billing',        params: [] },
     { pattern: /^#?settings$/,       page: 'settings',       params: [] },
   ];
 
@@ -136,6 +140,18 @@ const App = (() => {
         break;
       case 'comparison':
         ComparisonPage.render(container);
+        break;
+      case 'webhooks':
+        WebhooksPage.render(container);
+        break;
+      case 'reports':
+        ReportsPage.render(container);
+        break;
+      case 'apikeys':
+        ApiKeysPage.render(container);
+        break;
+      case 'billing':
+        BillingPage.render(container);
         break;
       case 'settings':
         renderSettingsPage(container);

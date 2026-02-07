@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const supabase = require('../supabase');
+const dispatcher = require('../webhook-dispatcher');
 
 // ============================================================================
 // Event type constants (must match the tracker)
@@ -242,6 +243,38 @@ router.post('/', async (req, res) => {
           .update(updates)
           .eq('id', sessionId);
         if (updateError) throw updateError;
+      }
+    }
+
+    // --- Dispatch webhook notifications (fire-and-forget) ---
+    for (const event of events) {
+      const eventType = event.type;
+      const eventData = event.data || {};
+
+      // JS Error (type 11 = ERROR)
+      if (eventType === EVENT_TYPES.ERROR) {
+        dispatcher.dispatch('js_error', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
+      }
+
+      // Rage Click (type 12 = RAGE_CLICK)
+      if (eventType === EVENT_TYPES.RAGE_CLICK) {
+        dispatcher.dispatch('rage_click', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
+      }
+
+      // Custom events: cart abandonment / form abandon detection
+      if (eventType === EVENT_TYPES.CUSTOM_EVENT && eventData) {
+        const eventName = (eventData.name || '').toLowerCase();
+        if (eventName.includes('cart_abandonment') || eventName.includes('cart_abandon')) {
+          dispatcher.dispatch('cart_abandonment', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
+        }
+        if (eventName.includes('form_abandon')) {
+          dispatcher.dispatch('form_abandon', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
+        }
+      }
+
+      // Rage click detection from click data
+      if (eventType === EVENT_TYPES.MOUSE_CLICK && eventData && eventData.is_rage_click) {
+        dispatcher.dispatch('rage_click', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
       }
     }
 
