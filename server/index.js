@@ -46,6 +46,12 @@ app.use('/api/journeys', require('./routes/journeys'));
 app.use('/api/ecommerce', require('./routes/ecommerce'));
 app.use('/api/behavioral', require('./routes/behavioral'));
 app.use('/api/insights', require('./routes/insights'));
+app.use('/api/forms', require('./routes/forms'));
+app.use('/api/errors', require('./routes/errors'));
+app.use('/api/performance', require('./routes/performance'));
+app.use('/api/scrolldepth', require('./routes/scrolldepth'));
+app.use('/api/comparison', require('./routes/comparison'));
+app.use('/api/sharing', require('./routes/sharing'));
 
 // Serve dashboard (local dev only)
 app.use(express.static(path.join(__dirname, '..', 'dashboard')));

@@ -290,7 +290,13 @@
     _hasAddToCart: false,  // e-commerce: tracks if add_to_cart fired in session
     _hasPurchase: false,   // e-commerce: tracks if purchase fired in session
     _lastCartData: null,   // e-commerce: stores last cart state for abandonment
+    _scrollDepthMax: 0,          // scroll depth: max depth percent reached
+    _scrollZonesSeen: [],        // scroll depth: which 10% zones have been seen
+    _scrollPageLoadTime: 0,      // scroll depth: timestamp when page loaded
+    _scrollDepthFlushed: false,  // scroll depth: whether we already sent the event
 
+    // Form tracking state
+    _formState: {},        // form_id -> { started, submitted, fields: { field_name -> { focusTime, corrections, lastValue } }, currentField }
 
     init: function (options) {
       if (this._initialized) return;
@@ -360,6 +366,8 @@
       this._bindErrors();
       this._bindVisibility();
       this._bindNavigation();
+      this._trackScrollDepth();
+      this._collectWebVitals();
     },
 
     /** Stop recording – flush remaining data, tear down observers & listeners. */
@@ -381,6 +389,7 @@
       this._pendingClicks = [];
       this._buffer = [];
       this._clickLog = [];
+      this._formState = {};
     },
 
 
@@ -604,11 +613,274 @@
         var m = shouldMaskInput(el, self._config);
         emitInput(el, m ? maskValue(val) : val, m);
       }, true);
+
+      // --- Form tracking ---
+      this._bindFormTracking();
     },
 
     _listen: function (target, event, handler, options) {
       target.addEventListener(event, handler, options || false);
       this._listeners.push({ target: target, event: event, handler: handler, options: options || false });
+    },
+
+
+    // ── Form Tracking ─────────────────────────────────────────────────
+
+    /** Detect form ID from a form element. */
+    _getFormId: function (formEl) {
+      if (!formEl) return null;
+      return formEl.id || formEl.getAttribute('name') || formEl.getAttribute('action') || 'form_' + Serializer.id(formEl);
+    },
+
+    /** Detect form name from a form element. */
+    _getFormName: function (formEl) {
+      if (!formEl) return null;
+      return formEl.getAttribute('data-form-name') || formEl.getAttribute('name') || formEl.id || 'Unnamed Form';
+    },
+
+    /** Detect field name from an input element. */
+    _getFieldName: function (el) {
+      if (!el) return null;
+      return el.getAttribute('name') || el.id || el.getAttribute('placeholder') || el.getAttribute('aria-label') || 'unnamed_field';
+    },
+
+    /** Detect field type from an input element. */
+    _getFieldType: function (el) {
+      if (!el) return 'text';
+      var tag = (el.tagName || '').toLowerCase();
+      if (tag === 'select') return 'select';
+      if (tag === 'textarea') return 'textarea';
+      return el.type || 'text';
+    },
+
+    /** Check if an element is a form field. */
+    _isFormField: function (el) {
+      if (!el || el.nodeType !== 1) return false;
+      var tag = (el.tagName || '').toLowerCase();
+      return tag === 'input' || tag === 'textarea' || tag === 'select';
+    },
+
+    /** Get the parent form element for a field. */
+    _getParentForm: function (el) {
+      if (!el) return null;
+      // Use the native form property first
+      if (el.form) return el.form;
+      // Walk up the DOM
+      var node = el.parentElement;
+      while (node) {
+        if (node.tagName && node.tagName.toLowerCase() === 'form') return node;
+        node = node.parentElement;
+      }
+      return null;
+    },
+
+    /** Ensure form state exists for a given form, return it. */
+    _ensureFormState: function (formId, formName) {
+      if (!this._formState[formId]) {
+        this._formState[formId] = {
+          started: false,
+          submitted: false,
+          fields: {},
+          currentField: null,
+          formName: formName || formId,
+        };
+      }
+      return this._formState[formId];
+    },
+
+    /** Bind form-level tracking listeners. */
+    _bindFormTracking: function () {
+      var self = this;
+
+      // --- focusin on form fields → track form_field_focus ---
+      this._listen(document, 'focusin', function (e) {
+        var el = e.target;
+        if (!self._isFormField(el) || isIgnored(el)) return;
+
+        var formEl = self._getParentForm(el);
+        if (!formEl) return;
+
+        var formId = self._getFormId(formEl);
+        var formName = self._getFormName(formEl);
+        var fieldName = self._getFieldName(el);
+        var fieldType = self._getFieldType(el);
+
+        var fs = self._ensureFormState(formId, formName);
+
+        // Emit form_start on first interaction
+        if (!fs.started) {
+          fs.started = true;
+          self._push(EVT.CUSTOM_EVENT, {
+            name: 'form_start',
+            properties: {
+              form_id: formId,
+              form_name: formName,
+            }
+          });
+        }
+
+        // Initialize field state if needed
+        if (!fs.fields[fieldName]) {
+          fs.fields[fieldName] = {
+            focusTime: 0,
+            corrections: 0,
+            lastValue: '',
+            changeCount: 0,
+            hadError: false,
+          };
+        }
+
+        fs.fields[fieldName].focusTime = performance.now();
+        fs.currentField = fieldName;
+
+        self._push(EVT.CUSTOM_EVENT, {
+          name: 'form_field_focus',
+          properties: {
+            form_id: formId,
+            form_name: formName,
+            field_name: fieldName,
+            field_type: fieldType,
+          }
+        });
+      }, true);
+
+      // --- focusout on form fields → track form_field_blur with time_spent ---
+      this._listen(document, 'focusout', function (e) {
+        var el = e.target;
+        if (!self._isFormField(el) || isIgnored(el)) return;
+
+        var formEl = self._getParentForm(el);
+        if (!formEl) return;
+
+        var formId = self._getFormId(formEl);
+        var formName = self._getFormName(formEl);
+        var fieldName = self._getFieldName(el);
+        var fieldType = self._getFieldType(el);
+
+        var fs = self._ensureFormState(formId, formName);
+        var fieldState = fs.fields[fieldName];
+
+        var timeSpent = 0;
+        if (fieldState && fieldState.focusTime > 0) {
+          timeSpent = Math.round(performance.now() - fieldState.focusTime);
+          fieldState.focusTime = 0;
+        }
+
+        var corrections = fieldState ? fieldState.corrections : 0;
+        var hadError = fieldState ? fieldState.hadError : false;
+        var valueLength = 0;
+        try { valueLength = (el.value || '').length; } catch (ex) { /* */ }
+
+        // Reset corrections counter for next focus cycle
+        if (fieldState) {
+          fieldState.corrections = 0;
+          fieldState.changeCount = 0;
+        }
+
+        self._push(EVT.CUSTOM_EVENT, {
+          name: 'form_field_blur',
+          properties: {
+            form_id: formId,
+            form_name: formName,
+            field_name: fieldName,
+            field_type: fieldType,
+            value_length: valueLength,
+            time_spent_ms: timeSpent,
+            corrections: corrections,
+            had_error: hadError,
+          }
+        });
+      }, true);
+
+      // --- input/change on form fields → track corrections ---
+      this._listen(document, 'input', function (e) {
+        var el = e.target;
+        if (!self._isFormField(el) || isIgnored(el)) return;
+
+        var formEl = self._getParentForm(el);
+        if (!formEl) return;
+
+        var formId = self._getFormId(formEl);
+        var formName = self._getFormName(formEl);
+        var fieldName = self._getFieldName(el);
+
+        var fs = self._ensureFormState(formId, formName);
+        if (!fs.fields[fieldName]) {
+          fs.fields[fieldName] = {
+            focusTime: 0,
+            corrections: 0,
+            lastValue: '',
+            changeCount: 0,
+            hadError: false,
+          };
+        }
+
+        var fieldState = fs.fields[fieldName];
+        var currentValue = '';
+        try { currentValue = el.value || ''; } catch (ex) { /* */ }
+
+        fieldState.changeCount++;
+
+        // Detect correction: value got shorter (user deleted text) after initial input
+        if (fieldState.changeCount > 1 && currentValue.length < fieldState.lastValue.length) {
+          fieldState.corrections++;
+        }
+
+        fieldState.lastValue = currentValue;
+
+        // Check for validation errors
+        try {
+          if (el.validity && !el.validity.valid) {
+            fieldState.hadError = true;
+          }
+        } catch (ex) { /* */ }
+      }, true);
+
+      // --- form submit → track form_submit ---
+      this._listen(document, 'submit', function (e) {
+        var formEl = e.target;
+        if (!formEl || (formEl.tagName || '').toLowerCase() !== 'form') return;
+        if (isIgnored(formEl)) return;
+
+        var formId = self._getFormId(formEl);
+        var formName = self._getFormName(formEl);
+
+        var fs = self._ensureFormState(formId, formName);
+        fs.submitted = true;
+
+        // Count fields interacted with
+        var fieldCount = Object.keys(fs.fields).length;
+
+        self._push(EVT.CUSTOM_EVENT, {
+          name: 'form_submit',
+          properties: {
+            form_id: formId,
+            form_name: formName,
+            field_count: fieldCount,
+          }
+        });
+      }, true);
+    },
+
+    /** Check for form abandonment on page unload: started but not submitted forms. */
+    _checkFormAbandonment: function () {
+      for (var formId in this._formState) {
+        if (!this._formState.hasOwnProperty(formId)) continue;
+        var fs = this._formState[formId];
+        if (fs.started && !fs.submitted) {
+          this._push(EVT.CUSTOM_EVENT, {
+            name: 'form_abandon',
+            properties: {
+              form_id: formId,
+              form_name: fs.formName,
+              field_name: fs.currentField || null,
+              fields_filled: Object.keys(fs.fields).length,
+            }
+          });
+          // Prevent duplicate firing
+          fs.started = false;
+        }
+      }
     },
 
 
@@ -777,6 +1049,8 @@
       var self = this;
 
       var unloadHandler = function () {
+        // Auto-detect form abandonment on page unload
+        self._checkFormAbandonment();
         // Auto-detect cart abandonment on page unload
         self._checkCartAbandonment();
         self._flush(true); // beacon = true
@@ -786,6 +1060,7 @@
       this._listen(window, 'beforeunload', unloadHandler);
       this._listen(document, 'visibilitychange', function () {
         if (document.visibilityState === 'hidden') {
+          self._checkFormAbandonment();
           self._checkCartAbandonment();
           self._flush(true);
         }
@@ -810,6 +1085,210 @@
       }
     },
 
+
+    // ── Scroll Depth Tracking ──────────────────────────────────────────
+
+    /** Set up scroll depth tracking: listen for scroll events (throttled)
+     *  and emit a scroll_depth custom event on page unload / navigation. */
+    _trackScrollDepth: function () {
+      var self = this;
+
+      // Record the page load time for time-on-page calculation
+      this._scrollPageLoadTime = now();
+      this._scrollDepthMax = 0;
+      this._scrollZonesSeen = [0]; // zone 0% is always "seen"
+      this._scrollDepthFlushed = false;
+
+      // Compute current scroll depth percentage
+      function computeDepth() {
+        try {
+          var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+          var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+          var docHeight = Math.max(
+            document.body.scrollHeight || 0,
+            document.documentElement.scrollHeight || 0,
+            document.body.offsetHeight || 0,
+            document.documentElement.offsetHeight || 0,
+            document.body.clientHeight || 0,
+            document.documentElement.clientHeight || 0
+          );
+          if (docHeight <= 0) return 0;
+          var depth = ((scrollTop + viewportHeight) / docHeight) * 100;
+          return Math.min(100, Math.round(depth * 10) / 10);
+        } catch (e) {
+          return 0;
+        }
+      }
+
+      // Update max depth and zones seen
+      function updateDepth() {
+        var depth = computeDepth();
+        if (depth > self._scrollDepthMax) {
+          self._scrollDepthMax = depth;
+        }
+        // Determine which 10% zones the user has reached
+        for (var z = 0; z <= 90; z += 10) {
+          if (depth >= z && self._scrollZonesSeen.indexOf(z) === -1) {
+            self._scrollZonesSeen.push(z);
+          }
+        }
+      }
+
+      // Capture initial depth (above-the-fold content)
+      updateDepth();
+
+      // Throttled scroll listener (every 500ms)
+      this._listen(window, 'scroll', throttle(function () {
+        updateDepth();
+      }, 500), { passive: true });
+
+      // On beforeunload, send the scroll_depth event
+      var flushScrollDepth = function () {
+        self._flushScrollDepth();
+      };
+
+      this._listen(window, 'beforeunload', flushScrollDepth);
+      this._listen(document, 'visibilitychange', function () {
+        if (document.visibilityState === 'hidden') {
+          self._flushScrollDepth();
+        }
+      });
+    },
+
+    /** Emit the scroll_depth custom event (called on unload/navigation). */
+    _flushScrollDepth: function () {
+      if (this._scrollDepthFlushed) return;
+      this._scrollDepthFlushed = true;
+
+      var timeOnPageMs = now() - (this._scrollPageLoadTime || now());
+      this._scrollZonesSeen.sort(function (a, b) { return a - b; });
+
+      this._push(EVT.CUSTOM_EVENT, {
+        name: 'scroll_depth',
+        properties: {
+          url: window.location.href,
+          max_depth_percent: this._scrollDepthMax,
+          time_on_page_ms: Math.max(0, timeOnPageMs),
+          zones_seen: this._scrollZonesSeen
+        }
+      });
+    },
+
+
+    /** Collect Core Web Vitals (LCP, CLS, FID, INP, TTFB, page load time). */
+    _collectWebVitals: function () {
+      var self = this;
+      var vitals = { lcp: null, cls: 0, fid: null, inp: null, ttfb: null, page_load_time: null };
+      var hasSent = false;
+
+      function sendVitals() {
+        if (hasSent) return;
+        hasSent = true;
+
+        // Gather navigation timing for TTFB and page load time
+        try {
+          var navEntries = performance.getEntriesByType('navigation');
+          if (navEntries && navEntries.length > 0) {
+            var nav = navEntries[0];
+            vitals.ttfb = Math.round(nav.responseStart);
+            vitals.page_load_time = Math.round(nav.loadEventEnd > 0 ? nav.loadEventEnd : nav.domComplete);
+          }
+        } catch (e) { /* navigation timing unavailable */ }
+
+        var connType = null;
+        try {
+          connType = navigator && navigator.connection ? navigator.connection.effectiveType : null;
+        } catch (e) { /* connection API unavailable */ }
+
+        self._push(EVT.CUSTOM_EVENT, {
+          name: 'web_vitals',
+          properties: {
+            lcp: vitals.lcp,
+            cls: Math.round(vitals.cls * 1000) / 1000,
+            fid: vitals.fid,
+            inp: vitals.inp,
+            ttfb: vitals.ttfb,
+            page_load_time: vitals.page_load_time,
+            url: location.href,
+            connection_type: connType
+          }
+        });
+      }
+
+      // Observe LCP
+      try {
+        if (typeof PerformanceObserver !== 'undefined') {
+          var lcpObserver = new PerformanceObserver(function (list) {
+            var entries = list.getEntries();
+            if (entries.length > 0) {
+              vitals.lcp = Math.round(entries[entries.length - 1].startTime);
+            }
+          });
+          lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+          self._listeners.push({ cleanup: function () { try { lcpObserver.disconnect(); } catch (e) {} } });
+        }
+      } catch (e) { /* LCP observer not supported */ }
+
+      // Observe CLS (accumulate all layout shift values)
+      try {
+        if (typeof PerformanceObserver !== 'undefined') {
+          var clsObserver = new PerformanceObserver(function (list) {
+            var entries = list.getEntries();
+            for (var i = 0; i < entries.length; i++) {
+              if (!entries[i].hadRecentInput) {
+                vitals.cls += entries[i].value;
+              }
+            }
+          });
+          clsObserver.observe({ type: 'layout-shift', buffered: true });
+          self._listeners.push({ cleanup: function () { try { clsObserver.disconnect(); } catch (e) {} } });
+        }
+      } catch (e) { /* CLS observer not supported */ }
+
+      // Observe FID (first-input)
+      try {
+        if (typeof PerformanceObserver !== 'undefined') {
+          var fidObserver = new PerformanceObserver(function (list) {
+            var entries = list.getEntries();
+            if (entries.length > 0) {
+              vitals.fid = Math.round(entries[0].processingStart - entries[0].startTime);
+            }
+          });
+          fidObserver.observe({ type: 'first-input', buffered: true });
+          self._listeners.push({ cleanup: function () { try { fidObserver.disconnect(); } catch (e) {} } });
+        }
+      } catch (e) { /* FID observer not supported */ }
+
+      // Observe INP (event timing for Interaction to Next Paint)
+      try {
+        if (typeof PerformanceObserver !== 'undefined') {
+          var maxINP = 0;
+          var inpObserver = new PerformanceObserver(function (list) {
+            var entries = list.getEntries();
+            for (var i = 0; i < entries.length; i++) {
+              var duration = entries[i].duration;
+              if (duration > maxINP) {
+                maxINP = duration;
+                vitals.inp = Math.round(duration);
+              }
+            }
+          });
+          inpObserver.observe({ type: 'event', buffered: true });
+          self._listeners.push({ cleanup: function () { try { inpObserver.disconnect(); } catch (e) {} } });
+        }
+      } catch (e) { /* INP observer not supported */ }
+
+      // Fire after page load with a delay to capture late metrics
+      if (document.readyState === 'complete') {
+        setTimeout(sendVitals, 5000);
+      } else {
+        var onLoad = function () {
+          setTimeout(sendVitals, 5000);
+        };
+        window.addEventListener('load', onLoad);
+        self._listeners.push({ target: window, event: 'load', handler: onLoad, options: false });
+      }
+    },
 
     _startFlushTimer: function () {
       var self = this;
@@ -969,6 +1448,7 @@
       }
       this._listeners = []; this._pendingClicks = []; this._buffer = [];
       this._clickLog = []; this._observer = null; this._flushTimer = null;
+      this._formState = {};
       this._initialized = false; window.__RML_INITIALIZED__ = false;
     },
 

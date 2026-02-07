@@ -162,6 +162,25 @@ DO $$ BEGIN
 END $$;
 
 -- -----------------------------------------------------------
+-- Share links (session sharing)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS share_links (
+  token TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+  project_id TEXT NOT NULL,
+  created_by TEXT DEFAULT 'admin',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  expires_at TIMESTAMPTZ NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_share_links_session ON share_links(session_id);
+ALTER TABLE share_links ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_share_links') THEN
+    CREATE POLICY "service_role_all_share_links" ON share_links FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+-- -----------------------------------------------------------
 -- Default project
 -- -----------------------------------------------------------
 INSERT INTO projects (id, name, domain)

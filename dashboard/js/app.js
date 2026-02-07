@@ -34,6 +34,11 @@ const App = (() => {
     { pattern: /^#?ecommerce$/,     page: 'ecommerce',      params: [] },
     { pattern: /^#?behavioral$/,     page: 'behavioral',     params: [] },
     { pattern: /^#?insights$/,       page: 'insights',       params: [] },
+    { pattern: /^#?forms$/,          page: 'forms',          params: [] },
+    { pattern: /^#?errors$/,         page: 'errors',         params: [] },
+    { pattern: /^#?performance$/,    page: 'performance',    params: [] },
+    { pattern: /^#?scrolldepth$/,    page: 'scrolldepth',    params: [] },
+    { pattern: /^#?comparison$/,     page: 'comparison',     params: [] },
     { pattern: /^#?settings$/,       page: 'settings',       params: [] },
   ];
 
@@ -116,6 +121,21 @@ const App = (() => {
         break;
       case 'insights':
         InsightsPage.render(container);
+        break;
+      case 'forms':
+        FormsPage.render(container);
+        break;
+      case 'errors':
+        ErrorsPage.render(container);
+        break;
+      case 'performance':
+        PerformancePage.render(container);
+        break;
+      case 'scrolldepth':
+        ScrollDepthPage.render(container);
+        break;
+      case 'comparison':
+        ComparisonPage.render(container);
         break;
       case 'settings':
         renderSettingsPage(container);

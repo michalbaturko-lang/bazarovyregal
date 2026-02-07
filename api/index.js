@@ -34,5 +34,11 @@ app.use('/api/journeys', require('../server/routes/journeys'));
 app.use('/api/ecommerce', require('../server/routes/ecommerce'));
 app.use('/api/behavioral', require('../server/routes/behavioral'));
 app.use('/api/insights', require('../server/routes/insights'));
+app.use('/api/forms', require('../server/routes/forms'));
+app.use('/api/errors', require('../server/routes/errors'));
+app.use('/api/performance', require('../server/routes/performance'));
+app.use('/api/scrolldepth', require('../server/routes/scrolldepth'));
+app.use('/api/comparison', require('../server/routes/comparison'));
+app.use('/api/sharing', require('../server/routes/sharing'));
 
 module.exports = app;
