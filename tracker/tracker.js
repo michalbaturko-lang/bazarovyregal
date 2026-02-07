@@ -287,6 +287,9 @@
     _initialized: false,
     _recording: false,
     _pageUrl: '',
+    _hasAddToCart: false,  // e-commerce: tracks if add_to_cart fired in session
+    _hasPurchase: false,   // e-commerce: tracks if purchase fired in session
+    _lastCartData: null,   // e-commerce: stores last cart state for abandonment
 
 
     init: function (options) {
@@ -774,6 +777,8 @@
       var self = this;
 
       var unloadHandler = function () {
+        // Auto-detect cart abandonment on page unload
+        self._checkCartAbandonment();
         self._flush(true); // beacon = true
       };
 
@@ -781,9 +786,28 @@
       this._listen(window, 'beforeunload', unloadHandler);
       this._listen(document, 'visibilitychange', function () {
         if (document.visibilityState === 'hidden') {
+          self._checkCartAbandonment();
           self._flush(true);
         }
       });
+    },
+
+    /** Auto-fire cart_abandonment if there were add_to_cart events but no purchase. */
+    _checkCartAbandonment: function () {
+      if (this._hasAddToCart && !this._hasPurchase && this._lastCartData) {
+        this._push(EVT.CUSTOM_EVENT, {
+          name: 'cart_abandonment',
+          properties: {
+            items: this._lastCartData.items,
+            total: this._lastCartData.total,
+            currency: this._lastCartData.currency || 'CZK',
+            exit_url: window.location.href,
+            auto_detected: true
+          }
+        });
+        // Prevent duplicate firing
+        this._hasAddToCart = false;
+      }
     },
 
 
@@ -869,6 +893,58 @@
       });
     },
 
+    /** Internal: track an e-commerce event and update cart/purchase state. */
+    _trackEcommerceEvent: function (name, properties) {
+      if (!this._initialized) return;
+      this._push(EVT.CUSTOM_EVENT, {
+        name: name,
+        properties: properties || {}
+      });
+      // Track cart state for auto-abandonment detection
+      if (name === 'add_to_cart') {
+        this._hasAddToCart = true;
+        // Build running cart data from add_to_cart events
+        if (!this._lastCartData) {
+          this._lastCartData = { items: [], total: 0, currency: 'CZK' };
+        }
+        if (properties) {
+          this._lastCartData.items.push({
+            id: properties.id,
+            name: properties.name,
+            price: properties.price,
+            quantity: properties.quantity || 1
+          });
+          this._lastCartData.total += (properties.price || 0) * (properties.quantity || 1);
+        }
+      } else if (name === 'remove_from_cart' && this._lastCartData) {
+        // Try to remove item from tracked cart
+        var items = this._lastCartData.items;
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].id === (properties && properties.id)) {
+            this._lastCartData.total -= (items[i].price || 0) * (items[i].quantity || 1);
+            items.splice(i, 1);
+            break;
+          }
+        }
+        if (items.length === 0) {
+          this._hasAddToCart = false;
+          this._lastCartData = null;
+        }
+      } else if (name === 'checkout_start' && properties) {
+        // Update cart data with full checkout cart info
+        this._lastCartData = {
+          items: properties.items || (this._lastCartData ? this._lastCartData.items : []),
+          total: properties.total || (this._lastCartData ? this._lastCartData.total : 0),
+          currency: properties.currency || 'CZK'
+        };
+      } else if (name === 'purchase') {
+        this._hasPurchase = true;
+        // Reset cart state after purchase
+        this._hasAddToCart = false;
+        this._lastCartData = null;
+      }
+    },
+
     identify: function (userId, traits) {
       if (!this._initialized) return;
       this._userId = userId ? String(userId) : null;
@@ -930,6 +1006,62 @@
     /** Check whether the user has previously granted consent. */
     hasConsent: function () {
       try { return localStorage.getItem('rml_consent') === 'granted'; } catch (e) { return false; }
+    },
+
+    // ── E-commerce Tracking ──────────────────────────────────
+
+    /** Track a page view with optional e-commerce context. */
+    // pageData: { url, title, category, product_id, product_name, price }
+    trackPageView: function (pageData) {
+      if (Recorder._initialized) Recorder._trackEcommerceEvent('page_view', pageData);
+    },
+
+    /** Track a product detail view. */
+    // product: { id, name, price, category, variant }
+    trackProductView: function (product) {
+      if (Recorder._initialized) Recorder._trackEcommerceEvent('product_view', product);
+    },
+
+    /** Track adding a product to the cart. */
+    // product: { id, name, price, quantity, category }
+    trackAddToCart: function (product) {
+      if (Recorder._initialized) Recorder._trackEcommerceEvent('add_to_cart', product);
+    },
+
+    /** Track removing a product from the cart. */
+    trackRemoveFromCart: function (product) {
+      if (Recorder._initialized) Recorder._trackEcommerceEvent('remove_from_cart', product);
+    },
+
+    /** Track the start of checkout. */
+    // cart: { total, items: [{id, name, price, quantity}], currency }
+    trackCheckoutStart: function (cart) {
+      if (Recorder._initialized) Recorder._trackEcommerceEvent('checkout_start', cart);
+    },
+
+    /** Track a checkout step (e.g. shipping, payment). */
+    // step: { step_number, step_name } e.g. { step_number: 2, step_name: 'shipping' }
+    trackCheckoutStep: function (step) {
+      if (Recorder._initialized) Recorder._trackEcommerceEvent('checkout_step', step);
+    },
+
+    /** Track a completed purchase. */
+    // order: { order_id, total, currency, items, shipping, tax }
+    trackPurchase: function (order) {
+      if (Recorder._initialized) Recorder._trackEcommerceEvent('purchase', order);
+    },
+
+    /** Track cart abandonment (usually auto-detected on page unload). */
+    trackCartAbandonment: function (cart) {
+      if (Recorder._initialized) Recorder._trackEcommerceEvent('cart_abandonment', cart);
+    },
+
+    /** Set revenue for the current session. */
+    setRevenue: function (amount, currency) {
+      if (Recorder._initialized) Recorder._trackEcommerceEvent('revenue', {
+        amount: amount,
+        currency: currency || 'CZK'
+      });
     },
 
     _EVT: EVT
