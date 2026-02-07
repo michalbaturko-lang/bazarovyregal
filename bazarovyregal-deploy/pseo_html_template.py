@@ -120,8 +120,12 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
     <meta name="twitter:description" content="{meta_desc}">
     <meta name="twitter:image" content="{og_image}">
     <link rel="canonical" href="{canonical_url}">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {{
