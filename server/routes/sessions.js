@@ -1,16 +1,15 @@
 'use strict';
 
 const { Router } = require('express');
-const getDatabase = require('../db');
+const db = require('../db');
 
 const router = Router();
 
 // ============================================================================
 // GET /api/sessions — List sessions with filtering & pagination
 // ============================================================================
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const db = getDatabase();
     const {
       project_id = 'default',
       date_from,
@@ -39,103 +38,64 @@ router.get('/', (req, res) => {
     const limit = Math.min(200, Math.max(1, parseInt(rawLimit, 10) || 50));
     const offset = (page - 1) * limit;
 
-    // Build dynamic WHERE clause
-    const conditions = ['project_id = @project_id'];
-    const params = { project_id };
-
-    if (date_from) {
-      conditions.push('started_at >= @date_from');
-      params.date_from = date_from;
-    }
-    if (date_to) {
-      conditions.push('started_at <= @date_to');
-      params.date_to = date_to;
-    }
-    if (min_duration !== undefined) {
-      conditions.push('duration >= @min_duration');
-      params.min_duration = parseInt(min_duration, 10);
-    }
-    if (max_duration !== undefined) {
-      conditions.push('duration <= @max_duration');
-      params.max_duration = parseInt(max_duration, 10);
-    }
-    if (browser) {
-      conditions.push('browser = @browser');
-      params.browser = browser;
-    }
-    if (os) {
-      conditions.push('os = @os');
-      params.os = os;
-    }
-    if (device_type) {
-      conditions.push('device_type = @device_type');
-      params.device_type = device_type;
-    }
-    if (country) {
-      conditions.push('country = @country');
-      params.country = country;
-    }
-    if (url) {
-      conditions.push('url LIKE @url');
-      params.url = `%${url}%`;
-    }
-    if (has_rage_clicks !== undefined) {
-      conditions.push('has_rage_clicks = @has_rage_clicks');
-      params.has_rage_clicks = has_rage_clicks === 'true' || has_rage_clicks === '1' ? 1 : 0;
-    }
-    if (has_errors !== undefined) {
-      conditions.push('has_errors = @has_errors');
-      params.has_errors = has_errors === 'true' || has_errors === '1' ? 1 : 0;
-    }
-    if (identified_user_id) {
-      conditions.push('identified_user_id = @identified_user_id');
-      params.identified_user_id = identified_user_id;
-    }
-    if (identified_user_email) {
-      conditions.push('identified_user_email = @identified_user_email');
-      params.identified_user_email = identified_user_email;
-    }
-    if (utm_source) {
-      conditions.push('utm_source = @utm_source');
-      params.utm_source = utm_source;
-    }
-    if (utm_medium) {
-      conditions.push('utm_medium = @utm_medium');
-      params.utm_medium = utm_medium;
-    }
-    if (utm_campaign) {
-      conditions.push('utm_campaign = @utm_campaign');
-      params.utm_campaign = utm_campaign;
-    }
-
-    const whereClause = conditions.length > 0
-      ? 'WHERE ' + conditions.join(' AND ')
-      : '';
-
-    // Whitelist sortable columns to prevent SQL injection
+    // Whitelist sortable columns to prevent injection
     const SORTABLE_COLUMNS = [
       'started_at', 'ended_at', 'duration', 'event_count',
       'page_count', 'browser', 'os', 'device_type', 'country',
     ];
     const sortColumn = SORTABLE_COLUMNS.includes(sort) ? sort : 'started_at';
-    const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const ascending = order.toUpperCase() === 'ASC';
 
-    // Count total matching rows
-    const countRow = db.prepare(
-      `SELECT COUNT(*) AS total FROM sessions ${whereClause}`
-    ).get(params);
-    const total = countRow.total;
+    // --- Build the filtered query for counting ---
+    let countQuery = db.query('sessions')
+      .select('*', { count: 'exact', head: true })
+      .eq('project_id', project_id);
 
-    // Fetch the page of results
-    const sessions = db.prepare(
-      `SELECT * FROM sessions ${whereClause}
-       ORDER BY ${sortColumn} ${sortOrder}
-       LIMIT @limit OFFSET @offset`
-    ).all({ ...params, limit, offset });
+    let dataQuery = db.query('sessions')
+      .select('*')
+      .eq('project_id', project_id);
 
-    const pages = Math.ceil(total / limit);
+    // Apply optional filters to both queries
+    function applyFilters(q) {
+      if (date_from)            q = q.gte('started_at', date_from);
+      if (date_to)              q = q.lte('started_at', date_to);
+      if (min_duration !== undefined) q = q.gte('duration', parseInt(min_duration, 10));
+      if (max_duration !== undefined) q = q.lte('duration', parseInt(max_duration, 10));
+      if (browser)              q = q.eq('browser', browser);
+      if (os)                   q = q.eq('os', os);
+      if (device_type)          q = q.eq('device_type', device_type);
+      if (country)              q = q.eq('country', country);
+      if (url)                  q = q.ilike('url', `%${url}%`);
+      if (has_rage_clicks !== undefined) {
+        q = q.eq('has_rage_clicks', has_rage_clicks === 'true' || has_rage_clicks === '1');
+      }
+      if (has_errors !== undefined) {
+        q = q.eq('has_errors', has_errors === 'true' || has_errors === '1');
+      }
+      if (identified_user_id)   q = q.eq('identified_user_id', identified_user_id);
+      if (identified_user_email) q = q.eq('identified_user_email', identified_user_email);
+      if (utm_source)           q = q.eq('utm_source', utm_source);
+      if (utm_medium)           q = q.eq('utm_medium', utm_medium);
+      if (utm_campaign)         q = q.eq('utm_campaign', utm_campaign);
+      return q;
+    }
 
-    res.json({ sessions, total, page, pages });
+    countQuery = applyFilters(countQuery);
+    dataQuery = applyFilters(dataQuery);
+
+    // Execute count
+    const { count: total, error: countError } = await countQuery;
+    if (countError) throw countError;
+
+    // Execute data query with sort & pagination
+    const { data: sessions, error: dataError } = await dataQuery
+      .order(sortColumn, { ascending })
+      .range(offset, offset + limit - 1);
+    if (dataError) throw dataError;
+
+    const pages = Math.ceil((total || 0) / limit);
+
+    res.json({ sessions: sessions || [], total: total || 0, page, pages });
   } catch (err) {
     console.error('[sessions] GET / error:', err);
     res.status(500).json({ error: 'Failed to list sessions' });
@@ -145,27 +105,30 @@ router.get('/', (req, res) => {
 // ============================================================================
 // GET /api/sessions/:id — Get a single session with all its events
 // ============================================================================
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const db = getDatabase();
     const { id } = req.params;
 
-    const session = db.prepare('SELECT * FROM sessions WHERE id = ?').get(id);
-    if (!session) {
+    // Fetch the session
+    const { data: session, error: sessionError } = await db.query('sessions')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (sessionError || !session) {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    const events = db.prepare(
-      'SELECT * FROM events WHERE session_id = ? ORDER BY timestamp ASC'
-    ).all(id);
+    // Fetch associated events
+    const { data: events, error: eventsError } = await db.query('events')
+      .select('*')
+      .eq('session_id', id)
+      .order('timestamp', { ascending: true });
 
-    // Parse JSON data field for each event
-    const parsedEvents = events.map((evt) => ({
-      ...evt,
-      data: evt.data ? JSON.parse(evt.data) : null,
-    }));
+    if (eventsError) throw eventsError;
 
-    res.json({ session, events: parsedEvents });
+    // data is already JSONB so Supabase returns it parsed
+    res.json({ session, events: events || [] });
   } catch (err) {
     console.error('[sessions] GET /:id error:', err);
     res.status(500).json({ error: 'Failed to get session' });
@@ -175,21 +138,31 @@ router.get('/:id', (req, res) => {
 // ============================================================================
 // DELETE /api/sessions/:id — Delete session and its events
 // ============================================================================
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    const db = getDatabase();
     const { id } = req.params;
 
-    const session = db.prepare('SELECT id FROM sessions WHERE id = ?').get(id);
-    if (!session) {
+    // Check existence
+    const { data: session, error: findError } = await db.query('sessions')
+      .select('id')
+      .eq('id', id)
+      .single();
+
+    if (findError || !session) {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    const deleteAll = db.transaction(() => {
-      db.prepare('DELETE FROM events WHERE session_id = ?').run(id);
-      db.prepare('DELETE FROM sessions WHERE id = ?').run(id);
-    });
-    deleteAll();
+    // Delete events first (cascade should handle this, but be explicit)
+    const { error: evtDelError } = await db.query('events')
+      .delete()
+      .eq('session_id', id);
+    if (evtDelError) throw evtDelError;
+
+    // Delete the session
+    const { error: sessDelError } = await db.query('sessions')
+      .delete()
+      .eq('id', id);
+    if (sessDelError) throw sessDelError;
 
     res.json({ success: true, message: 'Session deleted' });
   } catch (err) {

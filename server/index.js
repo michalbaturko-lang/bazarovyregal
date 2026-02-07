@@ -7,13 +7,23 @@ const path = require('path');
 const fs = require('fs');
 
 // ---------------------------------------------------------------------------
-// Auto-initialize the database on first start
+// Supabase connectivity check at startup
 // ---------------------------------------------------------------------------
-const DB_PATH = path.join(__dirname, 'data', 'sessions.db');
-if (!fs.existsSync(DB_PATH)) {
-  console.log('[server] Database not found. Running init-db...');
-  const initDatabase = require('./init-db');
-  initDatabase();
+const supabase = require('./supabase');
+
+async function checkSupabaseConnection() {
+  try {
+    const { data, error } = await supabase.from('projects').select('id').limit(1);
+    if (error) {
+      console.error('[server] Supabase connection check failed:', error.message);
+      console.error('[server] Make sure SUPABASE_URL and SUPABASE_SERVICE_KEY env vars are set');
+      console.error('[server] and that you have run the schema.sql migration.');
+    } else {
+      console.log('[server] Supabase connection verified successfully.');
+    }
+  } catch (err) {
+    console.error('[server] Could not reach Supabase:', err.message);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -88,8 +98,9 @@ app.use((err, _req, res, _next) => {
 // Start listening
 // ---------------------------------------------------------------------------
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`[server] Session recorder backend running on http://localhost:${PORT}`);
+  await checkSupabaseConnection();
 });
 
 module.exports = app;

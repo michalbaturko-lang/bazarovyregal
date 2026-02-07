@@ -2,7 +2,7 @@
 
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
-const getDatabase = require('../db');
+const db = require('../db');
 
 const router = Router();
 
@@ -98,9 +98,8 @@ function parseUserAgent(ua) {
 // ============================================================================
 // POST /api/events — Receive batched events from the tracker
 // ============================================================================
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const db = getDatabase();
     const { sessionId, projectId = 'default', events } = req.body;
 
     if (!sessionId) {
@@ -110,155 +109,142 @@ router.post('/', (req, res) => {
       return res.status(400).json({ error: 'events array is required and must not be empty' });
     }
 
-    const insertEvent = db.prepare(`
-      INSERT INTO events (session_id, type, timestamp, data, url)
-      VALUES (@session_id, @type, @timestamp, @data, @url)
-    `);
+    let hasRageClick = false;
+    let hasError = false;
+    let latestTimestamp = 0;
+    let pageNavigations = 0;
 
-    const upsertSession = db.prepare(`
-      INSERT INTO sessions (
-        id, project_id, visitor_id, started_at, url, referrer, user_agent,
-        screen_width, screen_height, viewport_width, viewport_height,
-        browser, os, device_type, language,
-        utm_source, utm_medium, utm_campaign, utm_term, utm_content
-      ) VALUES (
-        @id, @project_id, @visitor_id, @started_at, @url, @referrer, @user_agent,
-        @screen_width, @screen_height, @viewport_width, @viewport_height,
-        @browser, @os, @device_type, @language,
-        @utm_source, @utm_medium, @utm_campaign, @utm_term, @utm_content
-      )
-      ON CONFLICT(id) DO UPDATE SET
-        url        = COALESCE(excluded.url, sessions.url),
-        referrer   = COALESCE(excluded.referrer, sessions.referrer),
-        user_agent = COALESCE(excluded.user_agent, sessions.user_agent),
-        screen_width    = COALESCE(excluded.screen_width, sessions.screen_width),
-        screen_height   = COALESCE(excluded.screen_height, sessions.screen_height),
-        viewport_width  = COALESCE(excluded.viewport_width, sessions.viewport_width),
-        viewport_height = COALESCE(excluded.viewport_height, sessions.viewport_height),
-        browser    = COALESCE(excluded.browser, sessions.browser),
-        os         = COALESCE(excluded.os, sessions.os),
-        device_type = COALESCE(excluded.device_type, sessions.device_type),
-        language   = COALESCE(excluded.language, sessions.language),
-        utm_source   = COALESCE(excluded.utm_source, sessions.utm_source),
-        utm_medium   = COALESCE(excluded.utm_medium, sessions.utm_medium),
-        utm_campaign = COALESCE(excluded.utm_campaign, sessions.utm_campaign),
-        utm_term     = COALESCE(excluded.utm_term, sessions.utm_term),
-        utm_content  = COALESCE(excluded.utm_content, sessions.utm_content)
-    `);
+    const eventRows = [];
+    let sessionUpsertData = null;
+    let identifyData = null;
 
-    const identifySession = db.prepare(`
-      UPDATE sessions SET
-        identified_user_id    = @user_id,
-        identified_user_email = @user_email,
-        identified_user_name  = @user_name
-      WHERE id = @session_id
-    `);
+    for (const event of events) {
+      const eventType = event.type;
+      const eventTimestamp = event.timestamp || Date.now();
+      const eventData = event.data || null;
+      const eventUrl = event.url || null;
 
-    const updateSessionCounters = db.prepare(`
-      UPDATE sessions SET
-        event_count    = event_count + @new_event_count,
-        has_rage_clicks = CASE WHEN @has_rage_click = 1 THEN 1 ELSE has_rage_clicks END,
-        has_errors      = CASE WHEN @has_error = 1 THEN 1 ELSE has_errors END,
-        ended_at        = datetime(@ended_at_epoch, 'unixepoch'),
-        duration        = CAST((@ended_at_epoch - CAST(strftime('%%s', started_at) AS INTEGER)) AS INTEGER)
-      WHERE id = @session_id
-    `);
-
-    const updatePageCount = db.prepare(`
-      UPDATE sessions SET page_count = page_count + 1 WHERE id = ?
-    `);
-
-    // Process everything in a single transaction for performance
-    const processBatch = db.transaction(() => {
-      let hasRageClick = 0;
-      let hasError = 0;
-      let latestTimestamp = 0;
-
-      for (const event of events) {
-        const eventType = event.type;
-        const eventTimestamp = event.timestamp || Date.now();
-        const eventData = event.data || null;
-        const eventUrl = event.url || null;
-
-        // Track latest timestamp
-        if (eventTimestamp > latestTimestamp) {
-          latestTimestamp = eventTimestamp;
-        }
-
-        // Handle session_start events: create or update the session record
-        if (eventType === EVENT_TYPES.SESSION_START && eventData) {
-          const uaParsed = parseUserAgent(eventData.userAgent);
-
-          upsertSession.run({
-            id: sessionId,
-            project_id: projectId,
-            visitor_id: eventData.visitorId || null,
-            started_at: new Date(eventTimestamp).toISOString(),
-            url: eventData.url || eventUrl || null,
-            referrer: eventData.referrer || null,
-            user_agent: eventData.userAgent || null,
-            screen_width: eventData.screenWidth || null,
-            screen_height: eventData.screenHeight || null,
-            viewport_width: eventData.viewportWidth || null,
-            viewport_height: eventData.viewportHeight || null,
-            browser: uaParsed.browser,
-            os: uaParsed.os,
-            device_type: uaParsed.device_type,
-            language: eventData.language || null,
-            utm_source: eventData.utmSource || null,
-            utm_medium: eventData.utmMedium || null,
-            utm_campaign: eventData.utmCampaign || null,
-            utm_term: eventData.utmTerm || null,
-            utm_content: eventData.utmContent || null,
-          });
-        }
-
-        // Handle identify events: update session with user information
-        if (eventType === EVENT_TYPES.IDENTIFY && eventData) {
-          identifySession.run({
-            session_id: sessionId,
-            user_id: eventData.userId || null,
-            user_email: eventData.email || null,
-            user_name: eventData.name || null,
-          });
-        }
-
-        // Handle page navigation: increment page count
-        if (eventType === EVENT_TYPES.PAGE_NAVIGATION) {
-          updatePageCount.run(sessionId);
-        }
-
-        // Track rage clicks and errors
-        if (eventType === EVENT_TYPES.RAGE_CLICK) {
-          hasRageClick = 1;
-        }
-        if (eventType === EVENT_TYPES.ERROR) {
-          hasError = 1;
-        }
-
-        // Insert the event
-        insertEvent.run({
-          session_id: sessionId,
-          type: eventType,
-          timestamp: eventTimestamp,
-          data: eventData ? JSON.stringify(eventData) : null,
-          url: eventUrl,
-        });
+      // Track latest timestamp
+      if (eventTimestamp > latestTimestamp) {
+        latestTimestamp = eventTimestamp;
       }
 
-      // Update session counters
-      if (latestTimestamp > 0) {
-        updateSessionCounters.run({
-          session_id: sessionId,
-          new_event_count: events.length,
-          has_rage_click: hasRageClick,
-          has_error: hasError,
-          ended_at_epoch: Math.floor(latestTimestamp / 1000),
-        });
-      }
-    });
+      // Handle session_start events: build the session upsert payload
+      if (eventType === EVENT_TYPES.SESSION_START && eventData) {
+        const uaParsed = parseUserAgent(eventData.userAgent);
 
-    processBatch();
+        sessionUpsertData = {
+          id: sessionId,
+          project_id: projectId,
+          visitor_id: eventData.visitorId || null,
+          started_at: new Date(eventTimestamp).toISOString(),
+          url: eventData.url || eventUrl || null,
+          referrer: eventData.referrer || null,
+          user_agent: eventData.userAgent || null,
+          screen_width: eventData.screenWidth || null,
+          screen_height: eventData.screenHeight || null,
+          viewport_width: eventData.viewportWidth || null,
+          viewport_height: eventData.viewportHeight || null,
+          browser: uaParsed.browser,
+          os: uaParsed.os,
+          device_type: uaParsed.device_type,
+          language: eventData.language || null,
+          utm_source: eventData.utmSource || null,
+          utm_medium: eventData.utmMedium || null,
+          utm_campaign: eventData.utmCampaign || null,
+          utm_term: eventData.utmTerm || null,
+          utm_content: eventData.utmContent || null,
+        };
+      }
+
+      // Handle identify events
+      if (eventType === EVENT_TYPES.IDENTIFY && eventData) {
+        identifyData = {
+          identified_user_id: eventData.userId || null,
+          identified_user_email: eventData.email || null,
+          identified_user_name: eventData.name || null,
+        };
+      }
+
+      // Track page navigations
+      if (eventType === EVENT_TYPES.PAGE_NAVIGATION) {
+        pageNavigations++;
+      }
+
+      // Track rage clicks and errors
+      if (eventType === EVENT_TYPES.RAGE_CLICK) {
+        hasRageClick = true;
+      }
+      if (eventType === EVENT_TYPES.ERROR) {
+        hasError = true;
+      }
+
+      // Accumulate event row (data is stored as JSONB, pass object directly)
+      eventRows.push({
+        session_id: sessionId,
+        type: eventType,
+        timestamp: eventTimestamp,
+        data: eventData || null,
+        url: eventUrl,
+      });
+    }
+
+    // --- Upsert session ---
+    if (sessionUpsertData) {
+      const { error: upsertError } = await db.query('sessions')
+        .upsert(sessionUpsertData, { onConflict: 'id', ignoreDuplicates: false });
+      if (upsertError) throw upsertError;
+    }
+
+    // --- Identify user on session ---
+    if (identifyData) {
+      const { error: identifyError } = await db.query('sessions')
+        .update(identifyData)
+        .eq('id', sessionId);
+      if (identifyError) throw identifyError;
+    }
+
+    // --- Batch-insert events ---
+    if (eventRows.length > 0) {
+      const { error: insertError } = await db.query('events')
+        .insert(eventRows);
+      if (insertError) throw insertError;
+    }
+
+    // --- Update session counters ---
+    if (latestTimestamp > 0) {
+      // Fetch current session to compute duration properly
+      const { data: currentSession, error: fetchError } = await db.query('sessions')
+        .select('started_at, event_count, page_count, has_rage_clicks, has_errors')
+        .eq('id', sessionId)
+        .single();
+
+      if (!fetchError && currentSession) {
+        const startedAtMs = new Date(currentSession.started_at).getTime();
+        const duration = Math.floor((latestTimestamp - startedAtMs) / 1000);
+
+        const updates = {
+          event_count: (currentSession.event_count || 0) + events.length,
+          ended_at: new Date(latestTimestamp).toISOString(),
+          duration: Math.max(0, duration),
+        };
+
+        if (pageNavigations > 0) {
+          updates.page_count = (currentSession.page_count || 1) + pageNavigations;
+        }
+        if (hasRageClick) {
+          updates.has_rage_clicks = true;
+        }
+        if (hasError) {
+          updates.has_errors = true;
+        }
+
+        const { error: updateError } = await db.query('sessions')
+          .update(updates)
+          .eq('id', sessionId);
+        if (updateError) throw updateError;
+      }
+    }
 
     res.status(200).json({ success: true, stored: events.length });
   } catch (err) {
@@ -270,9 +256,8 @@ router.post('/', (req, res) => {
 // ============================================================================
 // GET /api/events — List events with filtering & pagination
 // ============================================================================
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const db = getDatabase();
     const {
       session_id,
       type,
@@ -286,50 +271,36 @@ router.get('/', (req, res) => {
     const limit = Math.min(1000, Math.max(1, parseInt(rawLimit, 10) || 100));
     const offset = (page - 1) * limit;
 
-    const conditions = [];
-    const params = {};
+    // Build count query
+    let countQuery = db.query('events')
+      .select('*', { count: 'exact', head: true });
 
-    if (session_id) {
-      conditions.push('session_id = @session_id');
-      params.session_id = session_id;
-    }
-    if (type !== undefined) {
-      conditions.push('type = @type');
-      params.type = parseInt(type, 10);
-    }
-    if (date_from) {
-      conditions.push('created_at >= @date_from');
-      params.date_from = date_from;
-    }
-    if (date_to) {
-      conditions.push('created_at <= @date_to');
-      params.date_to = date_to;
+    let dataQuery = db.query('events')
+      .select('*');
+
+    function applyFilters(q) {
+      if (session_id)           q = q.eq('session_id', session_id);
+      if (type !== undefined)   q = q.eq('type', parseInt(type, 10));
+      if (date_from)            q = q.gte('created_at', date_from);
+      if (date_to)              q = q.lte('created_at', date_to);
+      return q;
     }
 
-    const whereClause = conditions.length > 0
-      ? 'WHERE ' + conditions.join(' AND ')
-      : '';
+    countQuery = applyFilters(countQuery);
+    dataQuery = applyFilters(dataQuery);
 
-    const countRow = db.prepare(
-      `SELECT COUNT(*) AS total FROM events ${whereClause}`
-    ).get(params);
-    const total = countRow.total;
+    const { count: total, error: countError } = await countQuery;
+    if (countError) throw countError;
 
-    const events = db.prepare(
-      `SELECT * FROM events ${whereClause}
-       ORDER BY timestamp ASC
-       LIMIT @limit OFFSET @offset`
-    ).all({ ...params, limit, offset });
+    const { data: events, error: dataError } = await dataQuery
+      .order('timestamp', { ascending: true })
+      .range(offset, offset + limit - 1);
+    if (dataError) throw dataError;
 
-    // Parse JSON data
-    const parsedEvents = events.map((evt) => ({
-      ...evt,
-      data: evt.data ? JSON.parse(evt.data) : null,
-    }));
+    // data column is JSONB so Supabase returns it already parsed
+    const pages = Math.ceil((total || 0) / limit);
 
-    const pages = Math.ceil(total / limit);
-
-    res.json({ events: parsedEvents, total, page, pages });
+    res.json({ events: events || [], total: total || 0, page, pages });
   } catch (err) {
     console.error('[events] GET / error:', err);
     res.status(500).json({ error: 'Failed to list events' });

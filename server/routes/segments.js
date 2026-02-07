@@ -2,29 +2,25 @@
 
 const { Router } = require('express');
 const { v4: uuidv4 } = require('uuid');
-const getDatabase = require('../db');
+const db = require('../db');
 
 const router = Router();
 
 // ============================================================================
 // GET /api/segments — List segments for a project
 // ============================================================================
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const db = getDatabase();
     const { project_id = 'default' } = req.query;
 
-    const segments = db.prepare(
-      'SELECT * FROM segments WHERE project_id = ? ORDER BY created_at DESC'
-    ).all(project_id);
+    const { data: segments, error } = await db.query('segments')
+      .select('*')
+      .eq('project_id', project_id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
 
-    // Parse JSON filters
-    const parsed = segments.map((s) => ({
-      ...s,
-      filters: JSON.parse(s.filters),
-    }));
-
-    res.json({ segments: parsed });
+    // filters is already parsed from JSONB
+    res.json({ segments: segments || [] });
   } catch (err) {
     console.error('[segments] GET / error:', err);
     res.status(500).json({ error: 'Failed to list segments' });
@@ -34,9 +30,8 @@ router.get('/', (req, res) => {
 // ============================================================================
 // POST /api/segments — Create a segment
 // ============================================================================
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const db = getDatabase();
     const { name, projectId = 'default', filters } = req.body;
 
     if (!name || !name.trim()) {
@@ -48,18 +43,20 @@ router.post('/', (req, res) => {
 
     const id = uuidv4();
 
-    db.prepare(`
-      INSERT INTO segments (id, project_id, name, filters)
-      VALUES (@id, @project_id, @name, @filters)
-    `).run({
-      id,
-      project_id: projectId,
-      name: name.trim(),
-      filters: JSON.stringify(filters),
-    });
+    const { error: insertError } = await db.query('segments')
+      .insert({
+        id,
+        project_id: projectId,
+        name: name.trim(),
+        filters,          // JSONB — pass as object directly
+      });
+    if (insertError) throw insertError;
 
-    const segment = db.prepare('SELECT * FROM segments WHERE id = ?').get(id);
-    segment.filters = JSON.parse(segment.filters);
+    const { data: segment, error: fetchError } = await db.query('segments')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (fetchError) throw fetchError;
 
     res.status(201).json({ segment });
   } catch (err) {
@@ -71,18 +68,20 @@ router.post('/', (req, res) => {
 // ============================================================================
 // GET /api/segments/:id — Get a single segment
 // ============================================================================
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const db = getDatabase();
     const { id } = req.params;
 
-    const segment = db.prepare('SELECT * FROM segments WHERE id = ?').get(id);
-    if (!segment) {
+    const { data: segment, error } = await db.query('segments')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !segment) {
       return res.status(404).json({ error: 'Segment not found' });
     }
 
-    segment.filters = JSON.parse(segment.filters);
-
+    // filters is already parsed from JSONB
     res.json({ segment });
   } catch (err) {
     console.error('[segments] GET /:id error:', err);
@@ -93,30 +92,40 @@ router.get('/:id', (req, res) => {
 // ============================================================================
 // PUT /api/segments/:id — Update a segment
 // ============================================================================
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
-    const db = getDatabase();
     const { id } = req.params;
     const { name, filters } = req.body;
 
-    const existing = db.prepare('SELECT * FROM segments WHERE id = ?').get(id);
-    if (!existing) {
+    const { data: existing, error: findError } = await db.query('segments')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (findError || !existing) {
       return res.status(404).json({ error: 'Segment not found' });
     }
-
-    const updatedName = name !== undefined ? name.trim() : existing.name;
-    const updatedFilters = filters !== undefined ? JSON.stringify(filters) : existing.filters;
 
     if (filters !== undefined && (typeof filters !== 'object' || filters === null)) {
       return res.status(400).json({ error: 'filters must be a valid object' });
     }
 
-    db.prepare(`
-      UPDATE segments SET name = ?, filters = ? WHERE id = ?
-    `).run(updatedName, updatedFilters, id);
+    const updatedName = name !== undefined ? name.trim() : existing.name;
+    const updatedFilters = filters !== undefined ? filters : existing.filters;
 
-    const segment = db.prepare('SELECT * FROM segments WHERE id = ?').get(id);
-    segment.filters = JSON.parse(segment.filters);
+    const { error: updateError } = await db.query('segments')
+      .update({
+        name: updatedName,
+        filters: updatedFilters,
+      })
+      .eq('id', id);
+    if (updateError) throw updateError;
+
+    const { data: segment, error: fetchError } = await db.query('segments')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (fetchError) throw fetchError;
 
     res.json({ segment });
   } catch (err) {
@@ -128,17 +137,23 @@ router.put('/:id', (req, res) => {
 // ============================================================================
 // DELETE /api/segments/:id — Delete a segment
 // ============================================================================
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    const db = getDatabase();
     const { id } = req.params;
 
-    const existing = db.prepare('SELECT id FROM segments WHERE id = ?').get(id);
-    if (!existing) {
+    const { data: existing, error: findError } = await db.query('segments')
+      .select('id')
+      .eq('id', id)
+      .single();
+
+    if (findError || !existing) {
       return res.status(404).json({ error: 'Segment not found' });
     }
 
-    db.prepare('DELETE FROM segments WHERE id = ?').run(id);
+    const { error: deleteError } = await db.query('segments')
+      .delete()
+      .eq('id', id);
+    if (deleteError) throw deleteError;
 
     res.json({ success: true, message: 'Segment deleted' });
   } catch (err) {
