@@ -1,9 +1,8 @@
 'use strict';
 
-const { Router } = require('express');
-const db = require('../db');
-
-const router = Router();
+const express = require('express');
+const router = express.Router();
+const supabase = require('../supabase');
 
 // ============================================================================
 // GET /api/dashboard/stats — Overall stats for a date range
@@ -17,7 +16,7 @@ router.get('/stats', async (req, res) => {
     } = req.query;
 
     // --- Fetch all matching sessions (select only needed columns) ---
-    let sessQuery = db.query('sessions')
+    let sessQuery = supabase.from('sessions')
       .select('url, browser, device_type, visitor_id, duration, page_count, has_rage_clicks, has_errors, started_at')
       .eq('project_id', project_id);
 
@@ -69,14 +68,6 @@ router.get('/stats', async (req, res) => {
     const totalSessions = rows.length;
     const avgDuration = totalSessions > 0 ? Math.floor(totalDuration / totalSessions) : 0;
 
-    // Sort and limit helper
-    function topN(obj, n = 10) {
-      return Object.entries(obj)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, n)
-        .map(([key, count]) => ({ [key === urlCounts ? 'url' : key]: key, count }));
-    }
-
     const topPages = Object.entries(urlCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
@@ -110,7 +101,7 @@ router.get('/stats', async (req, res) => {
     });
   } catch (err) {
     console.error('[dashboard] GET /stats error:', err);
-    res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -125,7 +116,7 @@ router.get('/live', async (req, res) => {
     // or if its started_at is within the last 5 min and it has no ended_at.
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
 
-    const { data: activeSessions, error } = await db.query('sessions')
+    const { data: activeSessions, error } = await supabase.from('sessions')
       .select('*')
       .eq('project_id', project_id)
       .or(`ended_at.gte.${fiveMinutesAgo},and(ended_at.is.null,started_at.gte.${fiveMinutesAgo})`)
@@ -140,7 +131,7 @@ router.get('/live', async (req, res) => {
     });
   } catch (err) {
     console.error('[dashboard] GET /live error:', err);
-    res.status(500).json({ error: 'Failed to fetch live sessions' });
+    res.status(500).json({ error: err.message });
   }
 });
 

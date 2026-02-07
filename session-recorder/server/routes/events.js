@@ -1,10 +1,9 @@
 'use strict';
 
-const { Router } = require('express');
+const express = require('express');
+const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const db = require('../db');
-
-const router = Router();
+const supabase = require('../supabase');
 
 // ============================================================================
 // Event type constants (must match the tracker)
@@ -191,14 +190,14 @@ router.post('/', async (req, res) => {
 
     // --- Upsert session ---
     if (sessionUpsertData) {
-      const { error: upsertError } = await db.query('sessions')
+      const { error: upsertError } = await supabase.from('sessions')
         .upsert(sessionUpsertData, { onConflict: 'id', ignoreDuplicates: false });
       if (upsertError) throw upsertError;
     }
 
     // --- Identify user on session ---
     if (identifyData) {
-      const { error: identifyError } = await db.query('sessions')
+      const { error: identifyError } = await supabase.from('sessions')
         .update(identifyData)
         .eq('id', sessionId);
       if (identifyError) throw identifyError;
@@ -206,7 +205,7 @@ router.post('/', async (req, res) => {
 
     // --- Batch-insert events ---
     if (eventRows.length > 0) {
-      const { error: insertError } = await db.query('events')
+      const { error: insertError } = await supabase.from('events')
         .insert(eventRows);
       if (insertError) throw insertError;
     }
@@ -214,7 +213,7 @@ router.post('/', async (req, res) => {
     // --- Update session counters ---
     if (latestTimestamp > 0) {
       // Fetch current session to compute duration properly
-      const { data: currentSession, error: fetchError } = await db.query('sessions')
+      const { data: currentSession, error: fetchError } = await supabase.from('sessions')
         .select('started_at, event_count, page_count, has_rage_clicks, has_errors')
         .eq('id', sessionId)
         .single();
@@ -239,7 +238,7 @@ router.post('/', async (req, res) => {
           updates.has_errors = true;
         }
 
-        const { error: updateError } = await db.query('sessions')
+        const { error: updateError } = await supabase.from('sessions')
           .update(updates)
           .eq('id', sessionId);
         if (updateError) throw updateError;
@@ -249,7 +248,7 @@ router.post('/', async (req, res) => {
     res.status(200).json({ success: true, stored: events.length });
   } catch (err) {
     console.error('[events] POST / error:', err);
-    res.status(500).json({ error: 'Failed to store events' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -272,10 +271,10 @@ router.get('/', async (req, res) => {
     const offset = (page - 1) * limit;
 
     // Build count query
-    let countQuery = db.query('events')
+    let countQuery = supabase.from('events')
       .select('*', { count: 'exact', head: true });
 
-    let dataQuery = db.query('events')
+    let dataQuery = supabase.from('events')
       .select('*');
 
     function applyFilters(q) {
@@ -303,7 +302,7 @@ router.get('/', async (req, res) => {
     res.json({ events: events || [], total: total || 0, page, pages });
   } catch (err) {
     console.error('[events] GET / error:', err);
-    res.status(500).json({ error: 'Failed to list events' });
+    res.status(500).json({ error: err.message });
   }
 });
 

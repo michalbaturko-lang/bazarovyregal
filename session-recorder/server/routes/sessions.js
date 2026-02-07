@@ -1,9 +1,8 @@
 'use strict';
 
-const { Router } = require('express');
-const db = require('../db');
-
-const router = Router();
+const express = require('express');
+const router = express.Router();
+const supabase = require('../supabase');
 
 // ============================================================================
 // GET /api/sessions — List sessions with filtering & pagination
@@ -47,11 +46,11 @@ router.get('/', async (req, res) => {
     const ascending = order.toUpperCase() === 'ASC';
 
     // --- Build the filtered query for counting ---
-    let countQuery = db.query('sessions')
+    let countQuery = supabase.from('sessions')
       .select('*', { count: 'exact', head: true })
       .eq('project_id', project_id);
 
-    let dataQuery = db.query('sessions')
+    let dataQuery = supabase.from('sessions')
       .select('*')
       .eq('project_id', project_id);
 
@@ -98,7 +97,7 @@ router.get('/', async (req, res) => {
     res.json({ sessions: sessions || [], total: total || 0, page, pages });
   } catch (err) {
     console.error('[sessions] GET / error:', err);
-    res.status(500).json({ error: 'Failed to list sessions' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -110,7 +109,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
     // Fetch the session
-    const { data: session, error: sessionError } = await db.query('sessions')
+    const { data: session, error: sessionError } = await supabase.from('sessions')
       .select('*')
       .eq('id', id)
       .single();
@@ -120,7 +119,7 @@ router.get('/:id', async (req, res) => {
     }
 
     // Fetch associated events
-    const { data: events, error: eventsError } = await db.query('events')
+    const { data: events, error: eventsError } = await supabase.from('events')
       .select('*')
       .eq('session_id', id)
       .order('timestamp', { ascending: true });
@@ -131,7 +130,7 @@ router.get('/:id', async (req, res) => {
     res.json({ session, events: events || [] });
   } catch (err) {
     console.error('[sessions] GET /:id error:', err);
-    res.status(500).json({ error: 'Failed to get session' });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -143,7 +142,7 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 
     // Check existence
-    const { data: session, error: findError } = await db.query('sessions')
+    const { data: session, error: findError } = await supabase.from('sessions')
       .select('id')
       .eq('id', id)
       .single();
@@ -153,13 +152,13 @@ router.delete('/:id', async (req, res) => {
     }
 
     // Delete events first (cascade should handle this, but be explicit)
-    const { error: evtDelError } = await db.query('events')
+    const { error: evtDelError } = await supabase.from('events')
       .delete()
       .eq('session_id', id);
     if (evtDelError) throw evtDelError;
 
     // Delete the session
-    const { error: sessDelError } = await db.query('sessions')
+    const { error: sessDelError } = await supabase.from('sessions')
       .delete()
       .eq('id', id);
     if (sessDelError) throw sessDelError;
@@ -167,7 +166,7 @@ router.delete('/:id', async (req, res) => {
     res.json({ success: true, message: 'Session deleted' });
   } catch (err) {
     console.error('[sessions] DELETE /:id error:', err);
-    res.status(500).json({ error: 'Failed to delete session' });
+    res.status(500).json({ error: err.message });
   }
 });
 
