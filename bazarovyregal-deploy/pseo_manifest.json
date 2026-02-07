@@ -1,0 +1,566 @@
+{
+  "generated_at": "2026-02-07T14:12:48.456623",
+  "total_pages": 112,
+  "pages": [
+    {
+      "slug": "kovove-regaly-praha",
+      "type": "locations",
+      "title": "Kovové regály Praha | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-brno",
+      "type": "locations",
+      "title": "Kovové regály Brno | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-ostrava",
+      "type": "locations",
+      "title": "Kovové regály Ostrava | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-plzen",
+      "type": "locations",
+      "title": "Kovové regály Plzen | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-liberec",
+      "type": "locations",
+      "title": "Kovové regály Liberec | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-olomouc",
+      "type": "locations",
+      "title": "Kovové regály Olomouc | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-ceske-budejovice",
+      "type": "locations",
+      "title": "Kovové regály Ceske Budejovice | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-hradec-kralove",
+      "type": "locations",
+      "title": "Kovové regály Hradec Kralove | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-usti-nad-labem",
+      "type": "locations",
+      "title": "Kovové regály Usti nad Labem | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-pardubice",
+      "type": "locations",
+      "title": "Kovové regály Pardubice | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-zlin",
+      "type": "locations",
+      "title": "Kovové regály Zlin | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-havirov",
+      "type": "locations",
+      "title": "Kovové regály Havirov | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-kladno",
+      "type": "locations",
+      "title": "Kovové regály Kladno | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-most",
+      "type": "locations",
+      "title": "Kovové regály Most | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-opava",
+      "type": "locations",
+      "title": "Kovové regály Opava | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-frydek-mistek",
+      "type": "locations",
+      "title": "Kovové regály Frydek-Mistek | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-karlovy-vary",
+      "type": "locations",
+      "title": "Kovové regály Karlovy Vary | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-jihlava",
+      "type": "locations",
+      "title": "Kovové regály Jihlava | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-teplice",
+      "type": "locations",
+      "title": "Kovové regály Teplice | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-chomutov",
+      "type": "locations",
+      "title": "Kovové regály Chomutov | Doprava od 99 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-pro-kutily",
+      "type": "personas",
+      "title": "Regaly pro kutily a remeslniky | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-pro-domacnost",
+      "type": "personas",
+      "title": "Regaly pro domacnost a rodinu | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-pro-firmy",
+      "type": "personas",
+      "title": "Regaly pro firmy a podnikatele | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-pro-eshopy",
+      "type": "personas",
+      "title": "Regaly pro e-shopy a online prodejce | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-pro-seniory",
+      "type": "personas",
+      "title": "Regaly pro seniory - snadna montaz a pristupnost | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-pro-studenty",
+      "type": "personas",
+      "title": "Regaly pro studenty - levne a prakticke | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-nosnost-regalu",
+      "type": "glossary",
+      "title": "Nosnost regalu – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-nosnost-police",
+      "type": "glossary",
+      "title": "Nosnost police – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-celkova-nosnost",
+      "type": "glossary",
+      "title": "Celkova nosnost regalu – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-bezroubova-montaz",
+      "type": "glossary",
+      "title": "Bezroubova montaz – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-montaz-regalu",
+      "type": "glossary",
+      "title": "Montaz regalu – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-nastavitelne-police",
+      "type": "glossary",
+      "title": "Nastavitelne police – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-zinkovani",
+      "type": "glossary",
+      "title": "Zinkovani (povrchova uprava) – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-lakovani",
+      "type": "glossary",
+      "title": "Lakovani (povrchova uprava) – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-povrchova-uprava",
+      "type": "glossary",
+      "title": "Povrchova uprava regalu – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-koroze",
+      "type": "glossary",
+      "title": "Koroze (rez) – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-stojny",
+      "type": "glossary",
+      "title": "Stojny (sloupky regalu) – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-police-regalu",
+      "type": "glossary",
+      "title": "Police regalu – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-pricka",
+      "type": "glossary",
+      "title": "Pricka (traversa) – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-likvidace-skladu",
+      "type": "glossary",
+      "title": "Likvidace skladu – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "slovnik-zatizeni-regalu",
+      "type": "glossary",
+      "title": "Zatizeni regalu – co to je a proč je důležitá | Bazarovyregal.cz"
+    },
+    {
+      "slug": "srovnani-regal-180-vs-200-cm",
+      "type": "comparisons",
+      "title": "Srovnani regalu 180 vs 200 cm - ktery vybrat? | Bazarovyregal.cz"
+    },
+    {
+      "slug": "srovnani-cerny-vs-zinkovany-regal",
+      "type": "comparisons",
+      "title": "Cerny vs zinkovany regal - co je lepsi? | Bazarovyregal.cz"
+    },
+    {
+      "slug": "srovnani-regal-150-vs-180-cm",
+      "type": "comparisons",
+      "title": "Regal 150 cm vs 180 cm - srovnani a doporuceni | Bazarovyregal.cz"
+    },
+    {
+      "slug": "srovnani-regal-sirka-90-vs-120-cm",
+      "type": "comparisons",
+      "title": "Regal sirka 90 cm vs 120 cm - jak vybrat? | Bazarovyregal.cz"
+    },
+    {
+      "slug": "srovnani-novy-vs-bazarovy-regal",
+      "type": "comparisons",
+      "title": "Novy regal z vyprodeje vs bazarovy regal | Bazarovyregal.cz"
+    },
+    {
+      "slug": "nejlepsi-kovove-regaly-2026",
+      "type": "curation",
+      "title": "Nejlepší kovové regály 2026 – TOP výběr | Bazarovyregal.cz"
+    },
+    {
+      "slug": "nejlepsi-regaly-do-garaze",
+      "type": "curation",
+      "title": "TOP regály do garáže 2026 | Bazarovyregal.cz"
+    },
+    {
+      "slug": "nejlepsi-regaly-do-sklepa",
+      "type": "curation",
+      "title": "TOP regály do sklepa 2026 – odolné vlhkosti | Bazarovyregal.cz"
+    },
+    {
+      "slug": "nejlepsi-zinkovane-regaly",
+      "type": "curation",
+      "title": "TOP zinkované regály – odolnost bez kompromisů | Bazarovyregal.cz"
+    },
+    {
+      "slug": "nejlepsi-regaly-do-dilny",
+      "type": "curation",
+      "title": "TOP regály do dílny 2026 | Bazarovyregal.cz"
+    },
+    {
+      "slug": "nejlevnejsi-regaly",
+      "type": "curation",
+      "title": "Nejlevnější kovové regály – od 549 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "nejprodavanejsi-regaly",
+      "type": "curation",
+      "title": "Nejprodávanější regály 2026 – co kupují ostatní | Bazarovyregal.cz"
+    },
+    {
+      "slug": "top-regaly-pro-firmy",
+      "type": "curation",
+      "title": "TOP regály pro firmy a podnikatele 2026 | Bazarovyregal.cz"
+    },
+    {
+      "slug": "sablona-organizace-garaze",
+      "type": "templates",
+      "title": "Šablona pro organizaci garáže s regály | Bazarovyregal.cz"
+    },
+    {
+      "slug": "sablona-organizace-sklepa",
+      "type": "templates",
+      "title": "Šablona pro organizaci sklepa s regály | Bazarovyregal.cz"
+    },
+    {
+      "slug": "sablona-organizace-dilny",
+      "type": "templates",
+      "title": "Šablona pro organizaci dílny s regály | Bazarovyregal.cz"
+    },
+    {
+      "slug": "sablona-vybaveni-skladu",
+      "type": "templates",
+      "title": "Šablona pro vybavení skladu regály | Bazarovyregal.cz"
+    },
+    {
+      "slug": "pruvodce-vyberem-regalu",
+      "type": "templates",
+      "title": "Průvodce výběrem regálu – krok za krokem | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kalkulacka-ulozneho-prostoru",
+      "type": "templates",
+      "title": "Kalkulačka úložného prostoru – kolik regálů potřebujete | Bazarovyregal.cz"
+    },
+    {
+      "slug": "priklad-organizace-garaze-regaly",
+      "type": "examples",
+      "title": "Příklad: Jak zorganizovat garáž s regály | Bazarovyregal.cz"
+    },
+    {
+      "slug": "priklad-organizace-sklepa-regaly",
+      "type": "examples",
+      "title": "Příklad: Organizace sklepa s regály | Bazarovyregal.cz"
+    },
+    {
+      "slug": "priklad-sklad-eshopu-regaly",
+      "type": "examples",
+      "title": "Příklad: Jak vybavit sklad e-shopu regály | Bazarovyregal.cz"
+    },
+    {
+      "slug": "priklad-dilna-organizace",
+      "type": "examples",
+      "title": "Příklad: Profesionální organizace dílny | Bazarovyregal.cz"
+    },
+    {
+      "slug": "priklad-spiz-organizace",
+      "type": "examples",
+      "title": "Příklad: Jak zorganizovat spíž pomocí regálů | Bazarovyregal.cz"
+    },
+    {
+      "slug": "priklad-archiv-dokumenty",
+      "type": "examples",
+      "title": "Příklad: Archivace dokumentů na regálech | Bazarovyregal.cz"
+    },
+    {
+      "slug": "priklad-satna-ulozny-system",
+      "type": "examples",
+      "title": "Příklad: Šatní úložný systém z regálů | Bazarovyregal.cz"
+    },
+    {
+      "slug": "priklad-domaci-knihovna",
+      "type": "examples",
+      "title": "Příklad: Domácí knihovna z kovových regálů | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-vyska-150-cm",
+      "type": "directory",
+      "title": "Regály výška 150 cm – 4 police, nosnost 700 kg | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-vyska-180-cm",
+      "type": "directory",
+      "title": "Regály výška 180 cm – 5 police, nosnost 875 kg | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-vyska-200-cm",
+      "type": "directory",
+      "title": "Regály výška 200 cm – 5 police, nosnost 875 kg | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-vyska-220-cm",
+      "type": "directory",
+      "title": "Regály výška 220 cm – 5 police, nosnost 875 kg | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-sirka-40-cm",
+      "type": "directory",
+      "title": "Regály šířka 40 cm – nejužší varianta do stísněných prostor | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-sirka-60-cm",
+      "type": "directory",
+      "title": "Regály šířka 60 cm – kompaktní šířka pro menší prostory | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-sirka-70-cm",
+      "type": "directory",
+      "title": "Regály šířka 70 cm – standardní šířka pro domácnost | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-sirka-90-cm",
+      "type": "directory",
+      "title": "Regály šířka 90 cm – nejprodávanější šířka – univerzální | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-sirka-120-cm",
+      "type": "directory",
+      "title": "Regály šířka 120 cm – nejširší varianta pro profesionální použití | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-naradi",
+      "type": "directory",
+      "title": "Regály na naradi – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-pneumatiky",
+      "type": "directory",
+      "title": "Regály na pneumatiky – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-vino",
+      "type": "directory",
+      "title": "Regály na vino – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-zavareniny",
+      "type": "directory",
+      "title": "Regály na zavareniny – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-knihy",
+      "type": "directory",
+      "title": "Regály na knihy – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-boxy",
+      "type": "directory",
+      "title": "Regály na ulozne boxy – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-krabice",
+      "type": "directory",
+      "title": "Regály na krabice – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-dokumenty",
+      "type": "directory",
+      "title": "Regály na dokumenty a sanony – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-potraviny",
+      "type": "directory",
+      "title": "Regály na potraviny – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-na-obleceni",
+      "type": "directory",
+      "title": "Regály na obleceni – pevné a levné | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-podle-nosnosti",
+      "type": "directory",
+      "title": "Regály podle nosnosti – 700, 875, 1050 kg | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-podle-ceny",
+      "type": "directory",
+      "title": "Regály podle ceny – od nejlevnějšího | Bazarovyregal.cz"
+    },
+    {
+      "slug": "profil-regal-150-serie",
+      "type": "profiles",
+      "title": "Řada 150 cm – kompletní profil | Bazarovyregal.cz"
+    },
+    {
+      "slug": "profil-regal-180-serie",
+      "type": "profiles",
+      "title": "Řada 180 cm – nejprodávanější | Bazarovyregal.cz"
+    },
+    {
+      "slug": "profil-regal-200-serie",
+      "type": "profiles",
+      "title": "Řada 200 cm – extra kapacita | Bazarovyregal.cz"
+    },
+    {
+      "slug": "profil-regal-220-serie",
+      "type": "profiles",
+      "title": "Řada 220 cm – maximální výška | Bazarovyregal.cz"
+    },
+    {
+      "slug": "profil-profesionalni-rada",
+      "type": "profiles",
+      "title": "Profesionální řada – nosnost 1050 kg | Bazarovyregal.cz"
+    },
+    {
+      "slug": "profil-zinkovane-regaly",
+      "type": "profiles",
+      "title": "Zinkovaná řada – odolnost vlhkosti | Bazarovyregal.cz"
+    },
+    {
+      "slug": "koupit-kovovy-regal-online",
+      "type": "conversions",
+      "title": "Koupit kovový regál online – nejnižší ceny na trhu | Bazarovyregal.cz"
+    },
+    {
+      "slug": "levne-kovove-regaly-vyprodej",
+      "type": "conversions",
+      "title": "Levné kovové regály – výprodej skladu od 549 Kč | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-akce-sleva",
+      "type": "conversions",
+      "title": "Kovové regály v akci – aktuální slevy a nabídky | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-s-dopravou-zdarma",
+      "type": "conversions",
+      "title": "Kovové regály s výhodnou dopravou – od 99 Kč po celé ČR | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-se-zarukou",
+      "type": "conversions",
+      "title": "Kovové regály se zárukou 7 let – kvalita ověřena tisíci zákazníky | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-pro-firmy-velkoobchod",
+      "type": "conversions",
+      "title": "Regály pro firmy – velkoobchodní ceny, množstevní slevy | Bazarovyregal.cz"
+    },
+    {
+      "slug": "objednat-regal-bez-registrace",
+      "type": "conversions",
+      "title": "Objednat regál rychle – bez registrace, expedice ihned | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regale-slovensko",
+      "type": "translations",
+      "title": "Kovové regále – dodávka na Slovensko | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regale-do-garaze-slovensko",
+      "type": "translations",
+      "title": "Regále do garáže – dodávka na Slovensko | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regale-do-pivnice-slovensko",
+      "type": "translations",
+      "title": "Regále do pivnice – zinkované, odolné vlhkosti | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-bratislava",
+      "type": "translations",
+      "title": "Kovové regále Bratislava – dodávka do 3–5 dní | Bazarovyregal.cz"
+    },
+    {
+      "slug": "kovove-regaly-kosice",
+      "type": "translations",
+      "title": "Kovové regále Košice – dodávka do 4–5 dní | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-a-ulozne-boxy-system",
+      "type": "integrations",
+      "title": "Regály + úložné boxy – kompletní organizační systém | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-kotveni-ke-zdi",
+      "type": "integrations",
+      "title": "Kotvení regálů ke zdi – návod a doporučení | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-a-stitky-organizace",
+      "type": "integrations",
+      "title": "Organizační systém – regály + štítky + kategorizace | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-modularni-system-rozsireni",
+      "type": "integrations",
+      "title": "Modulární systém – jak rozšířit regálový systém | Bazarovyregal.cz"
+    },
+    {
+      "slug": "regaly-do-pronajateho-prostoru",
+      "type": "integrations",
+      "title": "Regály do pronajatého prostoru – bez vrtání, snadná demontáž | Bazarovyregal.cz"
+    }
+  ]
+}
