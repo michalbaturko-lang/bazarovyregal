@@ -13,6 +13,7 @@ function authMiddleware(req, res, next) {
       req.path === '/api/auth/login' ||
       req.path === '/api/auth/check' ||
       req.path.startsWith('/api/sharing/') ||
+      req.path.startsWith('/api/v1/') ||
       req.path === '/shared' ||
       req.path === '/shared.html' ||
       req.path.startsWith('/css/') ||

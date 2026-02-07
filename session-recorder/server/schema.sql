@@ -181,6 +181,132 @@ DO $$ BEGIN
 END $$;
 
 -- -----------------------------------------------------------
+-- Webhooks
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS webhooks (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  project_id TEXT NOT NULL DEFAULT 'default',
+  name TEXT NOT NULL,
+  url TEXT NOT NULL,
+  event_types TEXT[] NOT NULL DEFAULT '{}',
+  headers JSONB DEFAULT '{}',
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE webhooks ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_webhooks') THEN
+    CREATE POLICY "service_role_all_webhooks" ON webhooks FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS webhook_logs (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  webhook_id TEXT REFERENCES webhooks(id) ON DELETE CASCADE,
+  event_type TEXT NOT NULL,
+  payload JSONB NOT NULL,
+  response_status INTEGER,
+  response_body TEXT,
+  success BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE webhook_logs ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_webhook_logs') THEN
+    CREATE POLICY "service_role_all_webhook_logs" ON webhook_logs FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+-- -----------------------------------------------------------
+-- Report configs (automated email reports)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS report_configs (
+  id TEXT PRIMARY KEY DEFAULT 'default',
+  project_id TEXT NOT NULL DEFAULT 'default',
+  enabled BOOLEAN DEFAULT false,
+  recipients TEXT[] DEFAULT '{}',
+  frequency TEXT DEFAULT 'weekly',
+  day_of_week INTEGER DEFAULT 1,
+  hour INTEGER DEFAULT 9,
+  timezone TEXT DEFAULT 'Europe/Prague',
+  include_sections TEXT[] DEFAULT '{overview,top_pages,errors,performance}',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE report_configs ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_report_configs') THEN
+    CREATE POLICY "service_role_all_report_configs" ON report_configs FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS report_history (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  project_id TEXT NOT NULL DEFAULT 'default',
+  period_start TIMESTAMPTZ NOT NULL,
+  period_end TIMESTAMPTZ NOT NULL,
+  recipients TEXT[] DEFAULT '{}',
+  html_content TEXT,
+  sent_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE report_history ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_report_history') THEN
+    CREATE POLICY "service_role_all_report_history" ON report_history FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+-- -----------------------------------------------------------
+-- API Keys (Developer API)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS api_keys (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  project_id TEXT NOT NULL DEFAULT 'default',
+  name TEXT NOT NULL,
+  key_hash TEXT NOT NULL UNIQUE,
+  key_prefix TEXT NOT NULL,
+  scopes TEXT[] DEFAULT '{read:sessions,read:events,read:analytics}',
+  last_used_at TIMESTAMPTZ,
+  request_count INTEGER DEFAULT 0,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash);
+ALTER TABLE api_keys ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_api_keys') THEN
+    CREATE POLICY "service_role_all_api_keys" ON api_keys FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+-- -----------------------------------------------------------
+-- Tenants (multi-tenant billing & white-label)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS tenants (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  name TEXT NOT NULL,
+  domain TEXT,
+  owner_email TEXT,
+  plan_id TEXT DEFAULT 'free',
+  stripe_customer_id TEXT,
+  stripe_subscription_id TEXT,
+  sessions_limit INTEGER DEFAULT 1000,
+  sessions_used INTEGER DEFAULT 0,
+  billing_cycle_start TIMESTAMPTZ DEFAULT now(),
+  branding JSONB DEFAULT '{"primary_color": "#3b82f6", "company_name": "Regal Master Look"}',
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'service_role_all_tenants') THEN
+    CREATE POLICY "service_role_all_tenants" ON tenants FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+-- -----------------------------------------------------------
 -- Default project
 -- -----------------------------------------------------------
 INSERT INTO projects (id, name, domain)

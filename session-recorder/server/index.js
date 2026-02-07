@@ -52,6 +52,12 @@ app.use('/api/performance', require('./routes/performance'));
 app.use('/api/scrolldepth', require('./routes/scrolldepth'));
 app.use('/api/comparison', require('./routes/comparison'));
 app.use('/api/sharing', require('./routes/sharing'));
+app.use('/api/webhooks', require('./routes/webhooks'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/apikeys', require('./routes/apikeys'));
+app.use('/api/v1', require('./routes/publicapi'));
+app.use('/api/billing', require('./routes/billing'));
+app.use('/api/tenants', require('./routes/tenants'));
 
 // Serve dashboard (local dev only)
 app.use(express.static(path.join(__dirname, '..', 'dashboard')));

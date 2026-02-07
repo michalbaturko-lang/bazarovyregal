@@ -40,5 +40,11 @@ app.use('/api/performance', require('../server/routes/performance'));
 app.use('/api/scrolldepth', require('../server/routes/scrolldepth'));
 app.use('/api/comparison', require('../server/routes/comparison'));
 app.use('/api/sharing', require('../server/routes/sharing'));
+app.use('/api/webhooks', require('../server/routes/webhooks'));
+app.use('/api/reports', require('../server/routes/reports'));
+app.use('/api/apikeys', require('../server/routes/apikeys'));
+app.use('/api/v1', require('../server/routes/publicapi'));
+app.use('/api/billing', require('../server/routes/billing'));
+app.use('/api/tenants', require('../server/routes/tenants'));
 
 module.exports = app;
