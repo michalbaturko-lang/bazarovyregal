@@ -57,7 +57,7 @@ router.get('/', async (req, res) => {
     // Apply optional filters to both queries
     function applyFilters(q) {
       if (date_from)            q = q.gte('started_at', date_from);
-      if (date_to)              q = q.lte('started_at', date_to);
+      if (date_to)              q = q.lte('started_at', date_to + 'T23:59:59.999Z');
       if (min_duration !== undefined) q = q.gte('duration', parseInt(min_duration, 10));
       if (max_duration !== undefined) q = q.lte('duration', parseInt(max_duration, 10));
       if (browser)              q = q.eq('browser', browser);
