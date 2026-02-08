@@ -9,22 +9,23 @@ const dispatcher = require('../webhook-dispatcher');
 // ============================================================================
 // Event type constants (must match the tracker)
 // ============================================================================
+// Must match the tracker's EVT constants exactly
 const EVENT_TYPES = {
-  SESSION_START: 0,
-  DOM_SNAPSHOT: 1,
-  DOM_MUTATION: 2,
-  MOUSE_MOVE: 3,
-  MOUSE_CLICK: 4,
-  SCROLL: 5,
-  INPUT: 6,
-  RESIZE: 7,
-  PAGE_NAVIGATION: 8,
-  CONSOLE: 9,
-  NETWORK: 10,
-  ERROR: 11,
-  RAGE_CLICK: 12,
-  IDENTIFY: 13,
-  CUSTOM_EVENT: 14,
+  SESSION_START:   0,
+  DOM_SNAPSHOT:    1,
+  DOM_MUTATION:    2,
+  MOUSE_MOVE:      3,
+  MOUSE_CLICK:     4,
+  SCROLL:          5,
+  RESIZE:          6,
+  INPUT:           7,
+  PAGE_VISIBILITY: 8,
+  RAGE_CLICK:      9,
+  DEAD_CLICK:     10,
+  JS_ERROR:       11,
+  CUSTOM_EVENT:   12,
+  IDENTIFY:       13,
+  PAGE_NAVIGATION: 14,
 };
 
 // ============================================================================
@@ -100,7 +101,10 @@ function parseUserAgent(ua) {
 // ============================================================================
 router.post('/', async (req, res) => {
   try {
-    const { sessionId, projectId = 'default', events } = req.body;
+    // Accept both full names (sessionId/projectId) and short names (sid/pid) from tracker
+    const sessionId = req.body.sessionId || req.body.sid;
+    const projectId = req.body.projectId || req.body.pid || 'default';
+    const events = req.body.events;
 
     if (!sessionId) {
       return res.status(400).json({ error: 'sessionId is required' });
@@ -119,9 +123,10 @@ router.post('/', async (req, res) => {
     let identifyData = null;
 
     for (const event of events) {
-      const eventType = event.type;
-      const eventTimestamp = event.timestamp || Date.now();
-      const eventData = event.data || null;
+      // Accept both full (type/timestamp/data) and short (e/ts/d) field names
+      const eventType = event.type !== undefined ? event.type : event.e;
+      const eventTimestamp = event.timestamp || event.ts || Date.now();
+      const eventData = event.data || event.d || null;
       const eventUrl = event.url || null;
 
       // Track latest timestamp
@@ -130,8 +135,19 @@ router.post('/', async (req, res) => {
       }
 
       // Handle session_start events: build the session upsert payload
+      // Supports both tracker format (screen:{w,h}, utm:{source,...}) and legacy format
       if (eventType === EVENT_TYPES.SESSION_START && eventData) {
-        const uaParsed = parseUserAgent(eventData.userAgent);
+        // Tracker sends browser/os/device directly; fallback to UA parsing
+        const uaParsed = eventData.browser ? {} : parseUserAgent(req.headers['user-agent']);
+
+        // Handle screen dimensions: tracker sends {w,h} objects
+        const sw = eventData.screenWidth || (eventData.screen && eventData.screen.w) || null;
+        const sh = eventData.screenHeight || (eventData.screen && eventData.screen.h) || null;
+        const vw = eventData.viewportWidth || (eventData.viewport && eventData.viewport.w) || null;
+        const vh = eventData.viewportHeight || (eventData.viewport && eventData.viewport.h) || null;
+
+        // Handle UTM: tracker sends {source, medium, campaign, ...} object
+        const utm = eventData.utm || {};
 
         sessionUpsertData = {
           id: sessionId,
@@ -140,20 +156,20 @@ router.post('/', async (req, res) => {
           started_at: new Date(eventTimestamp).toISOString(),
           url: eventData.url || eventUrl || null,
           referrer: eventData.referrer || null,
-          user_agent: eventData.userAgent || null,
-          screen_width: eventData.screenWidth || null,
-          screen_height: eventData.screenHeight || null,
-          viewport_width: eventData.viewportWidth || null,
-          viewport_height: eventData.viewportHeight || null,
-          browser: uaParsed.browser,
-          os: uaParsed.os,
-          device_type: uaParsed.device_type,
+          user_agent: req.headers['user-agent'] || null,
+          screen_width: sw,
+          screen_height: sh,
+          viewport_width: vw,
+          viewport_height: vh,
+          browser: eventData.browser || uaParsed.browser || null,
+          os: eventData.os || uaParsed.os || null,
+          device_type: eventData.device || uaParsed.device_type || 'desktop',
           language: eventData.language || null,
-          utm_source: eventData.utmSource || null,
-          utm_medium: eventData.utmMedium || null,
-          utm_campaign: eventData.utmCampaign || null,
-          utm_term: eventData.utmTerm || null,
-          utm_content: eventData.utmContent || null,
+          utm_source: eventData.utmSource || utm.source || null,
+          utm_medium: eventData.utmMedium || utm.medium || null,
+          utm_campaign: eventData.utmCampaign || utm.campaign || null,
+          utm_term: eventData.utmTerm || utm.term || null,
+          utm_content: eventData.utmContent || utm.content || null,
         };
       }
 
@@ -175,7 +191,7 @@ router.post('/', async (req, res) => {
       if (eventType === EVENT_TYPES.RAGE_CLICK) {
         hasRageClick = true;
       }
-      if (eventType === EVENT_TYPES.ERROR) {
+      if (eventType === EVENT_TYPES.JS_ERROR) {
         hasError = true;
       }
 
@@ -248,33 +264,33 @@ router.post('/', async (req, res) => {
 
     // --- Dispatch webhook notifications (fire-and-forget) ---
     for (const event of events) {
-      const eventType = event.type;
-      const eventData = event.data || {};
+      const evtType = event.type !== undefined ? event.type : event.e;
+      const evtData = event.data || event.d || {};
 
-      // JS Error (type 11 = ERROR)
-      if (eventType === EVENT_TYPES.ERROR) {
-        dispatcher.dispatch('js_error', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
+      // JS Error (type 11)
+      if (evtType === EVENT_TYPES.JS_ERROR) {
+        dispatcher.dispatch('js_error', { session_id: sessionId, ...evtData }, projectId).catch(() => {});
       }
 
-      // Rage Click (type 12 = RAGE_CLICK)
-      if (eventType === EVENT_TYPES.RAGE_CLICK) {
-        dispatcher.dispatch('rage_click', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
+      // Rage Click (type 9)
+      if (evtType === EVENT_TYPES.RAGE_CLICK) {
+        dispatcher.dispatch('rage_click', { session_id: sessionId, ...evtData }, projectId).catch(() => {});
       }
 
       // Custom events: cart abandonment / form abandon detection
-      if (eventType === EVENT_TYPES.CUSTOM_EVENT && eventData) {
-        const eventName = (eventData.name || '').toLowerCase();
+      if (evtType === EVENT_TYPES.CUSTOM_EVENT && evtData) {
+        const eventName = (evtData.name || '').toLowerCase();
         if (eventName.includes('cart_abandonment') || eventName.includes('cart_abandon')) {
-          dispatcher.dispatch('cart_abandonment', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
+          dispatcher.dispatch('cart_abandonment', { session_id: sessionId, ...evtData }, projectId).catch(() => {});
         }
         if (eventName.includes('form_abandon')) {
-          dispatcher.dispatch('form_abandon', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
+          dispatcher.dispatch('form_abandon', { session_id: sessionId, ...evtData }, projectId).catch(() => {});
         }
       }
 
       // Rage click detection from click data
-      if (eventType === EVENT_TYPES.MOUSE_CLICK && eventData && eventData.is_rage_click) {
-        dispatcher.dispatch('rage_click', { session_id: sessionId, ...eventData }, projectId).catch(() => {});
+      if (evtType === EVENT_TYPES.MOUSE_CLICK && evtData && evtData.is_rage_click) {
+        dispatcher.dispatch('rage_click', { session_id: sessionId, ...evtData }, projectId).catch(() => {});
       }
     }
 
@@ -402,6 +418,70 @@ router.get('/', async (req, res) => {
     res.json({ events: events || [], total: total || 0, page, pages });
   } catch (err) {
     console.error('[events] GET / error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================================
+// GET /api/events/diagnostic — Quick health check for tracker integration
+// ============================================================================
+router.get('/diagnostic', async (req, res) => {
+  try {
+    const project_id = req.query.project_id || 'default';
+
+    // Count total sessions
+    const { count: sessionCount, error: sessErr } = await supabase.from('sessions')
+      .select('*', { count: 'exact', head: true })
+      .eq('project_id', project_id);
+
+    // Count total events
+    const { count: eventCount, error: evtErr } = await supabase.from('events')
+      .select('*', { count: 'exact', head: true });
+
+    // Get last 5 sessions
+    const { data: recentSessions, error: recSessErr } = await supabase.from('sessions')
+      .select('id, visitor_id, started_at, url, browser, os, device_type, event_count, duration')
+      .eq('project_id', project_id)
+      .order('started_at', { ascending: false })
+      .limit(5);
+
+    // Get last 10 events
+    const { data: recentEvents, error: recEvtErr } = await supabase.from('events')
+      .select('id, session_id, type, timestamp, url, created_at')
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    // Event type distribution
+    const eventTypeCounts = {};
+    if (recentEvents) {
+      for (const e of recentEvents) {
+        const typeName = Object.keys(EVENT_TYPES).find(k => EVENT_TYPES[k] === e.type) || `unknown(${e.type})`;
+        eventTypeCounts[typeName] = (eventTypeCounts[typeName] || 0) + 1;
+      }
+    }
+
+    res.json({
+      status: 'ok',
+      project_id,
+      summary: {
+        total_sessions: sessionCount || 0,
+        total_events: eventCount || 0,
+      },
+      recent_sessions: recentSessions || [],
+      recent_events: (recentEvents || []).map(e => ({
+        ...e,
+        type_name: Object.keys(EVENT_TYPES).find(k => EVENT_TYPES[k] === e.type) || `unknown(${e.type})`,
+      })),
+      event_type_distribution: eventTypeCounts,
+      errors: {
+        sessions: sessErr ? sessErr.message : null,
+        events: evtErr ? evtErr.message : null,
+        recent_sessions: recSessErr ? recSessErr.message : null,
+        recent_events: recEvtErr ? recEvtErr.message : null,
+      },
+    });
+  } catch (err) {
+    console.error('[events] GET /diagnostic error:', err);
     res.status(500).json({ error: err.message });
   }
 });
