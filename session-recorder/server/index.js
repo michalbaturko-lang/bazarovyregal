@@ -58,6 +58,10 @@ app.use('/api/apikeys', require('./routes/apikeys'));
 app.use('/api/v1', require('./routes/publicapi'));
 app.use('/api/billing', require('./routes/billing'));
 app.use('/api/tenants', require('./routes/tenants'));
+app.use('/api/alerts', require('./routes/alerts'));
+app.use('/api/retention', require('./routes/retention'));
+app.use('/api/revenue', require('./routes/revenue'));
+app.use('/api/tags', require('./routes/tags'));
 
 // Serve dashboard (local dev only)
 app.use(express.static(path.join(__dirname, '..', 'dashboard')));
