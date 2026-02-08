@@ -205,11 +205,42 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // --- Upsert session ---
+    // --- Ensure session exists (must happen BEFORE inserting events due to FK constraint) ---
     if (sessionUpsertData) {
+      // Full session data from SESSION_START event
       const { error: upsertError } = await supabase.from('sessions')
         .upsert(sessionUpsertData, { onConflict: 'id', ignoreDuplicates: false });
-      if (upsertError) throw upsertError;
+      if (upsertError) {
+        // If full upsert fails (e.g. columns don't exist in table), try minimal upsert
+        console.warn('[events] Full session upsert failed, trying minimal:', upsertError.message);
+        const { error: minimalError } = await supabase.from('sessions')
+          .upsert({
+            id: sessionId,
+            project_id: projectId,
+            started_at: sessionUpsertData.started_at,
+            url: sessionUpsertData.url,
+            browser: sessionUpsertData.browser,
+            os: sessionUpsertData.os,
+            device_type: sessionUpsertData.device_type,
+          }, { onConflict: 'id', ignoreDuplicates: false });
+        if (minimalError) throw minimalError;
+      }
+    } else {
+      // No SESSION_START in this batch — ensure the session row exists anyway
+      // (handles race conditions where batch 2 arrives before batch 1 finishes,
+      //  and subsequent batches that only contain mouse/scroll/click events)
+      // ignoreDuplicates: true → won't overwrite existing session data
+      const uaParsed = parseUserAgent(req.headers['user-agent']);
+      const { error: ensureError } = await supabase.from('sessions')
+        .upsert({
+          id: sessionId,
+          project_id: projectId,
+          started_at: new Date().toISOString(),
+          browser: uaParsed.browser,
+          os: uaParsed.os,
+          device_type: uaParsed.device_type,
+        }, { onConflict: 'id', ignoreDuplicates: true });
+      if (ensureError) throw ensureError;
     }
 
     // --- Identify user on session ---
