@@ -439,7 +439,7 @@
 
     _emitSessionStart: function () {
       var ua = parseUA();
-      this._push(EVT.SESSION_START, {
+      var data = {
         url:        window.location.href,
         referrer:   document.referrer || '',
         screen:     { w: screen.width, h: screen.height },
@@ -449,8 +449,45 @@
         device:     ua.device,
         language:   navigator.language || '',
         utm:        getUtmParams(),
-        pixelRatio: window.devicePixelRatio || 1
-      });
+        pixelRatio: window.devicePixelRatio || 1,
+        // Extended visitor data ("Big Brother" mode)
+        timezone:   '',
+        colorDepth: screen.colorDepth || 0,
+        touchScreen: ('ontouchstart' in window) || (navigator.maxTouchPoints > 0),
+        cookiesEnabled: navigator.cookieEnabled || false,
+        doNotTrack: navigator.doNotTrack === '1' || window.doNotTrack === '1',
+        languages:  (navigator.languages || [navigator.language]).join(','),
+        platform:   navigator.platform || ''
+      };
+      // Timezone
+      try { data.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) {}
+      // Hardware (CPU cores + device memory)
+      if (navigator.hardwareConcurrency) data.cpuCores = navigator.hardwareConcurrency;
+      if (navigator.deviceMemory) data.deviceMemory = navigator.deviceMemory;
+      // Connection info
+      var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (conn) {
+        data.connection = {
+          type: conn.effectiveType || conn.type || '',
+          downlink: conn.downlink || 0,
+          rtt: conn.rtt || 0,
+          saveData: conn.saveData || false
+        };
+      }
+      // Ad blocker detection (async, non-blocking)
+      var self = this;
+      try {
+        var testAd = document.createElement('div');
+        testAd.innerHTML = '&nbsp;';
+        testAd.className = 'adsbox ad-banner ad-placeholder';
+        testAd.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;';
+        document.body.appendChild(testAd);
+        setTimeout(function () {
+          data.adBlocker = !testAd.offsetHeight || !testAd.clientHeight;
+          try { document.body.removeChild(testAd); } catch (e) {}
+        }, 100);
+      } catch (e) {}
+      this._push(EVT.SESSION_START, data);
     },
 
 
