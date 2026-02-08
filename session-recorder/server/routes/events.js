@@ -309,6 +309,22 @@ router.post('/', async (req, res) => {
       }
     }
 
+    // --- Backfill GeoIP on existing sessions that lack it (non-fatal) ---
+    if ((geoCountry || geoCity) && !sessionUpsertData) {
+      try {
+        const { data: existing } = await supabase.from('sessions')
+          .select('country, city')
+          .eq('id', sessionId)
+          .single();
+        if (existing && !existing.country && !existing.city) {
+          const geoUpdate = {};
+          if (geoCountry) geoUpdate.country = geoCountry;
+          if (geoCity) geoUpdate.city = geoCity;
+          await supabase.from('sessions').update(geoUpdate).eq('id', sessionId);
+        }
+      } catch (_) { /* non-fatal */ }
+    }
+
     // --- Identify user on session (non-fatal) ---
     if (identifyData) {
       const { error: identifyError } = await supabase.from('sessions')
