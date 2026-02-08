@@ -484,37 +484,16 @@ const SessionsPage = (() => {
             `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg>`)}
         </div>
 
-        <!-- Session Replay Placeholder -->
-        <div class="bg-slate-800 rounded-xl border border-slate-700/50 mb-6 overflow-hidden">
-          <div class="px-5 py-3 border-b border-slate-700/50 flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-              <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
-              </svg>
-              Session Replay
-            </h3>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-500">${App.formatDuration(s.duration)}</span>
-              <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
-                </svg>
-                Play
-              </button>
-            </div>
-          </div>
-          <div class="aspect-video bg-slate-900 flex items-center justify-center">
+        <!-- Session Replay -->
+        <div id="session-replay-container" class="mb-6" style="height: 680px;">
+          <div class="bg-slate-800 rounded-xl border border-slate-700/50 h-full flex items-center justify-center">
             <div class="text-center">
-              <svg class="w-16 h-16 text-slate-700 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
-              </svg>
-              <p class="text-slate-500 text-sm">Click play to start session replay</p>
-            </div>
-          </div>
-          <!-- Playback timeline -->
-          <div class="px-5 py-3 border-t border-slate-700/50">
-            <div class="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-              <div class="h-full w-0 bg-blue-500 rounded-full"></div>
+              <div class="relative w-12 h-12 mx-auto mb-4">
+                <div class="absolute inset-0 rounded-full border-2 border-slate-700"></div>
+                <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-500 animate-spin"></div>
+              </div>
+              <p class="text-slate-400 text-sm">Loading session replay...</p>
+              <p class="text-slate-600 text-xs mt-1">${s.eventCount} events</p>
             </div>
           </div>
         </div>
@@ -553,6 +532,82 @@ const SessionsPage = (() => {
           </div>
         ` : ''}
       </div>`;
+
+    // Initialize the session replay player
+    _initReplayPlayer(session);
+  }
+
+  /** Stored reference to current player instance (for cleanup). */
+  let _currentPlayer = null;
+
+  /**
+   * Initialize the replay player with session events.
+   */
+  async function _initReplayPlayer(session) {
+    const replayContainer = document.getElementById('session-replay-container');
+    if (!replayContainer) return;
+
+    try {
+      // Fetch all events for this session (paginated — events API has limit 1000)
+      let allEvents = session.events || [];
+
+      // If events weren't pre-loaded, or there may be more, fetch them
+      if (allEvents.length === 0) {
+        const params = new URLSearchParams({ session_id: session.id, limit: 1000 });
+        const result = await App.api(`/events?${params}`);
+        allEvents = result.events || [];
+
+        // If there are more pages, fetch them too
+        if (result.pages > 1) {
+          for (let p = 2; p <= result.pages; p++) {
+            const moreParams = new URLSearchParams({ session_id: session.id, page: p, limit: 1000 });
+            const moreResult = await App.api(`/events?${moreParams}`);
+            allEvents = allEvents.concat(moreResult.events || []);
+          }
+        }
+      }
+
+      if (allEvents.length === 0) {
+        replayContainer.innerHTML = `
+          <div class="bg-slate-800 rounded-xl border border-slate-700/50 h-full flex items-center justify-center">
+            <div class="text-center">
+              <svg class="w-16 h-16 text-slate-700 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
+              </svg>
+              <p class="text-slate-400 text-sm">No events recorded for this session</p>
+              <p class="text-slate-600 text-xs mt-1">The replay cannot be reconstructed</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      // Destroy previous player if any
+      if (_currentPlayer) {
+        try { _currentPlayer.destroy(); } catch (_) {}
+        _currentPlayer = null;
+      }
+
+      // Create the player
+      _currentPlayer = new SessionPlayer(replayContainer, allEvents, {
+        session: session._raw || session,
+        speed: 1,
+        skipInactivity: true,
+        inactivityThreshold: 3,
+      });
+
+    } catch (err) {
+      console.error('[sessions] Replay player init failed:', err);
+      replayContainer.innerHTML = `
+        <div class="bg-slate-800 rounded-xl border border-slate-700/50 h-full flex items-center justify-center">
+          <div class="text-center">
+            <svg class="w-12 h-12 text-red-500/50 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+            </svg>
+            <p class="text-slate-400 text-sm">Failed to load replay</p>
+            <p class="text-slate-600 text-xs mt-1">${err.message || 'Unknown error'}</p>
+          </div>
+        </div>`;
+    }
   }
 
   /* ------------------------------------------------------------------

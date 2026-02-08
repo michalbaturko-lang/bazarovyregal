@@ -928,6 +928,9 @@ class SessionPlayer {
     this._trailTimer = null;
     this._lastTrailTime = 0;
 
+    // Node ID map for virtual DOM reconstruction (id → real DOM node)
+    this._nodeMap = new Map();
+
     // Sidebar filter state
     this._activeFilters = new Set();
 
@@ -1529,9 +1532,9 @@ class SessionPlayer {
       case EVENT_TYPES.MOUSE_CLICK:
         return d.text ? d.text.substring(0, 40) : (d.target || '');
       case EVENT_TYPES.SCROLL:
-        return 'x:' + (d.scrollX || 0) + ' y:' + (d.scrollY || 0);
+        return 'x:' + (d.x || d.scrollX || 0) + ' y:' + (d.y || d.scrollY || 0);
       case EVENT_TYPES.RESIZE:
-        return (d.width || 0) + ' x ' + (d.height || 0);
+        return (d.w || d.width || 0) + ' x ' + (d.h || d.height || 0);
       case EVENT_TYPES.INPUT:
         return d.target || '';
       case EVENT_TYPES.PAGE_VISIBILITY:
@@ -1547,7 +1550,7 @@ class SessionPlayer {
       case EVENT_TYPES.IDENTIFY:
         return d.userId || d.user_id || '';
       case EVENT_TYPES.PAGE_NAVIGATION:
-        return d.url || d.title || '';
+        return d.to || d.url || d.title || '';
       default:
         return '';
     }
@@ -1756,10 +1759,16 @@ class SessionPlayer {
   }
 
   _handleSessionStart(d) {
+    // Handle multiple viewport formats
     if (d.viewport_width) this._viewportWidth = d.viewport_width;
     if (d.viewport_height) this._viewportHeight = d.viewport_height;
     if (d.viewportWidth) this._viewportWidth = d.viewportWidth;
     if (d.viewportHeight) this._viewportHeight = d.viewportHeight;
+    // Tracker sends viewport: {w, h}
+    if (d.viewport) {
+      if (d.viewport.w) this._viewportWidth = d.viewport.w;
+      if (d.viewport.h) this._viewportHeight = d.viewport.h;
+    }
     if (d.url) {
       this._currentUrl = d.url;
       this._els.urlDisplay.textContent = d.url;
@@ -1772,9 +1781,19 @@ class SessionPlayer {
     const doc = iframe.contentDocument;
     if (!doc) return;
 
+    // Clear node map for fresh snapshot
+    this._nodeMap = new Map();
+
+    // Support tracker's virtual DOM format: d.dom = {id, t, tag, a, c}
+    if (d.dom && typeof d.dom === 'object') {
+      this._rebuildFromVDom(doc, d.dom);
+      this._updateViewportScale();
+      return;
+    }
+
+    // Legacy format: HTML string
     let html = d.html || d.snapshot || d;
     if (typeof html !== 'string') {
-      // If the data itself is the HTML string
       html = String(html);
     }
 
@@ -1790,8 +1809,160 @@ class SessionPlayer {
 
     // After writing, disable forms and links
     this._disableInteractiveElements(doc);
+    this._injectReplayStyle(doc);
+    this._updateViewportScale();
+  }
 
-    // Add a base style to prevent scrollbar interference
+  /**
+   * Rebuild the iframe document from a virtual DOM tree (tracker format).
+   * Virtual node format:
+   *   Element:  { id, t:1,  tag, a:{attrs}, c:[children] }
+   *   Text:     { id, t:3,  v:text }
+   *   Doctype:  { id, t:10, name, publicId, systemId }
+   *   Document: { id, t:9,  c:[children] }
+   *   Fragment: { id, t:11, c:[children] }
+   */
+  _rebuildFromVDom(doc, vNode) {
+    // Start fresh
+    doc.open();
+    doc.write('<!DOCTYPE html><html><head></head><body></body></html>');
+    doc.close();
+
+    if (!vNode) return;
+
+    // The root vNode is t:9 (document) — process its children
+    if (vNode.t === 9 && vNode.c) {
+      // Find the html element child
+      for (const child of vNode.c) {
+        if (child.t === 10) {
+          // Doctype node — already written above
+          if (child.id) this._nodeMap.set(child.id, doc.doctype);
+          continue;
+        }
+        if (child.t === 1 && child.tag === 'html') {
+          // Rebuild the <html> element in place
+          this._applyVNodeToElement(doc, doc.documentElement, child);
+          continue;
+        }
+      }
+    } else if (vNode.t === 1 && vNode.tag === 'html') {
+      // Directly an <html> node
+      this._applyVNodeToElement(doc, doc.documentElement, vNode);
+    }
+
+    if (vNode.id) this._nodeMap.set(vNode.id, doc);
+    this._disableInteractiveElements(doc);
+    this._injectReplayStyle(doc);
+  }
+
+  /**
+   * Apply a virtual node's attributes and children onto an existing DOM element.
+   */
+  _applyVNodeToElement(doc, el, vNode) {
+    if (!el || !vNode) return;
+
+    // Map node ID
+    if (vNode.id) this._nodeMap.set(vNode.id, el);
+
+    // Set attributes
+    if (vNode.a) {
+      for (const [name, val] of Object.entries(vNode.a)) {
+        // Skip event handlers and scripts
+        if (name.startsWith('on')) continue;
+        try {
+          el.setAttribute(name, val);
+        } catch (_) { /* ignore invalid attributes */ }
+      }
+    }
+
+    // Clear existing children
+    while (el.firstChild) el.removeChild(el.firstChild);
+
+    // Create children
+    if (vNode.c) {
+      for (const childVNode of vNode.c) {
+        const childEl = this._createDomNode(doc, childVNode);
+        if (childEl) {
+          try { el.appendChild(childEl); } catch (_) { /* ignore */ }
+        }
+      }
+    }
+  }
+
+  /**
+   * Create a real DOM node from a virtual node recursively.
+   */
+  _createDomNode(doc, vNode) {
+    if (!vNode) return null;
+
+    // Text node
+    if (vNode.t === 3) {
+      const text = doc.createTextNode(vNode.v || '');
+      if (vNode.id) this._nodeMap.set(vNode.id, text);
+      return text;
+    }
+
+    // Element node
+    if (vNode.t === 1) {
+      const tag = (vNode.tag || 'div').toLowerCase();
+
+      // Skip script/noscript tags for security
+      if (tag === 'script' || tag === 'noscript') return null;
+
+      let el;
+      try {
+        el = doc.createElement(tag);
+      } catch (_) {
+        el = doc.createElement('div');
+      }
+
+      if (vNode.id) this._nodeMap.set(vNode.id, el);
+
+      // Set attributes
+      if (vNode.a) {
+        for (const [name, val] of Object.entries(vNode.a)) {
+          if (name.startsWith('on')) continue; // Skip event handlers
+          // Rewrite src/href to prevent loading — except for stylesheets and images
+          if (name === 'src' && tag !== 'img') continue;
+          try {
+            el.setAttribute(name, val);
+          } catch (_) { /* ignore */ }
+        }
+      }
+
+      // Recurse children
+      if (vNode.c) {
+        for (const childVNode of vNode.c) {
+          const childEl = this._createDomNode(doc, childVNode);
+          if (childEl) {
+            try { el.appendChild(childEl); } catch (_) { /* ignore */ }
+          }
+        }
+      }
+
+      return el;
+    }
+
+    // Document fragment (t:11)
+    if (vNode.t === 11) {
+      const frag = doc.createDocumentFragment();
+      if (vNode.id) this._nodeMap.set(vNode.id, frag);
+      if (vNode.c) {
+        for (const childVNode of vNode.c) {
+          const childEl = this._createDomNode(doc, childVNode);
+          if (childEl) frag.appendChild(childEl);
+        }
+      }
+      return frag;
+    }
+
+    return null;
+  }
+
+  /**
+   * Inject a style tag to disable interactive elements in the replay iframe.
+   */
+  _injectReplayStyle(doc) {
     try {
       const style = doc.createElement('style');
       style.textContent = `
@@ -1802,8 +1973,6 @@ class SessionPlayer {
         doc.head.appendChild(style);
       }
     } catch (_) { /* cross-origin issues, safe to ignore */ }
-
-    this._updateViewportScale();
   }
 
   _disableInteractiveElements(doc) {
@@ -1839,71 +2008,105 @@ class SessionPlayer {
 
   _applyMutation(doc, mut) {
     const type = mut.type || mut.mutationType;
-    const targetSelector = mut.target || mut.targetSelector;
 
-    if (!targetSelector) return;
-
-    let target;
-    try {
-      target = doc.querySelector(targetSelector);
-    } catch (_) {
-      return; // invalid selector
+    // Resolve target: prefer node ID map (tracker format), fall back to CSS selector
+    let target = null;
+    if (mut.targetId !== undefined && this._nodeMap.has(mut.targetId)) {
+      target = this._nodeMap.get(mut.targetId);
+    } else if (mut.target && typeof mut.target === 'string') {
+      try { target = doc.querySelector(mut.target); } catch (_) { /* ignore */ }
     }
+
     if (!target) return;
 
     switch (type) {
       case 'childList': {
-        // Removals
+        // Removals (tracker format: [{id}])
+        if (mut.removes) {
+          for (const removed of mut.removes) {
+            const node = this._nodeMap.get(removed.id);
+            if (node && node.parentNode) {
+              node.parentNode.removeChild(node);
+              this._nodeMap.delete(removed.id);
+            }
+          }
+        }
+        // Legacy removals
         if (mut.removedNodes) {
-          mut.removedNodes.forEach((removed) => {
-            if (removed.selector) {
+          for (const removed of mut.removedNodes) {
+            if (removed.id !== undefined && this._nodeMap.has(removed.id)) {
+              const node = this._nodeMap.get(removed.id);
+              if (node && node.parentNode) node.parentNode.removeChild(node);
+              this._nodeMap.delete(removed.id);
+            } else if (removed.selector) {
               try {
                 const el = doc.querySelector(removed.selector);
                 if (el && el.parentNode) el.parentNode.removeChild(el);
               } catch (_) { /* ignore */ }
-            } else if (removed.index !== undefined && target.childNodes[removed.index]) {
-              target.removeChild(target.childNodes[removed.index]);
             }
-          });
+          }
         }
 
-        // Additions
+        // Additions (tracker format: [{node: vNode, prev, next}])
+        if (mut.adds) {
+          for (const added of mut.adds) {
+            const newNode = this._createDomNode(doc, added.node);
+            if (!newNode) continue;
+
+            // Try to insert relative to sibling references
+            let inserted = false;
+            if (added.next !== null && added.next !== undefined && this._nodeMap.has(added.next)) {
+              const nextSibling = this._nodeMap.get(added.next);
+              if (nextSibling && nextSibling.parentNode === target) {
+                target.insertBefore(newNode, nextSibling);
+                inserted = true;
+              }
+            }
+            if (!inserted && added.prev !== null && added.prev !== undefined && this._nodeMap.has(added.prev)) {
+              const prevSibling = this._nodeMap.get(added.prev);
+              if (prevSibling && prevSibling.parentNode === target && prevSibling.nextSibling) {
+                target.insertBefore(newNode, prevSibling.nextSibling);
+                inserted = true;
+              }
+            }
+            if (!inserted) {
+              target.appendChild(newNode);
+            }
+          }
+        }
+        // Legacy additions
         if (mut.addedNodes) {
-          mut.addedNodes.forEach((added) => {
+          for (const added of mut.addedNodes) {
             if (added.html) {
               const temp = doc.createElement('div');
               temp.innerHTML = added.html.replace(/<script[\s\S]*?<\/script>/gi, '');
               while (temp.firstChild) {
-                if (added.beforeSelector) {
-                  try {
-                    const ref = doc.querySelector(added.beforeSelector);
-                    if (ref) {
-                      target.insertBefore(temp.firstChild, ref);
-                      continue;
-                    }
-                  } catch (_) { /* ignore */ }
-                }
                 target.appendChild(temp.firstChild);
               }
             }
-          });
+          }
         }
         break;
       }
 
       case 'attributes': {
-        const attrName = mut.attributeName || mut.name;
-        const attrValue = mut.value !== undefined ? mut.value : mut.newValue;
+        // Tracker format: attr + val
+        const attrName = mut.attr || mut.attributeName || mut.name;
+        const attrValue = mut.val !== undefined ? mut.val : (mut.value !== undefined ? mut.value : mut.newValue);
+        if (!attrName) break;
         if (attrValue === null || attrValue === undefined) {
           target.removeAttribute(attrName);
         } else {
+          // Skip event handlers
+          if (attrName.startsWith('on')) break;
           target.setAttribute(attrName, attrValue);
         }
         break;
       }
 
       case 'characterData': {
-        target.textContent = mut.value !== undefined ? mut.value : (mut.newValue || '');
+        // Tracker format: text field
+        target.textContent = mut.text !== undefined ? mut.text : (mut.value !== undefined ? mut.value : (mut.newValue || ''));
         break;
       }
     }
@@ -1975,8 +2178,9 @@ class SessionPlayer {
     const doc = iframe.contentDocument;
     if (!doc || !doc.documentElement) return;
 
-    const x = d.scrollX || d.x || 0;
-    const y = d.scrollY || d.y || 0;
+    // Tracker sends {x: scrollX, y: scrollY}
+    const x = d.x || d.scrollX || 0;
+    const y = d.y || d.scrollY || 0;
 
     try {
       doc.documentElement.scrollTop = y;
@@ -1989,8 +2193,8 @@ class SessionPlayer {
   }
 
   _handleResize(d) {
-    const w = d.width || d.innerWidth || this._viewportWidth;
-    const h = d.height || d.innerHeight || this._viewportHeight;
+    const w = d.w || d.width || d.innerWidth || this._viewportWidth;
+    const h = d.h || d.height || d.innerHeight || this._viewportHeight;
     this._viewportWidth = w;
     this._viewportHeight = h;
     this._updateViewportScale();
@@ -2001,17 +2205,20 @@ class SessionPlayer {
     const doc = iframe.contentDocument;
     if (!doc) return;
 
-    const selector = d.target || d.selector;
+    const selector = d.selector || d.target;
     if (!selector) return;
 
     try {
       const el = doc.querySelector(selector);
       if (el) {
         const value = d.value || d.maskedValue || '';
-        if (el.tagName === 'SELECT') {
+        if (d.masked) {
+          // Show masked placeholder
+          el.value = value;
+        } else if (el.tagName === 'SELECT') {
           el.value = value;
         } else if (el.type === 'checkbox' || el.type === 'radio') {
-          el.checked = !!d.checked;
+          el.checked = (value === 'checked' || !!d.checked);
         } else {
           el.value = value;
         }
@@ -2036,7 +2243,8 @@ class SessionPlayer {
   }
 
   _handlePageNavigation(d, silent) {
-    const url = d.url || d.href || '';
+    // Tracker sends {from, to} for page navigations
+    const url = d.to || d.url || d.href || '';
     const title = d.title || '';
     this._currentUrl = url;
     this._els.urlDisplay.textContent = url;
@@ -2279,6 +2487,9 @@ class SessionPlayer {
       doc.write('<!DOCTYPE html><html><head></head><body></body></html>');
       doc.close();
     }
+
+    // Clear node map
+    this._nodeMap = new Map();
 
     // Hide cursor
     this._els.cursor.classList.remove('sp-cursor--visible');

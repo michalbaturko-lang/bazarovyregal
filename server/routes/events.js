@@ -205,6 +205,18 @@ router.post('/', async (req, res) => {
       });
     }
 
+    // --- GeoIP: extract country & city from Vercel geo headers ---
+    const geoCountry = req.headers['x-vercel-ip-country'] || null;
+    const geoCity = req.headers['x-vercel-ip-city']
+      ? decodeURIComponent(req.headers['x-vercel-ip-city'])
+      : null;
+
+    // Inject geo data into session upsert if available
+    if (sessionUpsertData) {
+      if (geoCountry) sessionUpsertData.country = geoCountry;
+      if (geoCity) sessionUpsertData.city = geoCity;
+    }
+
     // --- Ensure project exists (sessions.project_id FK → projects.id) ---
     // Auto-create the project row if it doesn't exist yet.
     // Detect domain from session URL to set a meaningful project name.
@@ -257,16 +269,19 @@ router.post('/', async (req, res) => {
     // Attempt 2: Medium upsert (common columns only)
     if (!sessionOk) {
       const uaParsed = parseUserAgent(req.headers['user-agent']);
+      const mediumData = {
+        id: sessionId,
+        project_id: projectId,
+        started_at: startedAt,
+        url: (sessionUpsertData && sessionUpsertData.url) || null,
+        browser: (sessionUpsertData && sessionUpsertData.browser) || uaParsed.browser,
+        os: (sessionUpsertData && sessionUpsertData.os) || uaParsed.os,
+        device_type: (sessionUpsertData && sessionUpsertData.device_type) || uaParsed.device_type,
+      };
+      if (geoCountry) mediumData.country = geoCountry;
+      if (geoCity) mediumData.city = geoCity;
       const { error } = await supabase.from('sessions')
-        .upsert({
-          id: sessionId,
-          project_id: projectId,
-          started_at: startedAt,
-          url: (sessionUpsertData && sessionUpsertData.url) || null,
-          browser: (sessionUpsertData && sessionUpsertData.browser) || uaParsed.browser,
-          os: (sessionUpsertData && sessionUpsertData.os) || uaParsed.os,
-          device_type: (sessionUpsertData && sessionUpsertData.device_type) || uaParsed.device_type,
-        }, { onConflict: 'id', ignoreDuplicates: ignoreDups });
+        .upsert(mediumData, { onConflict: 'id', ignoreDuplicates: ignoreDups });
       if (!error) sessionOk = true;
       else console.warn('[events] Medium session upsert failed:', error.message);
     }
