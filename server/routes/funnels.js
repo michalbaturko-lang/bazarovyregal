@@ -6,6 +6,85 @@ const { v4: uuidv4 } = require('uuid');
 const supabase = require('../supabase');
 
 // ============================================================================
+// Auto-create funnels table if it doesn't exist
+// ============================================================================
+let tableChecked = false;
+async function ensureFunnelsTable() {
+  if (tableChecked) return;
+  try {
+    // Try a simple query — if it fails, create the table via RPC
+    const { error } = await supabase.from('funnels').select('id').limit(1);
+    if (error && error.message.includes('does not exist')) {
+      // Create table via raw SQL (requires Supabase service role)
+      const { error: createErr } = await supabase.rpc('exec_sql', {
+        sql: `CREATE TABLE IF NOT EXISTS funnels (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          project_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          steps JSONB NOT NULL DEFAULT '[]',
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        )`
+      });
+      if (createErr) {
+        console.warn('[funnels] Could not auto-create table:', createErr.message);
+      }
+    }
+  } catch (_) { /* ignore */ }
+  tableChecked = true;
+}
+
+// E-commerce funnel step templates for Upgates shops
+const ECOMMERCE_STEPS = [
+  { type: 'url', value: '/', name: 'Website Visit' },
+  { type: 'url', value: '/cart', name: 'Cart' },
+  { type: 'url', value: '/shipment', name: 'Shipping & Payment' },
+  { type: 'url', value: '/checkout', name: 'Checkout' },
+  { type: 'url', value: '/Order-received', name: 'Order Complete' },
+];
+
+// ============================================================================
+// POST /api/funnels/seed-ecommerce — Auto-create e-commerce funnel for a project
+// ============================================================================
+router.post('/seed-ecommerce', async (req, res) => {
+  try {
+    await ensureFunnelsTable();
+    const { project_id } = req.body;
+    if (!project_id) return res.status(400).json({ error: 'project_id required' });
+
+    // Check if already exists
+    const { data: existing } = await supabase.from('funnels')
+      .select('id')
+      .eq('project_id', project_id)
+      .ilike('name', '%commerce%')
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      return res.json({ funnel: existing[0], message: 'E-commerce funnel already exists' });
+    }
+
+    const id = uuidv4();
+    const now = new Date().toISOString();
+    const { error: insertError } = await supabase.from('funnels')
+      .insert({
+        id,
+        project_id,
+        name: 'E-commerce Conversion Funnel',
+        steps: ECOMMERCE_STEPS,
+        created_at: now,
+        updated_at: now,
+      });
+
+    if (insertError) throw insertError;
+    const { data: funnel } = await supabase.from('funnels').select('*').eq('id', id).single();
+    res.status(201).json({ funnel });
+  } catch (err) {
+    console.error('[funnels] seed-ecommerce error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================================
 // POST /api/funnels — Create a funnel definition
 // ============================================================================
 router.post('/', async (req, res) => {
@@ -162,16 +241,37 @@ router.get('/:id', async (req, res) => {
         const batch = sessionIdArray.slice(b, b + BATCH_SIZE);
 
         if (step.type === 'url') {
-          // Check if the session visited the given URL
-          const { data: rows, error: qErr } = await supabase.from('events')
+          // Check if the session visited the given URL.
+          // Strategy: search 3 places (url column, data->>'url', data->>'to')
+          // because older events may not have the url column populated.
+          // Use OR via multiple queries and merge results.
+
+          // 1. Check events.url column (populated for new events)
+          const { data: rows1, error: qErr1 } = await supabase.from('events')
             .select('session_id')
             .in('session_id', batch)
             .ilike('url', `%${step.value}%`);
-          if (qErr) throw qErr;
+          if (qErr1) throw qErr1;
+          for (const row of (rows1 || [])) nextQualifying.add(row.session_id);
 
-          for (const row of (rows || [])) {
-            nextQualifying.add(row.session_id);
-          }
+          // 2. Check SESSION_START data->>'url' (type 0, for initial page)
+          const { data: rows2, error: qErr2 } = await supabase.from('events')
+            .select('session_id')
+            .in('session_id', batch)
+            .eq('type', 0)
+            .ilike('data->>url', `%${step.value}%`);
+          if (qErr2) console.warn('[funnels] data->>url query failed:', qErr2.message);
+          else for (const row of (rows2 || [])) nextQualifying.add(row.session_id);
+
+          // 3. Check PAGE_NAVIGATION data->>'to' (type 14, for navigated pages)
+          const { data: rows3, error: qErr3 } = await supabase.from('events')
+            .select('session_id')
+            .in('session_id', batch)
+            .eq('type', 14)
+            .ilike('data->>to', `%${step.value}%`);
+          if (qErr3) console.warn('[funnels] data->>to query failed:', qErr3.message);
+          else for (const row of (rows3 || [])) nextQualifying.add(row.session_id);
+
         } else if (step.type === 'event') {
           const eventTypeNum = parseInt(step.value, 10);
 
