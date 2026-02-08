@@ -206,91 +206,123 @@ router.post('/', async (req, res) => {
     }
 
     // --- Ensure session exists (must happen BEFORE inserting events due to FK constraint) ---
+    // Strategy: try full upsert → medium upsert → bare minimum upsert
+    // This handles missing columns in the sessions table gracefully.
+    const startedAt = sessionUpsertData
+      ? sessionUpsertData.started_at
+      : new Date().toISOString();
+    const ignoreDups = !sessionUpsertData; // only ignore duplicates for non-SESSION_START batches
+
+    // Attempt 1: Full upsert (all columns from SESSION_START)
+    let sessionOk = false;
     if (sessionUpsertData) {
-      // Full session data from SESSION_START event
-      const { error: upsertError } = await supabase.from('sessions')
+      const { error } = await supabase.from('sessions')
         .upsert(sessionUpsertData, { onConflict: 'id', ignoreDuplicates: false });
-      if (upsertError) {
-        // If full upsert fails (e.g. columns don't exist in table), try minimal upsert
-        console.warn('[events] Full session upsert failed, trying minimal:', upsertError.message);
-        const { error: minimalError } = await supabase.from('sessions')
-          .upsert({
-            id: sessionId,
-            project_id: projectId,
-            started_at: sessionUpsertData.started_at,
-            url: sessionUpsertData.url,
-            browser: sessionUpsertData.browser,
-            os: sessionUpsertData.os,
-            device_type: sessionUpsertData.device_type,
-          }, { onConflict: 'id', ignoreDuplicates: false });
-        if (minimalError) throw minimalError;
-      }
-    } else {
-      // No SESSION_START in this batch — ensure the session row exists anyway
-      // (handles race conditions where batch 2 arrives before batch 1 finishes,
-      //  and subsequent batches that only contain mouse/scroll/click events)
-      // ignoreDuplicates: true → won't overwrite existing session data
+      if (!error) sessionOk = true;
+      else console.warn('[events] Full session upsert failed:', error.message);
+    }
+
+    // Attempt 2: Medium upsert (common columns only)
+    if (!sessionOk) {
       const uaParsed = parseUserAgent(req.headers['user-agent']);
-      const { error: ensureError } = await supabase.from('sessions')
+      const { error } = await supabase.from('sessions')
         .upsert({
           id: sessionId,
           project_id: projectId,
-          started_at: new Date().toISOString(),
-          browser: uaParsed.browser,
-          os: uaParsed.os,
-          device_type: uaParsed.device_type,
-        }, { onConflict: 'id', ignoreDuplicates: true });
-      if (ensureError) throw ensureError;
+          started_at: startedAt,
+          url: (sessionUpsertData && sessionUpsertData.url) || null,
+          browser: (sessionUpsertData && sessionUpsertData.browser) || uaParsed.browser,
+          os: (sessionUpsertData && sessionUpsertData.os) || uaParsed.os,
+          device_type: (sessionUpsertData && sessionUpsertData.device_type) || uaParsed.device_type,
+        }, { onConflict: 'id', ignoreDuplicates: ignoreDups });
+      if (!error) sessionOk = true;
+      else console.warn('[events] Medium session upsert failed:', error.message);
     }
 
-    // --- Identify user on session ---
+    // Attempt 3: Bare minimum upsert (just id + project_id + started_at)
+    if (!sessionOk) {
+      const { error } = await supabase.from('sessions')
+        .upsert({
+          id: sessionId,
+          project_id: projectId,
+          started_at: startedAt,
+        }, { onConflict: 'id', ignoreDuplicates: ignoreDups });
+      if (!error) sessionOk = true;
+      else console.warn('[events] Bare minimum session upsert failed:', error.message);
+    }
+
+    // Attempt 4: Absolute last resort — just id and project_id
+    if (!sessionOk) {
+      const { error } = await supabase.from('sessions')
+        .upsert({ id: sessionId, project_id: projectId },
+          { onConflict: 'id', ignoreDuplicates: true });
+      if (error) {
+        console.error('[events] All session upsert attempts failed:', error.message);
+        throw new Error('Cannot create session: ' + error.message);
+      }
+    }
+
+    // --- Identify user on session (non-fatal) ---
     if (identifyData) {
       const { error: identifyError } = await supabase.from('sessions')
         .update(identifyData)
         .eq('id', sessionId);
-      if (identifyError) throw identifyError;
+      if (identifyError) console.warn('[events] Identify update failed:', identifyError.message);
     }
 
     // --- Batch-insert events ---
     if (eventRows.length > 0) {
       const { error: insertError } = await supabase.from('events')
         .insert(eventRows);
-      if (insertError) throw insertError;
+      if (insertError) {
+        // If batch insert fails, try inserting one by one to save what we can
+        console.warn('[events] Batch insert failed:', insertError.message, '— trying one-by-one');
+        let savedCount = 0;
+        for (const row of eventRows) {
+          const { error: singleErr } = await supabase.from('events').insert(row);
+          if (!singleErr) savedCount++;
+          else console.warn('[events] Single event insert failed:', singleErr.message);
+        }
+        if (savedCount === 0) throw new Error('All event inserts failed: ' + insertError.message);
+      }
     }
 
-    // --- Update session counters ---
-    if (latestTimestamp > 0) {
-      // Fetch current session to compute duration properly
-      const { data: currentSession, error: fetchError } = await supabase.from('sessions')
-        .select('started_at, event_count, page_count, has_rage_clicks, has_errors')
-        .eq('id', sessionId)
-        .single();
+    // --- Update session counters (non-fatal — don't lose events over counter updates) ---
+    try {
+      if (latestTimestamp > 0) {
+        const { data: currentSession, error: fetchError } = await supabase.from('sessions')
+          .select('started_at, event_count, page_count, has_rage_clicks, has_errors')
+          .eq('id', sessionId)
+          .single();
 
-      if (!fetchError && currentSession) {
-        const startedAtMs = new Date(currentSession.started_at).getTime();
-        const duration = Math.floor((latestTimestamp - startedAtMs) / 1000);
+        if (!fetchError && currentSession) {
+          const startedAtMs = new Date(currentSession.started_at).getTime();
+          const duration = Math.floor((latestTimestamp - startedAtMs) / 1000);
 
-        const updates = {
-          event_count: (currentSession.event_count || 0) + events.length,
-          ended_at: new Date(latestTimestamp).toISOString(),
-          duration: Math.max(0, duration),
-        };
+          const updates = {
+            event_count: (currentSession.event_count || 0) + events.length,
+            ended_at: new Date(latestTimestamp).toISOString(),
+            duration: Math.max(0, duration),
+          };
 
-        if (pageNavigations > 0) {
-          updates.page_count = (currentSession.page_count || 1) + pageNavigations;
+          if (pageNavigations > 0) {
+            updates.page_count = (currentSession.page_count || 1) + pageNavigations;
+          }
+          if (hasRageClick) {
+            updates.has_rage_clicks = true;
+          }
+          if (hasError) {
+            updates.has_errors = true;
+          }
+
+          const { error: updateError } = await supabase.from('sessions')
+            .update(updates)
+            .eq('id', sessionId);
+          if (updateError) console.warn('[events] Counter update failed:', updateError.message);
         }
-        if (hasRageClick) {
-          updates.has_rage_clicks = true;
-        }
-        if (hasError) {
-          updates.has_errors = true;
-        }
-
-        const { error: updateError } = await supabase.from('sessions')
-          .update(updates)
-          .eq('id', sessionId);
-        if (updateError) throw updateError;
       }
+    } catch (counterErr) {
+      console.warn('[events] Counter update exception:', counterErr.message);
     }
 
     // --- Dispatch webhook notifications (fire-and-forget) ---
@@ -515,6 +547,83 @@ router.get('/diagnostic', async (req, res) => {
     console.error('[events] GET /diagnostic error:', err);
     res.status(500).json({ error: err.message });
   }
+});
+
+// ============================================================================
+// GET /api/events/debug-schema — Show table columns & test insert
+// ============================================================================
+router.get('/debug-schema', async (req, res) => {
+  const results = {};
+
+  // 1. Try to read one row from sessions to see which columns exist
+  try {
+    const { data, error } = await supabase.from('sessions').select('*').limit(1);
+    if (error) {
+      results.sessions_error = error.message;
+    } else {
+      results.sessions_columns = data && data.length > 0 ? Object.keys(data[0]) : 'table exists but empty';
+    }
+  } catch (e) {
+    results.sessions_error = e.message;
+  }
+
+  // 2. Try to read one row from events to see which columns exist
+  try {
+    const { data, error } = await supabase.from('events').select('*').limit(1);
+    if (error) {
+      results.events_error = error.message;
+    } else {
+      results.events_columns = data && data.length > 0 ? Object.keys(data[0]) : 'table exists but empty';
+    }
+  } catch (e) {
+    results.events_error = e.message;
+  }
+
+  // 3. Try a test session insert + delete to confirm writability
+  const testId = 'test-' + Date.now();
+  try {
+    const { error: insertErr } = await supabase.from('sessions')
+      .insert({ id: testId, project_id: '_debug_test' });
+    if (insertErr) {
+      results.session_insert_test = 'FAILED: ' + insertErr.message;
+    } else {
+      results.session_insert_test = 'OK (minimal: id + project_id)';
+      // Clean up
+      await supabase.from('sessions').delete().eq('id', testId);
+    }
+  } catch (e) {
+    results.session_insert_test = 'EXCEPTION: ' + e.message;
+  }
+
+  // 4. Check if started_at has a default or is required
+  const testId2 = 'test2-' + Date.now();
+  try {
+    const { error: insertErr } = await supabase.from('sessions')
+      .insert({ id: testId2, project_id: '_debug_test', started_at: new Date().toISOString() });
+    if (insertErr) {
+      results.session_insert_with_started_at = 'FAILED: ' + insertErr.message;
+    } else {
+      results.session_insert_with_started_at = 'OK';
+      await supabase.from('sessions').delete().eq('id', testId2);
+    }
+  } catch (e) {
+    results.session_insert_with_started_at = 'EXCEPTION: ' + e.message;
+  }
+
+  // 5. Try a test event insert (will fail on FK if session doesn't exist)
+  try {
+    const { error: insertErr } = await supabase.from('events')
+      .insert({ session_id: testId, type: 0, timestamp: Date.now(), data: {} });
+    if (insertErr) {
+      results.event_insert_test = 'FAILED: ' + insertErr.message;
+    } else {
+      results.event_insert_test = 'OK';
+    }
+  } catch (e) {
+    results.event_insert_test = 'EXCEPTION: ' + e.message;
+  }
+
+  res.json({ debug_schema: results });
 });
 
 module.exports = router;
