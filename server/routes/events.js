@@ -97,6 +97,41 @@ function parseUserAgent(ua) {
 }
 
 // ============================================================================
+// GeoIP lookup via ipapi.co (free: 1000 req/day, no key needed)
+// Returns { country, city, region } or nulls on failure.
+// Only called when Vercel headers don't provide city detail.
+// ============================================================================
+async function lookupGeoIP(ip) {
+  if (!ip || ip === '127.0.0.1' || ip === '::1') return null;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const resp = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'RegalMasterLook/1.0' },
+    });
+    clearTimeout(timeout);
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    if (data.error) return null;
+    return {
+      country: data.country_code || null,
+      city: data.city || null,
+      region: data.region || null,
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+/** Extract client IP from request headers. */
+function getClientIP(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return xff.split(',')[0].trim();
+  return req.headers['x-real-ip'] || req.ip || null;
+}
+
+// ============================================================================
 // POST /api/events — Receive batched events from the tracker
 // ============================================================================
 router.post('/', async (req, res) => {
@@ -206,15 +241,36 @@ router.post('/', async (req, res) => {
     }
 
     // --- GeoIP: extract country & city from Vercel geo headers ---
-    const geoCountry = req.headers['x-vercel-ip-country'] || null;
-    const geoCity = req.headers['x-vercel-ip-city']
+    let geoCountry = req.headers['x-vercel-ip-country'] || null;
+    let geoCity = req.headers['x-vercel-ip-city']
       ? decodeURIComponent(req.headers['x-vercel-ip-city'])
       : null;
+    let geoRegion = req.headers['x-vercel-ip-country-region'] || null;
+
+    // Fallback: if Vercel doesn't provide city (or on SESSION_START for max detail),
+    // look up via ipapi.co for accurate city + region
+    if ((!geoCity || hasSessionStart) && events.length > 0) {
+      const clientIP = getClientIP(req);
+      if (clientIP) {
+        const ipGeo = await lookupGeoIP(clientIP);
+        if (ipGeo) {
+          if (!geoCountry && ipGeo.country) geoCountry = ipGeo.country;
+          // Prefer ipapi.co city — more detailed than Vercel
+          if (ipGeo.city) geoCity = ipGeo.city;
+          if (ipGeo.region) geoRegion = ipGeo.region;
+        }
+      }
+    }
+
+    // Build compact location string: "City, Region" or just "City"
+    const geoLocation = geoCity && geoRegion && geoRegion !== geoCity
+      ? `${geoCity}, ${geoRegion}`
+      : geoCity || null;
 
     // Inject geo data into session upsert if available
     if (sessionUpsertData) {
       if (geoCountry) sessionUpsertData.country = geoCountry;
-      if (geoCity) sessionUpsertData.city = geoCity;
+      if (geoLocation) sessionUpsertData.city = geoLocation;
     }
 
     // --- Ensure project exists (sessions.project_id FK → projects.id) ---
@@ -279,7 +335,7 @@ router.post('/', async (req, res) => {
         device_type: (sessionUpsertData && sessionUpsertData.device_type) || uaParsed.device_type,
       };
       if (geoCountry) mediumData.country = geoCountry;
-      if (geoCity) mediumData.city = geoCity;
+      if (geoLocation) mediumData.city = geoLocation;
       const { error } = await supabase.from('sessions')
         .upsert(mediumData, { onConflict: 'id', ignoreDuplicates: ignoreDups });
       if (!error) sessionOk = true;
@@ -310,7 +366,7 @@ router.post('/', async (req, res) => {
     }
 
     // --- Backfill GeoIP on existing sessions that lack it (non-fatal) ---
-    if ((geoCountry || geoCity) && !sessionUpsertData) {
+    if ((geoCountry || geoLocation) && !sessionUpsertData) {
       try {
         const { data: existing } = await supabase.from('sessions')
           .select('country, city')
@@ -319,7 +375,7 @@ router.post('/', async (req, res) => {
         if (existing && !existing.country && !existing.city) {
           const geoUpdate = {};
           if (geoCountry) geoUpdate.country = geoCountry;
-          if (geoCity) geoUpdate.city = geoCity;
+          if (geoLocation) geoUpdate.city = geoLocation;
           await supabase.from('sessions').update(geoUpdate).eq('id', sessionId);
         }
       } catch (_) { /* non-fatal */ }

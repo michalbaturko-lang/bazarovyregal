@@ -1851,8 +1851,50 @@ class SessionPlayer {
     }
 
     if (vNode.id) this._nodeMap.set(vNode.id, doc);
+
+    // Inject <base> tag so relative URLs (CSS, images, fonts) resolve to the original site
+    this._injectBaseTag(doc);
+
     this._disableInteractiveElements(doc);
     this._injectReplayStyle(doc);
+  }
+
+  /**
+   * Inject a <base href="..."> tag into the iframe <head> so that relative
+   * URLs in stylesheets, images, and fonts resolve to the original website.
+   */
+  _injectBaseTag(doc) {
+    try {
+      // Determine the base URL from session data or current URL being replayed
+      let baseUrl = this._currentUrl || '';
+      if (!baseUrl && this.session) {
+        baseUrl = this.session.url || '';
+      }
+      if (!baseUrl) return;
+
+      // Extract origin (e.g., "https://vyprodej-regalu.cz")
+      let origin;
+      try {
+        const parsed = new URL(baseUrl);
+        origin = parsed.origin;
+      } catch (_) {
+        // Try to extract origin manually
+        const match = baseUrl.match(/^(https?:\/\/[^\/]+)/);
+        if (match) origin = match[1];
+      }
+      if (!origin) return;
+
+      // Remove any existing <base> tag first
+      const existingBase = doc.querySelector('base');
+      if (existingBase) existingBase.remove();
+
+      // Create and insert <base> as first child of <head>
+      const base = doc.createElement('base');
+      base.href = origin + '/';
+      if (doc.head) {
+        doc.head.insertBefore(base, doc.head.firstChild);
+      }
+    } catch (_) { /* safe to ignore */ }
   }
 
   /**
@@ -1922,8 +1964,10 @@ class SessionPlayer {
       if (vNode.a) {
         for (const [name, val] of Object.entries(vNode.a)) {
           if (name.startsWith('on')) continue; // Skip event handlers
-          // Rewrite src/href to prevent loading — except for stylesheets and images
-          if (name === 'src' && tag !== 'img') continue;
+          // Skip src for script/iframe (security) but allow for img, source, video, audio
+          if (name === 'src' && (tag === 'script' || tag === 'iframe')) continue;
+          // Skip integrity/nonce attributes that could block loading
+          if (name === 'integrity' || name === 'nonce') continue;
           try {
             el.setAttribute(name, val);
           } catch (_) { /* ignore */ }
