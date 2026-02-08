@@ -43,6 +43,10 @@ const App = (() => {
     { pattern: /^#?reports$/,        page: 'reports',        params: [] },
     { pattern: /^#?apikeys$/,        page: 'apikeys',        params: [] },
     { pattern: /^#?billing$/,        page: 'billing',        params: [] },
+    { pattern: /^#?revenue$/,        page: 'revenue',        params: [] },
+    { pattern: /^#?retention$/,      page: 'retention',      params: [] },
+    { pattern: /^#?alerts$/,         page: 'alerts',         params: [] },
+    { pattern: /^#?tags$/,           page: 'tags',           params: [] },
     { pattern: /^#?settings$/,       page: 'settings',       params: [] },
   ];
 
@@ -152,6 +156,18 @@ const App = (() => {
         break;
       case 'billing':
         BillingPage.render(container);
+        break;
+      case 'revenue':
+        RevenuePage.init(container);
+        break;
+      case 'retention':
+        RetentionPage.init(container);
+        break;
+      case 'alerts':
+        AlertsPage.render(container);
+        break;
+      case 'tags':
+        TagsPage.render(container);
         break;
       case 'settings':
         renderSettingsPage(container);

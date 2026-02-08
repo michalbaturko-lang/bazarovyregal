@@ -46,5 +46,9 @@ app.use('/api/apikeys', require('../server/routes/apikeys'));
 app.use('/api/v1', require('../server/routes/publicapi'));
 app.use('/api/billing', require('../server/routes/billing'));
 app.use('/api/tenants', require('../server/routes/tenants'));
+app.use('/api/alerts', require('../server/routes/alerts'));
+app.use('/api/retention', require('../server/routes/retention'));
+app.use('/api/revenue', require('../server/routes/revenue'));
+app.use('/api/tags', require('../server/routes/tags'));
 
 module.exports = app;
