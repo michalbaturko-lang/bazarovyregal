@@ -626,6 +626,9 @@
         self._push(EVT.MOUSE_CLICK, clickData);
         self._trackClickForRage(e);
         self._trackClickForDead(e, clickData);
+
+        // Auto-detect e-commerce "Add to Cart" button clicks
+        self._detectAddToCartClick(e.target, text);
       }, true);
 
       this._listen(window, 'scroll', throttle(function () {
@@ -1109,6 +1112,129 @@
           self._flush(true);
         }
       });
+    },
+
+    /**
+     * Auto-detect "Add to Cart" button clicks on Upgates e-shops.
+     * Matches button text in CZ/SK/HU/EN and common CSS class patterns.
+     * Fires an add_to_cart e-commerce event with extracted product data.
+     */
+    _detectAddToCartClick: function (element, clickText) {
+      // Patterns for "Add to Cart" buttons across languages
+      // CZ: "Do košíku", "Přidat do košíku", "Koupit"
+      // SK: "Do košíka", "Pridať do košíka", "Kúpiť"
+      // HU: "Kosárba", "Kosárba tesz", "Megvásárlom"
+      // EN: "Add to cart", "Buy now"
+      var cartTextPattern = /do\s*košíku|do\s*košíka|přidat\s*do\s*košík|pridať\s*do\s*košík|koupit|kúpiť|kosárba|megvásárl|add\s*to\s*cart|buy\s*now/i;
+      var cartClassPattern = /add[-_]?to[-_]?cart|cart[-_]?btn|buy[-_]?btn|btn[-_]?buy|btn[-_]?cart|p-buy|to-cart|addtocart/i;
+
+      // Walk up to 4 levels to find the actual button element
+      var node = element;
+      var matched = false;
+      for (var depth = 0; node && node.nodeType === 1 && depth < 5; depth++) {
+        var nodeText = '';
+        try { nodeText = (node.textContent || '').substring(0, 120).trim(); } catch (_) {}
+        var classes = node.className || '';
+        if (typeof classes !== 'string') try { classes = classes.baseVal || ''; } catch (_) { classes = ''; }
+
+        if (cartTextPattern.test(clickText) || cartTextPattern.test(nodeText) || cartClassPattern.test(classes)) {
+          matched = true;
+          break;
+        }
+        node = node.parentElement;
+      }
+
+      if (!matched) return;
+
+      // Extract product info from surrounding DOM context
+      var product = this._extractProductFromDOM(element);
+
+      // Fire add_to_cart e-commerce event
+      this._trackEcommerceEvent('add_to_cart', {
+        id: product.id || 'unknown',
+        name: product.name || '',
+        price: product.price || 0,
+        quantity: product.quantity || 1,
+        category: product.category || '',
+        url: window.location.href,
+        auto_detected: true
+      });
+    },
+
+    /**
+     * Extract product information from surrounding DOM elements.
+     * Walks up the DOM to find a product container, then extracts
+     * id, name, price, category from common patterns.
+     */
+    _extractProductFromDOM: function (element) {
+      var product = { id: null, name: null, price: null, category: null, quantity: 1 };
+
+      // Walk up to find a product container
+      var container = element;
+      for (var d = 0; container && d < 12; d++) {
+        var cls = (container.className || '');
+        if (typeof cls !== 'string') try { cls = cls.baseVal || ''; } catch (_) { cls = ''; }
+        var id = container.id || '';
+        // Common product container patterns
+        if (/product|item[-_]?detail|p-detail|goods|zbozi|tovar|termek/i.test(cls + ' ' + id)) break;
+        // Also check data attributes
+        if (container.getAttribute && (container.getAttribute('data-product-id') || container.getAttribute('data-id'))) break;
+        // Check for itemscope (schema.org microdata)
+        if (container.getAttribute && container.getAttribute('itemtype') && /Product/i.test(container.getAttribute('itemtype'))) break;
+        container = container.parentElement;
+      }
+
+      if (!container || !container.nodeType) container = document;
+
+      try {
+        // Product ID
+        product.id = (container.getAttribute && container.getAttribute('data-product-id')) ||
+                     (container.getAttribute && container.getAttribute('data-id')) ||
+                     null;
+        // Try form input for product ID
+        if (!product.id) {
+          var idInput = container.querySelector('input[name*="product_id"], input[name*="productId"], input[name*="id"][type="hidden"]');
+          if (idInput) product.id = idInput.value;
+        }
+
+        // Product name — try multiple selectors
+        var nameEl = container.querySelector('[itemprop="name"], .product-name, .p-name, .product-title, .p-title, h1, h2');
+        if (nameEl) product.name = (nameEl.textContent || '').trim().substring(0, 150);
+
+        // Product price — try multiple selectors
+        var priceEl = container.querySelector('[itemprop="price"], .product-price, .p-price, .price-value, .current-price, .price');
+        if (priceEl) {
+          var priceAttr = priceEl.getAttribute && priceEl.getAttribute('content');
+          if (priceAttr) {
+            product.price = parseFloat(priceAttr);
+          } else {
+            var priceMatch = (priceEl.textContent || '').replace(/\s/g, '').match(/([\d]+[.,]?\d*)/);
+            if (priceMatch) product.price = parseFloat(priceMatch[1].replace(',', '.'));
+          }
+        }
+
+        // Category
+        var catEl = container.querySelector('[itemprop="category"], .product-category, .p-category');
+        if (catEl) product.category = (catEl.textContent || '').trim().substring(0, 80);
+
+        // Quantity
+        var qtyEl = container.querySelector('input[name*="qty"], input[name*="quantity"], input[name*="pocet"], input[type="number"]');
+        if (qtyEl && qtyEl.value) product.quantity = parseInt(qtyEl.value, 10) || 1;
+      } catch (_) { /* extraction failed — return partial data */ }
+
+      // Fallback: extract from URL if on a product page
+      if (!product.id) {
+        var pathMatch = window.location.pathname.match(/\/([^\/]+?)(?:\.html?)?$/);
+        if (pathMatch) product.id = pathMatch[1];
+      }
+      if (!product.name) {
+        try {
+          var h1 = document.querySelector('h1');
+          if (h1) product.name = (h1.textContent || '').trim().substring(0, 150);
+        } catch (_) {}
+      }
+
+      return product;
     },
 
     /** Auto-fire cart_abandonment if there were add_to_cart events but no purchase. */

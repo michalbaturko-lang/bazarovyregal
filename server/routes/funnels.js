@@ -37,7 +37,8 @@ async function ensureFunnelsTable() {
 // E-commerce funnel step templates for Upgates shops
 const ECOMMERCE_STEPS = [
   { type: 'url', value: '/', name: 'Website Visit' },
-  { type: 'url', value: '/cart', name: 'Cart' },
+  { type: 'event', value: 'add_to_cart', name: 'Add to Cart Click' },
+  { type: 'url', value: '/cart', name: 'Cart Page' },
   { type: 'url', value: '/shipment', name: 'Shipping & Payment' },
   { type: 'url', value: '/checkout', name: 'Checkout' },
   { type: 'url', value: '/Order-received', name: 'Order Complete' },
@@ -288,11 +289,11 @@ router.get('/:id', async (req, res) => {
             }
           } else {
             // Match custom events by name in the JSONB data field
-            // Supabase filter: data->>'name' = step.value
+            // CUSTOM_EVENT = type 12. Check data->>'name' for the event name.
             const { data: rows, error: qErr } = await supabase.from('events')
               .select('session_id')
               .in('session_id', batch)
-              .eq('type', 14)
+              .eq('type', 12)
               .eq('data->>name', step.value);
             if (qErr) throw qErr;
 
