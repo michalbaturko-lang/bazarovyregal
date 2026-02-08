@@ -230,13 +230,24 @@ router.post('/', async (req, res) => {
         hasError = true;
       }
 
+      // Derive URL from event data when not provided at top level.
+      // SESSION_START has url in data; PAGE_NAVIGATION has 'to' destination.
+      let derivedUrl = eventUrl;
+      if (!derivedUrl && eventData) {
+        if (eventType === EVENT_TYPES.SESSION_START && eventData.url) {
+          derivedUrl = eventData.url;
+        } else if (eventType === EVENT_TYPES.PAGE_NAVIGATION && eventData.to) {
+          derivedUrl = eventData.to;
+        }
+      }
+
       // Accumulate event row (data is stored as JSONB, pass object directly)
       eventRows.push({
         session_id: sessionId,
         type: eventType,
         timestamp: eventTimestamp,
         data: eventData || null,
-        url: eventUrl,
+        url: derivedUrl,
       });
     }
 
@@ -249,7 +260,7 @@ router.post('/', async (req, res) => {
 
     // Fallback: if Vercel doesn't provide city (or on SESSION_START for max detail),
     // look up via ipapi.co for accurate city + region
-    if ((!geoCity || hasSessionStart) && events.length > 0) {
+    if ((!geoCity || sessionUpsertData) && events.length > 0) {
       const clientIP = getClientIP(req);
       if (clientIP) {
         const ipGeo = await lookupGeoIP(clientIP);

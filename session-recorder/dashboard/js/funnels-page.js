@@ -1,5 +1,6 @@
 /* ==========================================================================
    funnels-page.js  -  Funnel builder, list & detail views
+   Connects to real /api/funnels endpoints, auto-seeds e-commerce funnel
    ========================================================================== */
 
 const FunnelsPage = (() => {
@@ -8,103 +9,97 @@ const FunnelsPage = (() => {
      State
   ------------------------------------------------------------------ */
   let funnels = [];
-  let activeFunnel = null;
+  let activeFunnel = null;   // { funnel, results }
+  let dateFrom = '';
+  let dateTo   = '';
+  let seeding  = false;
 
   /* ------------------------------------------------------------------
      Data helpers
   ------------------------------------------------------------------ */
   async function fetchFunnels() {
     try {
-      funnels = await App.api('/funnels?project_id=default');
+      const projectId = App.state.project || 'default';
+      const resp = await App.api(`/funnels?project_id=${encodeURIComponent(projectId)}`);
+      funnels = resp.funnels || resp || [];
     } catch (_) {
       funnels = [];
     }
   }
 
-  async function fetchFunnelDetail(id) {
+  async function fetchFunnelDetail(id, df, dt) {
     try {
-      activeFunnel = await App.api(`/funnels/${id}`);
+      let url = `/funnels/${id}`;
+      const params = [];
+      if (df) params.push(`date_from=${encodeURIComponent(df)}`);
+      if (dt) params.push(`date_to=${encodeURIComponent(dt)}`);
+      if (params.length) url += '?' + params.join('&');
+      activeFunnel = await App.api(url);
     } catch (_) {
       activeFunnel = null;
     }
   }
 
-  async function createFunnel(payload) {
+  async function seedEcommerceFunnel() {
     try {
-      const created = await App.api('/funnels', {
+      const projectId = App.state.project || 'default';
+      const resp = await App.api('/funnels/seed-ecommerce', {
         method: 'POST',
-        body: payload,
+        body: { project_id: projectId },
       });
-      Components.toast('Funnel created successfully', 'success');
-      return created;
-    } catch (_) {
-      // Mock: create a local entry
-      const newFunnel = {
-        id: 'f' + Date.now(),
-        name: payload.name,
-        steps: payload.steps,
-        overallConversion: (Math.random() * 20 + 2).toFixed(1),
-        totalEntries: Math.floor(Math.random() * 3000 + 500),
-      };
-      funnels.push(newFunnel);
-      Components.toast('Funnel created (local)', 'success');
-      return newFunnel;
+      return resp;
+    } catch (err) {
+      console.error('[funnels] seed error:', err);
+      return null;
     }
+  }
+
+  async function createFunnel(payload) {
+    const created = await App.api('/funnels', {
+      method: 'POST',
+      body: payload,
+    });
+    Components.toast('Funnel created successfully', 'success');
+    return created;
   }
 
   async function updateFunnel(id, payload) {
-    try {
-      const updated = await App.api(`/funnels/${id}`, {
-        method: 'PUT',
-        body: payload,
-      });
-      Components.toast('Funnel updated successfully', 'success');
-      return updated;
-    } catch (_) {
-      // Mock: update locally
-      const idx = funnels.findIndex(f => f.id === id);
-      if (idx !== -1) {
-        funnels[idx] = { ...funnels[idx], ...payload };
-      }
-      if (activeFunnel && activeFunnel.id === id) {
-        Object.assign(activeFunnel, payload);
-      }
-      Components.toast('Funnel updated (local)', 'success');
-      return funnels[idx] || activeFunnel;
-    }
+    const updated = await App.api(`/funnels/${id}`, {
+      method: 'PUT',
+      body: payload,
+    });
+    Components.toast('Funnel updated successfully', 'success');
+    return updated;
   }
 
   async function deleteFunnel(id) {
-    try {
-      await App.api(`/funnels/${id}`, { method: 'DELETE' });
-      Components.toast('Funnel deleted', 'success');
-    } catch (_) {
-      funnels = funnels.filter(f => f.id !== id);
-      Components.toast('Funnel deleted (local)', 'success');
-    }
+    await App.api(`/funnels/${id}`, { method: 'DELETE' });
+    Components.toast('Funnel deleted', 'success');
   }
 
   /* ------------------------------------------------------------------
-     Mini funnel sparkline SVG
+     Transform API results to display format
+     API: { name, type, value, count, rate, dropoff }
+     Display: { name, type, value, entered, exited, conversionFromPrev, conversionFromFirst }
   ------------------------------------------------------------------ */
-  function miniFunnelSvg(steps, width, height) {
-    width = width || 120;
-    height = height || 40;
-    const count = steps.length;
-    if (count === 0) return '';
-
-    const barWidth = Math.floor((width - (count - 1) * 3) / count);
-    const maxVal = steps[0].entered || steps[0].totalEntries || 1;
-    const bars = steps.map((step, i) => {
-      const val = step.entered || maxVal;
-      const barH = Math.max(4, Math.round((val / maxVal) * height));
-      const x = i * (barWidth + 3);
-      const y = height - barH;
-      const opacity = 1 - i * 0.15;
-      return `<rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="2" fill="rgb(59,130,246)" opacity="${Math.max(0.3, opacity)}"/>`;
+  function transformSteps(apiSteps, totalSessions) {
+    if (!apiSteps || apiSteps.length === 0) return [];
+    return apiSteps.map((step, i) => {
+      const entered = step.count || 0;
+      const prevCount = i === 0 ? totalSessions : (apiSteps[i - 1].count || 0);
+      const exited = step.dropoff || 0;
+      const convFromPrev = i === 0 ? '100.0' : (prevCount > 0 ? ((entered / prevCount) * 100).toFixed(1) : '0.0');
+      const convFromFirst = totalSessions > 0 ? ((entered / totalSessions) * 100).toFixed(1) : '0.0';
+      return {
+        name: step.name || `Step ${i + 1}`,
+        type: step.type,
+        value: step.value,
+        entered,
+        exited,
+        conversionFromPrev: convFromPrev,
+        conversionFromFirst: convFromFirst,
+      };
     });
-
-    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" class="flex-shrink-0">${bars.join('')}</svg>`;
   }
 
   /* ------------------------------------------------------------------
@@ -113,6 +108,25 @@ const FunnelsPage = (() => {
   async function render(container) {
     container.innerHTML = Components.loading();
     await fetchFunnels();
+
+    // Auto-seed e-commerce funnel if none exist
+    if (funnels.length === 0 && !seeding) {
+      seeding = true;
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-20">
+          <div class="relative w-10 h-10 mb-4">
+            <div class="absolute inset-0 rounded-full border-2 border-slate-700"></div>
+            <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-500 animate-spin"></div>
+          </div>
+          <span class="text-sm text-slate-400">Setting up E-commerce Conversion Funnel...</span>
+        </div>`;
+      const seedResult = await seedEcommerceFunnel();
+      seeding = false;
+      if (seedResult) {
+        Components.toast('E-commerce funnel created automatically', 'success');
+        await fetchFunnels();
+      }
+    }
 
     const createBtnHTML = `
       <button onclick="FunnelsPage.showCreateModal()"
@@ -138,25 +152,30 @@ const FunnelsPage = (() => {
       return;
     }
 
-    const cards = funnels.map(f => {
-      const stepCount = (f.steps || []).length;
-      const convRate = parseFloat(f.overallConversion) || 0;
-      const convColor = convRate >= 15 ? 'text-green-400' : convRate >= 8 ? 'text-blue-400' : 'text-amber-400';
+    // For each funnel in the list, we need to fetch its detail to get real conversion data
+    // Fetch all funnel details in parallel for the list view
+    const detailPromises = funnels.map(f =>
+      App.api(`/funnels/${f.id}`).catch(() => null)
+    );
+    const details = await Promise.all(detailPromises);
 
-      // Build a simple mock stepsData for sparkline if not available
-      let sparkSteps = f.stepsData || [];
-      if (sparkSteps.length === 0 && f.steps) {
-        let remaining = f.totalEntries || 1000;
-        sparkSteps = f.steps.map((s, i) => {
-          const entered = remaining;
-          if (i > 0) remaining = Math.round(remaining * (0.5 + Math.random() * 0.35));
-          return { ...s, entered };
-        });
-      }
+    const cards = funnels.map((f, idx) => {
+      const detail = details[idx];
+      const results = detail ? detail.results : null;
+      const totalSessions = results ? results.total_sessions : 0;
+      const overallConversion = results ? results.overall_conversion : 0;
+      const stepsData = results ? transformSteps(results.steps, totalSessions) : [];
+      const stepCount = (f.steps || []).length;
+
+      const convRate = parseFloat(overallConversion) || 0;
+      const convColor = convRate >= 15 ? 'text-green-400' : convRate >= 5 ? 'text-blue-400' : convRate > 0 ? 'text-amber-400' : 'text-slate-500';
+
+      // Mini funnel sparkline
+      const sparkSvg = miniBarsSvg(stepsData, 100, 36);
 
       return `
         <div onclick="App.navigate('funnels/${f.id}')"
-             class="bg-slate-800 rounded-xl border border-slate-700/50 p-5 cursor-pointer hover:border-slate-600/50 hover:bg-slate-800/80 transition-all group">
+             class="bg-slate-800 rounded-xl border border-slate-700/50 p-5 cursor-pointer hover:border-blue-500/30 hover:bg-slate-800/80 transition-all group">
           <div class="flex items-start justify-between mb-4">
             <div class="min-w-0 flex-1">
               <h3 class="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors truncate">${escHtml(f.name)}</h3>
@@ -172,12 +191,12 @@ const FunnelsPage = (() => {
               <div class="text-xs text-slate-500 mt-0.5">conversion rate</div>
             </div>
             <div class="opacity-60 group-hover:opacity-100 transition-opacity">
-              ${miniFunnelSvg(sparkSteps, 100, 36)}
+              ${sparkSvg}
             </div>
           </div>
           <div class="mt-3 pt-3 border-t border-slate-700/40 flex items-center justify-between">
-            <span class="text-xs text-slate-500">${App.formatNumber(f.totalEntries)} entries</span>
-            <span class="text-xs text-slate-500">${f.createdAt ? App.formatDate(f.createdAt) : 'Recently'}</span>
+            <span class="text-xs text-slate-500">${App.formatNumber(totalSessions)} sessions</span>
+            <span class="text-xs text-slate-500">${f.created_at ? App.formatDate(f.created_at) : 'Recently'}</span>
           </div>
         </div>`;
     }).join('');
@@ -189,6 +208,299 @@ const FunnelsPage = (() => {
           ${cards}
         </div>
       </div>`;
+  }
+
+  /* ------------------------------------------------------------------
+     Mini bar sparkline SVG for list view
+  ------------------------------------------------------------------ */
+  function miniBarsSvg(steps, width, height) {
+    width = width || 120;
+    height = height || 40;
+    if (!steps || steps.length === 0) return '';
+
+    const count = steps.length;
+    const barWidth = Math.floor((width - (count - 1) * 3) / count);
+    const maxVal = steps[0].entered || 1;
+    const bars = steps.map((step, i) => {
+      const val = step.entered || 0;
+      const barH = Math.max(4, Math.round((val / maxVal) * height));
+      const x = i * (barWidth + 3);
+      const y = height - barH;
+      const opacity = 1 - i * 0.12;
+      return `<rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="2" fill="rgb(59,130,246)" opacity="${Math.max(0.3, opacity)}"/>`;
+    });
+
+    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" class="flex-shrink-0">${bars.join('')}</svg>`;
+  }
+
+  /* ------------------------------------------------------------------
+     Render - Funnel Detail (beautiful visualization)
+  ------------------------------------------------------------------ */
+  async function renderDetail(container, funnelId) {
+    container.innerHTML = Components.loading();
+
+    // Use global date range or funnel-specific
+    const df = dateFrom || App.state.dateRange.start;
+    const dt = dateTo || App.state.dateRange.end;
+    await fetchFunnelDetail(funnelId, df, dt);
+
+    if (!activeFunnel || !activeFunnel.funnel) {
+      container.innerHTML = Components.emptyState('Funnel Not Found', 'The funnel you are looking for does not exist or has been deleted.');
+      return;
+    }
+
+    const f = activeFunnel.funnel;
+    const results = activeFunnel.results || {};
+    const totalSessions = results.total_sessions || 0;
+    const overallConversion = results.overall_conversion || 0;
+    const steps = transformSteps(results.steps || [], totalSessions);
+
+    // ── Header ──
+    const headerHTML = `
+      <div class="flex items-center gap-2 text-sm text-slate-400 mb-5">
+        <a href="#funnels" class="hover:text-white transition-colors">Funnels</a>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+        </svg>
+        <span class="text-white">${escHtml(f.name)}</span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-xl font-bold text-white">${escHtml(f.name)}</h1>
+          <p class="text-sm text-slate-400 mt-1">${steps.length} steps &middot; ${App.formatNumber(totalSessions)} total sessions</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Date filter -->
+          <div class="flex items-center gap-2 bg-slate-800 rounded-lg border border-slate-700/50 px-3 py-1.5">
+            <svg class="w-4 h-4 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/>
+            </svg>
+            <input type="date" id="funnel-date-from" value="${escHtml(df)}"
+                   onchange="FunnelsPage.setDateFrom(this.value)"
+                   class="bg-transparent border-none text-xs text-slate-300 focus:outline-none w-[105px] cursor-pointer" />
+            <span class="text-slate-600 text-xs">to</span>
+            <input type="date" id="funnel-date-to" value="${escHtml(dt)}"
+                   onchange="FunnelsPage.setDateTo(this.value)"
+                   class="bg-transparent border-none text-xs text-slate-300 focus:outline-none w-[105px] cursor-pointer" />
+          </div>
+          <button onclick="FunnelsPage.refreshDetail('${escHtml(f.id)}')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+            Apply
+          </button>
+          <button onclick="FunnelsPage.showEditModal('${escHtml(f.id)}')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 border border-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
+            Edit
+          </button>
+          <button onclick="FunnelsPage.confirmDelete('${escHtml(f.id)}')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors">
+            Delete
+          </button>
+        </div>
+      </div>`;
+
+    // ── Summary metrics ──
+    const lastStep = steps.length > 0 ? steps[steps.length - 1] : null;
+    const biggestDropIdx = steps.reduce((maxI, step, i) => {
+      if (i === 0) return maxI;
+      const rate = 100 - parseFloat(step.conversionFromPrev);
+      const maxRate = maxI === -1 ? -1 : (100 - parseFloat(steps[maxI].conversionFromPrev));
+      return rate > maxRate ? i : maxI;
+    }, -1);
+
+    const summaryHTML = `
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+        ${Components.metricCard('Overall Conversion', `${overallConversion}%`, null,
+          `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>`)}
+        ${Components.metricCard('Total Sessions', App.formatNumber(totalSessions), null,
+          `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>`)}
+        ${Components.metricCard('Completed', App.formatNumber(lastStep ? lastStep.entered : 0), null,
+          `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`)}
+        ${biggestDropIdx > 0
+          ? Components.metricCard('Biggest Drop-off', `Step ${biggestDropIdx + 1}`, null,
+              `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>`)
+          : Components.metricCard('Funnel Steps', `${steps.length}`, null,
+              `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"/></svg>`)}
+      </div>`;
+
+    // ── Beautiful Funnel Visualization ──
+    const funnelVizHTML = buildFunnelVisualization(steps, totalSessions);
+
+    // ── Detailed Table ──
+    const tableHTML = buildStepsTable(steps, totalSessions);
+
+    container.innerHTML = `
+      <div>
+        ${headerHTML}
+        ${summaryHTML}
+        ${funnelVizHTML}
+        ${tableHTML}
+      </div>`;
+  }
+
+  /* ------------------------------------------------------------------
+     Beautiful gradient funnel visualization
+  ------------------------------------------------------------------ */
+  function buildFunnelVisualization(steps, totalSessions) {
+    if (steps.length === 0 || totalSessions === 0) {
+      return `
+        <div class="bg-slate-800 rounded-xl border border-slate-700/50 p-8 mb-6 text-center">
+          <svg class="w-16 h-16 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"/>
+          </svg>
+          <p class="text-sm text-slate-400">No session data yet for this date range.</p>
+          <p class="text-xs text-slate-500 mt-1">Funnel results will appear here once sessions are recorded.</p>
+        </div>`;
+    }
+
+    const maxCount = steps[0].entered || 1;
+
+    // Build trapezoid funnel sections
+    const sections = steps.map((step, i) => {
+      const widthPct = Math.max(15, (step.entered / maxCount) * 100);
+      const nextWidthPct = i < steps.length - 1
+        ? Math.max(15, (steps[i + 1].entered / maxCount) * 100)
+        : widthPct * 0.7;
+
+      const hue = 220 - (i * 25);
+      const sat = 70 + (i * 3);
+      const light = 55 + (i * 5);
+      const color = `hsl(${Math.max(170, hue)}, ${Math.min(90, sat)}%, ${Math.min(75, light)}%)`;
+
+      const convPrev = i === 0 ? 100 : parseFloat(step.conversionFromPrev);
+      const dropColor = convPrev >= 70 ? 'text-green-400' : convPrev >= 40 ? 'text-amber-400' : 'text-red-400';
+
+      // Arrow between sections
+      const arrowHTML = i < steps.length - 1 ? `
+        <div class="flex flex-col items-center py-1">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"/>
+            </svg>
+            <span class="text-xs font-semibold ${steps[i + 1] ? (100 - parseFloat(steps[i + 1].conversionFromPrev) > 50 ? 'text-red-400' : 100 - parseFloat(steps[i + 1].conversionFromPrev) > 30 ? 'text-amber-400' : 'text-green-400') : 'text-slate-500'}">
+              -${steps[i + 1] ? (100 - parseFloat(steps[i + 1].conversionFromPrev)).toFixed(1) : 0}% drop
+            </span>
+            <span class="text-[10px] text-slate-600">(${App.formatNumber(steps[i + 1] ? steps[i + 1].exited : 0)} left)</span>
+          </div>
+        </div>` : '';
+
+      return `
+        <div class="flex flex-col items-center">
+          <!-- Funnel section -->
+          <div class="relative transition-all duration-300" style="width:${widthPct}%; min-width:200px;">
+            <div class="relative rounded-xl py-4 px-5 text-center border border-white/10"
+                 style="background: linear-gradient(135deg, ${color}, ${color}dd); box-shadow: 0 4px 20px ${color}33;">
+              <!-- Step number badge -->
+              <div class="absolute -top-2.5 -left-2.5 w-6 h-6 rounded-full bg-slate-900 border-2 flex items-center justify-center text-[10px] font-bold text-white"
+                   style="border-color: ${color};">
+                ${i + 1}
+              </div>
+              <p class="text-sm font-semibold text-white mb-1">${escHtml(step.name)}</p>
+              <div class="flex items-center justify-center gap-3">
+                <span class="text-lg font-bold text-white">${App.formatNumber(step.entered)}</span>
+                <span class="text-xs font-medium text-white/70">${step.conversionFromFirst}%</span>
+              </div>
+              <p class="text-[10px] text-white/50 mt-1">${step.type === 'url' ? step.value : 'Event: ' + step.value}</p>
+            </div>
+          </div>
+          ${arrowHTML}
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="bg-slate-800 rounded-xl border border-slate-700/50 p-6 mb-6">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="text-sm font-semibold text-white">Funnel Visualization</h3>
+          <span class="text-xs text-slate-500">${App.formatNumber(totalSessions)} total sessions</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 py-4">
+          ${sections}
+        </div>
+      </div>`;
+  }
+
+  /* ------------------------------------------------------------------
+     Detailed steps table
+  ------------------------------------------------------------------ */
+  function buildStepsTable(steps, totalSessions) {
+    if (steps.length === 0) return '';
+
+    const rows = steps.map((step, i) => {
+      const convPrev = parseFloat(step.conversionFromPrev);
+      const convFirst = parseFloat(step.conversionFromFirst);
+      const dropRate = i === 0 ? 0 : (100 - convPrev);
+
+      // Progress bar width
+      const barWidth = totalSessions > 0 ? Math.max(2, (step.entered / totalSessions) * 100) : 0;
+
+      const convColor = i === 0 ? 'text-green-400' : convPrev >= 70 ? 'text-green-400' : convPrev >= 40 ? 'text-amber-400' : 'text-red-400';
+      const dropColor = dropRate > 50 ? 'text-red-400' : dropRate > 30 ? 'text-amber-400' : 'text-green-400';
+
+      return `
+        <tr class="border-t border-slate-700/50 hover:bg-slate-700/30 transition-colors">
+          <td class="px-4 py-3.5">
+            <div class="flex items-center gap-3">
+              <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-xs font-bold text-blue-400">${i + 1}</span>
+              <div>
+                <span class="text-sm font-medium text-white">${escHtml(step.name)}</span>
+                <span class="block text-xs text-slate-500 mt-0.5">${step.type === 'url' ? 'URL: ' : 'Event: '}${escHtml(step.value)}</span>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3.5 text-right">
+            <span class="text-sm font-semibold text-white">${App.formatNumber(step.entered)}</span>
+            <div class="mt-1.5 w-24 ml-auto">
+              <div class="h-1.5 rounded-full bg-slate-700/50 overflow-hidden">
+                <div class="h-full rounded-full bg-blue-500 transition-all" style="width:${barWidth}%"></div>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3.5 text-right">
+            <span class="text-sm font-semibold ${convColor}">${i === 0 ? '100%' : convPrev.toFixed(1) + '%'}</span>
+            ${i > 0 ? `<span class="block text-xs text-slate-500 mt-0.5">${convFirst}% from start</span>` : ''}
+          </td>
+          <td class="px-4 py-3.5 text-right">
+            <span class="text-sm text-slate-300">${i === 0 ? '--' : App.formatNumber(step.exited)}</span>
+          </td>
+          <td class="px-4 py-3.5 text-right">
+            ${i === 0
+              ? '<span class="text-sm text-slate-500">--</span>'
+              : `<span class="text-sm font-semibold ${dropColor}">${dropRate.toFixed(1)}%</span>`}
+          </td>
+        </tr>`;
+    }).join('');
+
+    return `
+      <div class="mb-6">
+        <h3 class="text-sm font-semibold text-white mb-3">Step-by-Step Breakdown</h3>
+        <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+          <table class="w-full">
+            <thead class="bg-slate-800/80">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider" style="width:35%">Step</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Sessions</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Conversion</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Drop-off</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Drop Rate</th>
+              </tr>
+            </thead>
+            <tbody class="bg-slate-800/30">
+              ${rows}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  /* ------------------------------------------------------------------
+     Date filter helpers
+  ------------------------------------------------------------------ */
+  function setDateFrom(val) { dateFrom = val; }
+  function setDateTo(val) { dateTo = val; }
+
+  function refreshDetail(funnelId) {
+    const container = document.getElementById('main-content');
+    if (container) renderDetail(container, funnelId);
   }
 
   /* ------------------------------------------------------------------
@@ -264,7 +576,6 @@ const FunnelsPage = (() => {
       { label: 'Create Funnel', onClick: 'FunnelsPage.confirmCreate()' },
     ]);
 
-    // Focus name input after modal renders
     setTimeout(() => {
       const inp = document.getElementById('funnel-name-input');
       if (inp) inp.focus();
@@ -290,7 +601,6 @@ const FunnelsPage = (() => {
   function moveStep(index, direction) {
     const newIdx = index + direction;
     if (newIdx < 0 || newIdx >= modalSteps.length) return;
-    // Read current DOM values before swap
     syncStepsFromDOM();
     const temp = modalSteps[index];
     modalSteps[index] = modalSteps[newIdx];
@@ -301,7 +611,6 @@ const FunnelsPage = (() => {
   function updateStepType(index, value) {
     syncStepsFromDOM();
     modalSteps[index].type = value;
-    // Update placeholder
     const valInput = document.getElementById(`step-value-${index}`);
     if (valInput) valInput.placeholder = value === 'url' ? '/pricing' : 'signup_complete';
   }
@@ -326,7 +635,6 @@ const FunnelsPage = (() => {
   }
 
   function refreshModalSteps() {
-    // Re-render modal content by re-opening modal with current steps
     Components.closeModal();
     renderCreateModal();
   }
@@ -342,202 +650,40 @@ const FunnelsPage = (() => {
 
     syncStepsFromDOM();
 
-    // Validate steps
     const validSteps = modalSteps.filter(s => s.value.trim() !== '');
     if (validSteps.length < 2) {
       Components.toast('At least 2 steps with values are required', 'warning');
       return;
     }
 
-    // Fill in labels where missing
     validSteps.forEach((s, i) => {
       if (!s.label.trim()) {
         s.label = s.type === 'url' ? `Page: ${s.value}` : `Event: ${s.value}`;
       }
-      // Rename to match API field
       s.name = s.label;
     });
 
     Components.closeModal();
 
-    await createFunnel({
-      name,
-      projectId: 'default',
-      steps: validSteps.map(s => ({ type: s.type, value: s.value, name: s.name || s.label })),
-    });
+    try {
+      await createFunnel({
+        name,
+        projectId: App.state.project || 'default',
+        steps: validSteps.map(s => ({ type: s.type, value: s.value, name: s.name || s.label })),
+      });
+    } catch (_) {
+      // toast already shown by API helper
+    }
 
     const container = document.getElementById('main-content');
     render(container);
   }
 
   /* ------------------------------------------------------------------
-     Render - Funnel Detail
-  ------------------------------------------------------------------ */
-  async function renderDetail(container, funnelId) {
-    container.innerHTML = Components.loading();
-    await fetchFunnelDetail(funnelId);
-
-    if (!activeFunnel) {
-      container.innerHTML = Components.emptyState('Funnel Not Found', 'The funnel you are looking for does not exist or has been deleted.');
-      return;
-    }
-
-    const f = activeFunnel;
-    const steps = f.stepsData || [];
-    const firstCount = steps.length > 0 ? steps[0].entered : 0;
-
-    // ── Header ──
-    const headerHTML = `
-      <div class="flex items-center gap-2 text-sm text-slate-400 mb-5">
-        <a href="#funnels" class="hover:text-white transition-colors">Funnels</a>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
-        </svg>
-        <span class="text-white">${escHtml(f.name)}</span>
-      </div>
-
-      <div class="flex items-start justify-between mb-8">
-        <div>
-          <h1 class="text-xl font-bold text-white">${escHtml(f.name)}</h1>
-          <p class="text-sm text-slate-400 mt-1">${steps.length} steps &middot; ${App.formatNumber(firstCount)} total entries</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="FunnelsPage.showEditModal('${escHtml(f.id)}')"
-                  class="px-3.5 py-2 rounded-lg text-sm font-medium bg-slate-800 border border-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
-            Edit
-          </button>
-          <button onclick="FunnelsPage.confirmDelete('${escHtml(f.id)}')"
-                  class="px-3.5 py-2 rounded-lg text-sm font-medium bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
-            Delete
-          </button>
-        </div>
-      </div>`;
-
-    // ── Horizontal Funnel Visualization ──
-    const blueShades = ['bg-blue-500', 'bg-blue-400', 'bg-blue-300', 'bg-blue-200', 'bg-sky-300', 'bg-sky-200', 'bg-cyan-300', 'bg-cyan-200'];
-
-    let funnelBarsHTML = '';
-    if (steps.length > 0) {
-      const barSegments = steps.map((step, i) => {
-        const widthPct = firstCount > 0 ? Math.max(3, (step.entered / firstCount) * 100) : 100;
-        const bgClass = blueShades[i % blueShades.length];
-        const dropOffPct = i > 0 ? (100 - parseFloat(step.conversionFromPrev)).toFixed(1) : 0;
-        const convFromFirst = step.conversionFromFirst;
-
-        const arrowHTML = i > 0 ? `
-          <div class="flex flex-col items-center justify-center px-2 flex-shrink-0" style="min-width:60px;">
-            <svg class="w-5 h-5 text-slate-600 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
-            </svg>
-            <span class="text-xs font-semibold text-red-400">-${dropOffPct}%</span>
-          </div>` : '';
-
-        const barHTML = `
-          <div class="flex flex-col items-center flex-shrink-0" style="width:${Math.max(80, widthPct * 1.5)}px;">
-            <div class="${bgClass} rounded-lg w-full flex items-end justify-center transition-all relative"
-                 style="height:${Math.max(40, widthPct * 1.2)}px; opacity:${1 - i * 0.08};">
-              <span class="text-xs font-bold text-slate-900 pb-2">${App.formatNumber(step.entered)}</span>
-            </div>
-            <div class="mt-2 text-center">
-              <p class="text-xs font-medium text-white truncate max-w-[100px]">${escHtml(step.label || step.name || `Step ${i + 1}`)}</p>
-              <p class="text-[10px] text-slate-500 mt-0.5">${convFromFirst}% from start</p>
-            </div>
-          </div>`;
-
-        return arrowHTML + barHTML;
-      }).join('');
-
-      funnelBarsHTML = `
-        <div class="bg-slate-800 rounded-xl border border-slate-700/50 p-6 mb-6">
-          <h3 class="text-sm font-semibold text-white mb-5">Funnel Visualization</h3>
-          <div class="flex items-end gap-1 overflow-x-auto pb-4">
-            ${barSegments}
-          </div>
-        </div>`;
-    }
-
-    // ── Detailed Table ──
-    const tableHeaders = [
-      { key: 'step', label: 'Step', width: '30%' },
-      { key: 'users', label: 'Users', align: 'right' },
-      { key: 'conversion', label: 'Conversion Rate', align: 'right' },
-      { key: 'dropoff', label: 'Drop-off', align: 'right' },
-      { key: 'dropoffRate', label: 'Drop-off Rate', align: 'right' },
-      { key: 'actions', label: '', align: 'right', width: '140px' },
-    ];
-
-    const tableRows = steps.map((step, i) => {
-      const dropOffCount = step.exited || 0;
-      const dropOffRate = i === 0 ? '0%' : `${(100 - parseFloat(step.conversionFromPrev)).toFixed(1)}%`;
-      const convRate = i === 0 ? '100%' : `${step.conversionFromPrev}%`;
-
-      return {
-        cells: {
-          step: `<div class="flex items-center gap-3">
-                   <span class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-xs font-bold text-blue-400">${i + 1}</span>
-                   <div>
-                     <span class="text-sm font-medium text-white">${escHtml(step.label || step.name || `Step ${i + 1}`)}</span>
-                     <span class="block text-xs text-slate-500 mt-0.5">${step.type === 'url' ? 'URL: ' : 'Event: '}${escHtml(step.value)}</span>
-                   </div>
-                 </div>`,
-          users: `<span class="text-sm font-medium text-white">${App.formatNumber(step.entered)}</span>`,
-          conversion: `<span class="text-sm font-medium ${i === 0 ? 'text-green-400' : parseFloat(step.conversionFromPrev) >= 70 ? 'text-green-400' : parseFloat(step.conversionFromPrev) >= 40 ? 'text-amber-400' : 'text-red-400'}">${convRate}</span>
-                       ${i > 0 ? `<span class="block text-xs text-slate-500 mt-0.5">${step.conversionFromFirst}% from first</span>` : ''}`,
-          dropoff: `<span class="text-sm text-slate-300">${App.formatNumber(dropOffCount)}</span>`,
-          dropoffRate: i === 0
-            ? '<span class="text-sm text-slate-500">--</span>'
-            : `<span class="text-sm font-medium text-red-400">${dropOffRate}</span>`,
-          actions: i > 0
-            ? `<a href="#sessions" onclick="event.preventDefault(); FunnelsPage.viewDropOff(${i})" class="text-xs text-blue-400 hover:text-blue-300 transition-colors cursor-pointer">View drop-off sessions</a>`
-            : '',
-        },
-      };
-    });
-
-    const tableHTML = `
-      <div class="mb-6">
-        <h3 class="text-sm font-semibold text-white mb-3">Step-by-Step Breakdown</h3>
-        ${Components.dataTable(tableHeaders, tableRows, { striped: true })}
-      </div>`;
-
-    // ── Summary metrics ──
-    const lastStep = steps[steps.length - 1];
-    const overallConv = lastStep ? lastStep.conversionFromFirst : '0';
-    const biggestDropIdx = steps.reduce((maxI, step, i) => {
-      if (i === 0) return maxI;
-      const rate = 100 - parseFloat(step.conversionFromPrev);
-      const maxRate = maxI === -1 ? -1 : (100 - parseFloat(steps[maxI].conversionFromPrev));
-      return rate > maxRate ? i : maxI;
-    }, -1);
-
-    const summaryHTML = `
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        ${Components.metricCard('Overall Conversion', `${overallConv}%`, null,
-          `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>`)}
-        ${Components.metricCard('Total Entries', App.formatNumber(firstCount), null,
-          `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>`)}
-        ${biggestDropIdx > 0 ? Components.metricCard('Biggest Drop-off', `Step ${biggestDropIdx + 1}: ${escHtml(steps[biggestDropIdx].label || steps[biggestDropIdx].name || '')}`, null,
-          `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>`)
-        : Components.metricCard('Completed', App.formatNumber(lastStep ? lastStep.entered - (lastStep.exited || 0) : 0), null,
-          `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`)}
-      </div>`;
-
-    container.innerHTML = `
-      <div>
-        ${headerHTML}
-        ${summaryHTML}
-        ${funnelBarsHTML}
-        ${tableHTML}
-      </div>`;
-  }
-
-  /* ------------------------------------------------------------------
      Edit Funnel Modal
   ------------------------------------------------------------------ */
   function showEditModal(funnelId) {
-    const f = activeFunnel || funnels.find(fn => fn.id === funnelId);
+    const f = (activeFunnel && activeFunnel.funnel) ? activeFunnel.funnel : funnels.find(fn => fn.id === funnelId);
     if (!f) return;
 
     const inputClass = 'w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50';
@@ -569,7 +715,9 @@ const FunnelsPage = (() => {
     }
 
     Components.closeModal();
-    await updateFunnel(funnelId, { name });
+    try {
+      await updateFunnel(funnelId, { name });
+    } catch (_) {}
 
     const container = document.getElementById('main-content');
     renderDetail(container, funnelId);
@@ -592,24 +740,10 @@ const FunnelsPage = (() => {
 
   async function executeDelete(funnelId) {
     Components.closeModal();
-    await deleteFunnel(funnelId);
+    try {
+      await deleteFunnel(funnelId);
+    } catch (_) {}
     App.navigate('funnels');
-  }
-
-  /* ------------------------------------------------------------------
-     View drop-off sessions (navigate to sessions with context)
-  ------------------------------------------------------------------ */
-  function viewDropOff(stepIndex) {
-    if (!activeFunnel || !activeFunnel.stepsData || !activeFunnel.stepsData[stepIndex]) return;
-    const step = activeFunnel.stepsData[stepIndex];
-    // Navigate to sessions, applying a URL filter from the step
-    if (step.type === 'url' || step.value.startsWith('/')) {
-      App.navigate('sessions');
-      Components.toast(`Showing sessions that dropped off at: ${step.label || step.name || step.value}`, 'info');
-    } else {
-      App.navigate('sessions');
-      Components.toast(`Showing sessions that dropped off at: ${step.label || step.name || step.value}`, 'info');
-    }
   }
 
   /* ------------------------------------------------------------------
@@ -640,7 +774,9 @@ const FunnelsPage = (() => {
     confirmEdit,
     confirmDelete,
     executeDelete,
-    viewDropOff,
+    setDateFrom,
+    setDateTo,
+    refreshDetail,
   };
 
 })();
