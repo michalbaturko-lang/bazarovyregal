@@ -205,6 +205,24 @@ router.post('/', async (req, res) => {
       });
     }
 
+    // --- Ensure project exists (sessions.project_id FK → projects.id) ---
+    // Auto-create the project row if it doesn't exist yet.
+    // This allows tracker snippets to "just work" without manual project setup.
+    {
+      const { error: projErr } = await supabase.from('projects')
+        .upsert({ id: projectId, name: projectId }, { onConflict: 'id', ignoreDuplicates: true });
+      if (projErr) {
+        // Try with more fields in case 'name' column doesn't exist or has different schema
+        console.warn('[events] Project upsert (id+name) failed:', projErr.message);
+        const { error: projErr2 } = await supabase.from('projects')
+          .upsert({ id: projectId }, { onConflict: 'id', ignoreDuplicates: true });
+        if (projErr2) {
+          console.error('[events] Project auto-create failed completely:', projErr2.message);
+          // Don't throw — let the session upsert try anyway (maybe FK is soft)
+        }
+      }
+    }
+
     // --- Ensure session exists (must happen BEFORE inserting events due to FK constraint) ---
     // Strategy: try full upsert → medium upsert → bare minimum upsert
     // This handles missing columns in the sessions table gracefully.
@@ -579,48 +597,57 @@ router.get('/debug-schema', async (req, res) => {
     results.events_error = e.message;
   }
 
-  // 3. Try a test session insert + delete to confirm writability
-  const testId = 'test-' + Date.now();
+  // 3. Check projects table columns
   try {
-    const { error: insertErr } = await supabase.from('sessions')
-      .insert({ id: testId, project_id: '_debug_test' });
-    if (insertErr) {
-      results.session_insert_test = 'FAILED: ' + insertErr.message;
+    const { data, error } = await supabase.from('projects').select('*').limit(1);
+    if (error) {
+      results.projects_error = error.message;
     } else {
-      results.session_insert_test = 'OK (minimal: id + project_id)';
-      // Clean up
-      await supabase.from('sessions').delete().eq('id', testId);
+      results.projects_columns = data && data.length > 0 ? Object.keys(data[0]) : 'table exists but empty';
     }
   } catch (e) {
-    results.session_insert_test = 'EXCEPTION: ' + e.message;
+    results.projects_error = e.message;
   }
 
-  // 4. Check if started_at has a default or is required
-  const testId2 = 'test2-' + Date.now();
+  // 4. Test full chain: create project → create session → create event → clean up
+  const testProjectId = '_debug_test_' + Date.now();
+  const testSessionId = 'test-sess-' + Date.now();
+
+  // Step A: Create project
   try {
-    const { error: insertErr } = await supabase.from('sessions')
-      .insert({ id: testId2, project_id: '_debug_test', started_at: new Date().toISOString() });
-    if (insertErr) {
-      results.session_insert_with_started_at = 'FAILED: ' + insertErr.message;
-    } else {
-      results.session_insert_with_started_at = 'OK';
-      await supabase.from('sessions').delete().eq('id', testId2);
-    }
+    const { error } = await supabase.from('projects')
+      .insert({ id: testProjectId, name: 'Debug Test' });
+    results.test_project_insert = error ? 'FAILED: ' + error.message : 'OK';
   } catch (e) {
-    results.session_insert_with_started_at = 'EXCEPTION: ' + e.message;
+    results.test_project_insert = 'EXCEPTION: ' + e.message;
   }
 
-  // 5. Try a test event insert (will fail on FK if session doesn't exist)
+  // Step B: Create session (requires project)
   try {
-    const { error: insertErr } = await supabase.from('events')
-      .insert({ session_id: testId, type: 0, timestamp: Date.now(), data: {} });
-    if (insertErr) {
-      results.event_insert_test = 'FAILED: ' + insertErr.message;
-    } else {
-      results.event_insert_test = 'OK';
-    }
+    const { error } = await supabase.from('sessions')
+      .insert({ id: testSessionId, project_id: testProjectId, started_at: new Date().toISOString() });
+    results.test_session_insert = error ? 'FAILED: ' + error.message : 'OK';
   } catch (e) {
-    results.event_insert_test = 'EXCEPTION: ' + e.message;
+    results.test_session_insert = 'EXCEPTION: ' + e.message;
+  }
+
+  // Step C: Create event (requires session)
+  try {
+    const { error } = await supabase.from('events')
+      .insert({ session_id: testSessionId, type: 0, timestamp: Date.now(), data: {} });
+    results.test_event_insert = error ? 'FAILED: ' + error.message : 'OK';
+  } catch (e) {
+    results.test_event_insert = 'EXCEPTION: ' + e.message;
+  }
+
+  // Clean up test data
+  try {
+    await supabase.from('events').delete().eq('session_id', testSessionId);
+    await supabase.from('sessions').delete().eq('id', testSessionId);
+    await supabase.from('projects').delete().eq('id', testProjectId);
+    results.test_cleanup = 'OK';
+  } catch (e) {
+    results.test_cleanup = 'FAILED: ' + e.message;
   }
 
   res.json({ debug_schema: results });
