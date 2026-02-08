@@ -58,18 +58,8 @@ const UsersPage = (() => {
       users = result.users || [];
       totalCount = result.total || 0;
     } catch (_) {
-      // Fallback to mock
-      let allUsers = generateMockUsers(78);
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        allUsers = allUsers.filter(u =>
-          (u.name && u.name.toLowerCase().includes(q)) ||
-          (u.email && u.email.toLowerCase().includes(q))
-        );
-      }
-      totalCount = allUsers.length;
-      const start = (currentPage - 1) * pageSize;
-      users = allUsers.slice(start, start + pageSize);
+      users = [];
+      totalCount = 0;
     }
   }
 
@@ -78,19 +68,7 @@ const UsersPage = (() => {
       const result = await App.api(`/users/${encodeURIComponent(userId)}`);
       return result;
     } catch (_) {
-      // Mock detail
-      const mockUsers = generateMockUsers(78);
-      const user = mockUsers.find(u => u.id === userId) || mockUsers[0];
-      const sessions = App.Mock.generateSessions(user.total_sessions || 5, 30);
-      return {
-        user,
-        sessions: sessions.map(s => ({
-          ...s,
-          identified_user_id: userId,
-          identified_user_email: user.email,
-          identified_user_name: user.name,
-        })),
-      };
+      return null;
     }
   }
 

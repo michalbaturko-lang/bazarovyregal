@@ -8,7 +8,7 @@ function generateToken(password) {
 function authMiddleware(req, res, next) {
   // Skip auth for these paths (tracker and event ingestion must be public)
   if (req.path === '/tracker.js' ||
-      req.path === '/api/events' ||
+      req.path === '/api/events' || req.path.startsWith('/api/events/') ||
       req.path === '/login' ||
       req.path === '/api/auth/login' ||
       req.path === '/api/auth/check' ||
