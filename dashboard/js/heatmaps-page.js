@@ -285,7 +285,8 @@ const HeatmapsPage = (() => {
   ------------------------------------------------------------------ */
   async function fetchPages() {
     try {
-      const data = await App.api('/heatmaps/pages?project_id=default');
+      const projectId = App.state.project || 'default';
+      const data = await App.api(`/heatmaps/pages?project_id=${encodeURIComponent(projectId)}`);
       pages = data.pages || [];
     } catch (_) {
       pages = mockPages();

@@ -162,7 +162,7 @@ router.post('/', async (req, res) => {
       const eventType = event.type !== undefined ? event.type : event.e;
       const eventTimestamp = event.timestamp || event.ts || Date.now();
       const eventData = event.data || event.d || null;
-      const eventUrl = event.url || null;
+      const eventUrl = event.url || event.u || null;
 
       // Track latest timestamp
       if (eventTimestamp > latestTimestamp) {

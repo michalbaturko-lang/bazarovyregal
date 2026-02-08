@@ -429,7 +429,8 @@
         e: type,
         t: relativeTime(),
         ts: now(),
-        d: data || {}
+        d: data || {},
+        u: window.location.href
       };
       this._buffer.push(event);
       if (this._buffer.length >= this._config.batchSize) {
