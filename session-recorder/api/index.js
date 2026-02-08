@@ -50,5 +50,7 @@ app.use('/api/alerts', require('../server/routes/alerts'));
 app.use('/api/retention', require('../server/routes/retention'));
 app.use('/api/revenue', require('../server/routes/revenue'));
 app.use('/api/tags', require('../server/routes/tags'));
+app.use('/api/surveys', require('../server/routes/surveys'));
+app.use('/api/goals', require('../server/routes/goals'));
 
 module.exports = app;

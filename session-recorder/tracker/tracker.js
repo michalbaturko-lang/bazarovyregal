@@ -374,6 +374,7 @@
       this._bindNavigation();
       this._trackScrollDepth();
       this._collectWebVitals();
+      this._loadSurveyWidget();
     },
 
     /** Stop recording – flush remaining data, tear down observers & listeners. */
@@ -1551,6 +1552,29 @@
     },
 
     _EVT: EVT
+  };
+
+  // ---- Survey Widget Loader ----
+  Recorder._loadSurveyWidget = function () {
+    try {
+      // Derive base URL from apiUrl (strip /api/events)
+      var baseUrl = this._config.apiUrl.replace(/\/api\/events\/?$/, '');
+      if (!baseUrl) return;
+      var script = document.createElement('script');
+      script.src = baseUrl + '/survey-widget.js';
+      script.async = true;
+      script.onload = function () {
+        if (window.RMLSurveyWidget) {
+          window.RMLSurveyWidget.init({
+            apiUrl: baseUrl,
+            visitorId: Recorder._visitorId || Recorder._sessionId,
+            sessionId: Recorder._sessionId,
+            projectId: Recorder._config.projectId
+          });
+        }
+      };
+      document.head.appendChild(script);
+    } catch (e) { /* best effort */ }
   };
 
   // Auto-initialize from data attributes on script tag

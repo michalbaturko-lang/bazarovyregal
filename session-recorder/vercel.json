@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/tracker.js", "destination": "/tracker/tracker.js" },
     { "source": "/consent-banner.js", "destination": "/tracker/consent-banner.js" },
+    { "source": "/survey-widget.js", "destination": "/tracker/survey-widget.js" },
     { "source": "/api/:path*", "destination": "/api/index.js" },
     { "source": "/login", "destination": "/dashboard/login.html" },
     { "source": "/login.html", "destination": "/dashboard/login.html" },
@@ -13,6 +14,13 @@
   "headers": [
     {
       "source": "/tracker.js",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/survey-widget.js",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Cache-Control", "value": "public, max-age=3600" }
