@@ -43,12 +43,44 @@ const SessionsPage = (() => {
     try {
       const params = new URLSearchParams({ page: currentPage, limit: pageSize, ...filters });
       const result = await App.api(`/sessions?${params}`);
-      sessions = result.sessions;
+      // Map API snake_case → camelCase used by templates
+      sessions = (result.sessions || []).map(mapSession);
       totalCount = result.total;
     } catch (_) {
       sessions = [];
       totalCount = 0;
     }
+  }
+
+  /** Transform API session (snake_case) → template format (camelCase) */
+  function mapSession(s) {
+    return {
+      id: s.id,
+      visitorId: s.visitor_id || 'anonymous',
+      email: s.identified_user_email || null,
+      name: s.identified_user_name || null,
+      browser: s.browser || '',
+      browserVersion: s.browser_version || '',
+      os: s.os || '',
+      device: s.device_type || '',
+      country: s.country || null,
+      city: s.city || null,
+      duration: s.duration || 0,
+      pageViews: s.page_count || 0,
+      pages: s.pages || [],
+      startedAt: s.started_at,
+      endedAt: s.ended_at,
+      rageClicks: s.has_rage_clicks ? (s.rage_click_count || 1) : 0,
+      errors: s.has_errors ? (s.error_count || 1) : 0,
+      eventCount: s.event_count || 0,
+      utmSource: s.utm_source || null,
+      utmMedium: s.utm_medium || null,
+      utmCampaign: s.utm_campaign || null,
+      url: s.url || '',
+      language: s.language || '',
+      // Keep raw fields too for detail view
+      _raw: s,
+    };
   }
 
   /* ------------------------------------------------------------------
@@ -377,7 +409,11 @@ const SessionsPage = (() => {
   async function renderDetail(container, sessionId) {
     let session;
     try {
-      session = await App.api(`/sessions/${sessionId}`);
+      const result = await App.api(`/sessions/${sessionId}`);
+      // API returns { session: {...}, events: [...] }
+      const rawSession = result.session || result;
+      session = mapSession(rawSession);
+      session.events = result.events || [];
     } catch (_) {
       container.innerHTML = Components.emptyState('Session Not Found', 'Could not load this session. It may have been deleted.');
       return;
