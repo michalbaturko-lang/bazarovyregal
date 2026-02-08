@@ -17,7 +17,7 @@ const FunnelsPage = (() => {
     try {
       funnels = await App.api('/funnels?project_id=default');
     } catch (_) {
-      funnels = App.Mock.funnelList();
+      funnels = [];
     }
   }
 
@@ -25,7 +25,7 @@ const FunnelsPage = (() => {
     try {
       activeFunnel = await App.api(`/funnels/${id}`);
     } catch (_) {
-      activeFunnel = App.Mock.funnelDetail(id);
+      activeFunnel = null;
     }
   }
 

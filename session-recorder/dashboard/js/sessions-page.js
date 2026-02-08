@@ -46,26 +46,8 @@ const SessionsPage = (() => {
       sessions = result.sessions;
       totalCount = result.total;
     } catch (_) {
-      // Fallback to mock
-      const allSessions = App.Mock.generateSessions(187, 14);
-      // Apply client-side filtering on mock data
-      let filtered = allSessions;
-      if (filters.browser) filtered = filtered.filter(s => s.browser === filters.browser);
-      if (filters.os) filtered = filtered.filter(s => s.os === filters.os);
-      if (filters.device) filtered = filtered.filter(s => s.device === filters.device);
-      if (filters.url) filtered = filtered.filter(s => s.pages.some(p => p.includes(filters.url)));
-      if (filters.hasRageClicks) filtered = filtered.filter(s => s.rageClicks > 0);
-      if (filters.hasErrors) filtered = filtered.filter(s => s.errors > 0);
-      if (filters.email) filtered = filtered.filter(s => s.email && s.email.toLowerCase().includes(filters.email.toLowerCase()));
-      if (filters.durationMin) filtered = filtered.filter(s => s.duration >= Number(filters.durationMin));
-      if (filters.durationMax) filtered = filtered.filter(s => s.duration <= Number(filters.durationMax));
-      if (filters.utmSource) filtered = filtered.filter(s => s.utmSource === filters.utmSource);
-      if (filters.utmMedium) filtered = filtered.filter(s => s.utmMedium === filters.utmMedium);
-      if (filters.utmCampaign) filtered = filtered.filter(s => s.utmCampaign && s.utmCampaign.includes(filters.utmCampaign));
-
-      totalCount = filtered.length;
-      const start = (currentPage - 1) * pageSize;
-      sessions = filtered.slice(start, start + pageSize);
+      sessions = [];
+      totalCount = 0;
     }
   }
 
@@ -397,10 +379,8 @@ const SessionsPage = (() => {
     try {
       session = await App.api(`/sessions/${sessionId}`);
     } catch (_) {
-      // Mock a single session
-      const allSessions = App.Mock.generateSessions(50, 7);
-      session = allSessions.find(s => s.id === sessionId) || allSessions[0];
-      session.id = sessionId;
+      container.innerHTML = Components.emptyState('Session Not Found', 'Could not load this session. It may have been deleted.');
+      return;
     }
 
     const s = session;
