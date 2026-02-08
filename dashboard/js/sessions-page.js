@@ -41,7 +41,24 @@ const SessionsPage = (() => {
   ------------------------------------------------------------------ */
   async function fetchSessions() {
     try {
-      const params = new URLSearchParams({ page: currentPage, limit: pageSize, ...filters });
+      // Map camelCase filter names to API snake_case query params
+      const apiFilters = {};
+      if (filters.dateFrom) apiFilters.date_from = filters.dateFrom;
+      if (filters.dateTo) apiFilters.date_to = filters.dateTo;
+      if (filters.durationMin) apiFilters.min_duration = filters.durationMin;
+      if (filters.durationMax) apiFilters.max_duration = filters.durationMax;
+      if (filters.browser) apiFilters.browser = filters.browser;
+      if (filters.os) apiFilters.os = filters.os;
+      if (filters.device) apiFilters.device_type = filters.device;
+      if (filters.url) apiFilters.url = filters.url;
+      if (filters.hasRageClicks) apiFilters.has_rage_clicks = 'true';
+      if (filters.hasErrors) apiFilters.has_errors = 'true';
+      if (filters.email) apiFilters.identified_user_email = filters.email;
+      if (filters.utmSource) apiFilters.utm_source = filters.utmSource;
+      if (filters.utmMedium) apiFilters.utm_medium = filters.utmMedium;
+      if (filters.utmCampaign) apiFilters.utm_campaign = filters.utmCampaign;
+
+      const params = new URLSearchParams({ project_id: App.state.project, page: currentPage, limit: pageSize, ...apiFilters });
       const result = await App.api(`/sessions?${params}`);
       // Map API snake_case → camelCase used by templates
       sessions = (result.sessions || []).map(mapSession);

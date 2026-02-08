@@ -533,11 +533,108 @@ const App = (() => {
     }
   }
 
+  /* ------------------------------------------------------------------
+     Project loader & selector
+  ------------------------------------------------------------------ */
+  async function loadProjects() {
+    try {
+      const result = await api('/projects');
+      const projects = result.projects || [];
+      state.availableProjects = projects;
+
+      if (projects.length > 0) {
+        // Set first real project as active (skip 'default' if there are others)
+        const realProject = projects.find(p => p.id !== 'default') || projects[0];
+        state.project = realProject.id;
+      }
+
+      renderProjectSelector();
+    } catch (err) {
+      console.warn('Failed to load projects:', err);
+      state.availableProjects = [];
+    }
+  }
+
+  function renderProjectSelector() {
+    const container = document.getElementById('project-selector');
+    if (!container) return;
+
+    const projects = state.availableProjects || [];
+    if (projects.length === 0) {
+      container.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">RM</div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-slate-200 truncate">No projects</p>
+            <p class="text-xs text-slate-500 truncate">Waiting for data...</p>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const options = projects.map(p => {
+      const isActive = p.id === state.project;
+      const domain = p.domain || p.id;
+      const initials = p.name ? p.name.substring(0, 2).toUpperCase() : p.id.substring(0, 2).toUpperCase();
+      return `
+        <button onclick="App.switchProject('${p.id}')"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${isActive ? 'bg-blue-600/20 border border-blue-500/30' : 'hover:bg-slate-800/60 border border-transparent'}">
+          <div class="w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+               style="background:hsl(${Math.abs([...p.id].reduce((h,c)=>(h<<5)-h+c.charCodeAt(0),0))%360},50%,40%)">
+            ${initials}
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-medium ${isActive ? 'text-blue-400' : 'text-slate-300'} truncate">${p.name || p.id}</p>
+            <p class="text-[10px] ${isActive ? 'text-blue-500/60' : 'text-slate-600'} truncate">${domain}</p>
+          </div>
+          ${isActive ? '<svg class="w-3.5 h-3.5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>' : ''}
+        </button>`;
+    }).join('');
+
+    const current = projects.find(p => p.id === state.project);
+    const currentInitials = current ? (current.name || current.id).substring(0, 2).toUpperCase() : 'RM';
+    const currentName = current ? (current.name || current.id) : 'Select Project';
+
+    container.innerHTML = `
+      <div class="relative">
+        <button onclick="document.getElementById('project-dropdown').classList.toggle('hidden')"
+                class="w-full flex items-center gap-3 px-1 py-1 rounded-lg hover:bg-slate-800/40 transition-colors">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+               style="background:hsl(${current ? Math.abs([...current.id].reduce((h,c)=>(h<<5)-h+c.charCodeAt(0),0))%360 : 220},50%,40%)">
+            ${currentInitials}
+          </div>
+          <div class="min-w-0 flex-1 text-left">
+            <p class="text-sm font-medium text-slate-200 truncate">${currentName}</p>
+            <p class="text-xs text-slate-500 truncate">${state.project}</p>
+          </div>
+          <svg class="w-4 h-4 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"/>
+          </svg>
+        </button>
+        <div id="project-dropdown" class="hidden absolute bottom-full left-0 right-0 mb-2 bg-slate-800 border border-slate-700/50 rounded-xl shadow-xl z-50 p-2 space-y-1 max-h-[280px] overflow-y-auto">
+          <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-600 px-3 py-1">Switch Project</p>
+          ${options}
+        </div>
+      </div>`;
+  }
+
+  function switchProject(projectId) {
+    state.project = projectId;
+    // Close dropdown
+    const dropdown = document.getElementById('project-dropdown');
+    if (dropdown) dropdown.classList.add('hidden');
+    // Re-render project selector
+    renderProjectSelector();
+    // Re-render current page
+    handleRouteChange();
+  }
+
   async function init() {
     const authed = await checkAuth();
     if (!authed) return;
     window.addEventListener('hashchange', handleRouteChange);
     initDateRange();
+    await loadProjects();
     handleRouteChange();
   }
 
@@ -551,6 +648,8 @@ const App = (() => {
     Mock,
     init,
     handleRouteChange,
+    switchProject,
+    loadProjects,
     formatDuration,
     formatNumber,
     formatDate,
