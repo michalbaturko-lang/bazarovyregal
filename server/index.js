@@ -62,6 +62,8 @@ app.use('/api/alerts', require('./routes/alerts'));
 app.use('/api/retention', require('./routes/retention'));
 app.use('/api/revenue', require('./routes/revenue'));
 app.use('/api/tags', require('./routes/tags'));
+app.use('/api/surveys', require('./routes/surveys'));
+app.use('/api/goals', require('./routes/goals'));
 
 // Serve dashboard (local dev only)
 app.use(express.static(path.join(__dirname, '..', 'dashboard')));

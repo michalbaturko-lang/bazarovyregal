@@ -47,6 +47,9 @@ const App = (() => {
     { pattern: /^#?retention$/,      page: 'retention',      params: [] },
     { pattern: /^#?alerts$/,         page: 'alerts',         params: [] },
     { pattern: /^#?tags$/,           page: 'tags',           params: [] },
+    { pattern: /^#?surveys$/,        page: 'surveys',        params: [] },
+    { pattern: /^#?goals$/,          page: 'goals',          params: [] },
+    { pattern: /^#?live$/,           page: 'live',           params: [] },
     { pattern: /^#?settings$/,       page: 'settings',       params: [] },
   ];
 
@@ -168,6 +171,15 @@ const App = (() => {
         break;
       case 'tags':
         TagsPage.render(container);
+        break;
+      case 'surveys':
+        SurveysPage.render(container);
+        break;
+      case 'goals':
+        GoalsPage.render(container);
+        break;
+      case 'live':
+        LivePage.render(container);
         break;
       case 'settings':
         renderSettingsPage(container);
