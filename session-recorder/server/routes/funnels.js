@@ -184,7 +184,7 @@ router.get('/:id', async (req, res) => {
       .eq('project_id', funnel.project_id);
 
     if (date_from) sessionQuery = sessionQuery.gte('started_at', date_from);
-    if (date_to)   sessionQuery = sessionQuery.lte('started_at', date_to);
+    if (date_to)   sessionQuery = sessionQuery.lte('started_at', date_to.length === 10 ? date_to + 'T23:59:59.999Z' : date_to);
 
     const { data: sessionRows, error: sessError } = await sessionQuery;
     if (sessError) throw sessError;
