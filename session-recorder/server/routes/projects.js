@@ -15,6 +15,23 @@ const projectDefaults = {
 };
 
 // ============================================================================
+// GET /api/projects — List all projects
+// ============================================================================
+router.get('/', async (req, res) => {
+  try {
+    const { data: projects, error } = await supabase.from('projects')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    res.json({ projects: projects || [] });
+  } catch (err) {
+    console.error('[projects] GET / error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================================
 // GET /api/projects/:id — Get project details
 // ============================================================================
 router.get('/:id', async (req, res) => {
