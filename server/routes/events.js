@@ -207,19 +207,33 @@ router.post('/', async (req, res) => {
 
     // --- Ensure project exists (sessions.project_id FK → projects.id) ---
     // Auto-create the project row if it doesn't exist yet.
-    // This allows tracker snippets to "just work" without manual project setup.
+    // Detect domain from session URL to set a meaningful project name.
     {
+      let detectedDomain = null;
+      let detectedName = projectId;
+      const firstUrl = (sessionUpsertData && sessionUpsertData.url) ||
+                       (events[0] && (events[0].url || events[0].u)) || null;
+      if (firstUrl) {
+        try {
+          const u = new URL(firstUrl);
+          detectedDomain = u.hostname.replace(/^www\./, '');
+          detectedName = detectedDomain.split('.')[0]
+            .split('-')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        } catch (_) { /* invalid URL */ }
+      }
+
+      const projectData = { id: projectId, name: detectedName };
+      if (detectedDomain) projectData.domain = detectedDomain;
+
       const { error: projErr } = await supabase.from('projects')
-        .upsert({ id: projectId, name: projectId }, { onConflict: 'id', ignoreDuplicates: true });
+        .upsert(projectData, { onConflict: 'id', ignoreDuplicates: true });
       if (projErr) {
-        // Try with more fields in case 'name' column doesn't exist or has different schema
-        console.warn('[events] Project upsert (id+name) failed:', projErr.message);
+        console.warn('[events] Project upsert failed:', projErr.message);
         const { error: projErr2 } = await supabase.from('projects')
           .upsert({ id: projectId }, { onConflict: 'id', ignoreDuplicates: true });
-        if (projErr2) {
-          console.error('[events] Project auto-create failed completely:', projErr2.message);
-          // Don't throw — let the session upsert try anyway (maybe FK is soft)
-        }
+        if (projErr2) console.error('[events] Project auto-create failed:', projErr2.message);
       }
     }
 

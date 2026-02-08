@@ -21,7 +21,7 @@ router.get('/stats', async (req, res) => {
       .eq('project_id', project_id);
 
     if (date_from) sessQuery = sessQuery.gte('started_at', date_from);
-    if (date_to)   sessQuery = sessQuery.lte('started_at', date_to);
+    if (date_to)   sessQuery = sessQuery.lte('started_at', date_to + 'T23:59:59.999Z');
 
     const { data: sessions, error } = await sessQuery;
     if (error) throw error;
