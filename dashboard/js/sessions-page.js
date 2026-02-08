@@ -249,56 +249,144 @@ const SessionsPage = (() => {
     document.getElementById('sessions-pagination').innerHTML = Components.pagination(currentPage, totalPages, 'SessionsPage.goToPage');
   }
 
+  /** Icon helpers for device/os/browser */
+  function _deviceIcon(type) {
+    const t = (type || '').toLowerCase();
+    if (t.includes('mobile') || t.includes('phone')) return '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>';
+    if (t.includes('tablet')) return '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5h3m-6.75 2.25h10.5a2.25 2.25 0 002.25-2.25V4.5a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 4.5v15a2.25 2.25 0 002.25 2.25z"/></svg>';
+    return '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25z"/></svg>';
+  }
+  function _osIcon(os) {
+    const o = (os || '').toLowerCase();
+    if (o.includes('windows')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M0 2.3l6.5-.9v6.3H0V2.3zm7.3-1l8.7-1.3v7.7H7.3V1.3zM16 8.7v7.6l-8.7-1.2V8.7H16zM6.5 15l-6.5-.9V8.7h6.5V15z"/></svg>';
+    if (o.includes('mac') || o.includes('ios')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M11.2 1.4c-.7.8-1.8 1.4-2.8 1.3-.1-1.1.4-2.3 1-3 .7-.8 1.9-1.4 2.9-1.4.1 1.1-.3 2.3-1.1 3.1zm1.1 1.6c-1.6-.1-3 .9-3.7.9-.8 0-2-.9-3.3-.8-1.7.1-3.3 1-4.1 2.5C-.6 8.8.7 14.1 2.4 16.3c.8 1.1 1.8 2.4 3.1 2.3 1.2-.1 1.7-.8 3.2-.8s1.9.8 3.2.7c1.3 0 2.2-1.1 3-2.2.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.8c0-2.4 2-3.6 2.1-3.6-1.2-1.7-3-1.9-3.5-1.9z"/></svg>';
+    if (o.includes('android')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M2.8 6v5.2c0 .7.5 1.2 1.2 1.2h.8v2.4c0 .7.5 1.2 1.2 1.2s1.2-.5 1.2-1.2v-2.4h1.6v2.4c0 .7.5 1.2 1.2 1.2s1.2-.5 1.2-1.2v-2.4h.8c.7 0 1.2-.5 1.2-1.2V6H2.8zm-1.6 0c-.7 0-1.2.5-1.2 1.2v4c0 .7.5 1.2 1.2 1.2S2.4 11.9 2.4 11.2v-4C2.4 6.5 1.9 6 1.2 6zm13.6 0c-.7 0-1.2.5-1.2 1.2v4c0 .7.5 1.2 1.2 1.2s1.2-.5 1.2-1.2v-4c0-.7-.5-1.2-1.2-1.2zM10.4 1l.9-1.5c.1-.1 0-.3-.1-.3-.1-.1-.3 0-.3.1L10 1c-.6-.3-1.3-.4-2-.4s-1.4.1-2 .4L5.1-.7c-.1-.1-.3-.2-.3-.1-.2.1-.2.2-.1.3L5.6 1C4.1 1.8 3 3.3 3 5.2h10c0-1.9-1.1-3.4-2.6-4.2zM5.6 3.6c-.3 0-.6-.3-.6-.6s.3-.6.6-.6.6.3.6.6-.3.6-.6.6zm4.8 0c-.3 0-.6-.3-.6-.6s.3-.6.6-.6.6.3.6.6-.3.6-.6.6z"/></svg>';
+    if (o.includes('linux')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C5.2 0 3.7 2.4 3.7 5.3c0 1.4.4 2.6.8 3.7.3.8.6 1.5.6 2.3 0 .5-.1 1-.4 1.5l-.3.5c-.4.6-.8 1.3-.8 2.1 0 .3.2.6.5.6h8.8c.3 0 .5-.3.5-.6 0-.8-.4-1.5-.8-2.1l-.3-.5c-.3-.5-.4-1-.4-1.5 0-.8.3-1.5.6-2.3.4-1.1.8-2.3.8-3.7C13.3 2.4 10.8 0 8 0z"/></svg>';
+    return '';
+  }
+  function _browserIcon(browser) {
+    const b = (browser || '').toLowerCase();
+    if (b.includes('chrome')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1a7 7 0 016.93 8H11a3 3 0 00-3-3V1z" opacity=".6"/><path d="M4.5 12.46A7 7 0 011 8h4a3 3 0 001.5 2.6l-2 3.86z" opacity=".4"/><path d="M11.5 12.46L9.5 8.6A3 3 0 008 11v4a7 7 0 003.5-2.54z" opacity=".3"/></svg>';
+    if (b.includes('firefox')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M14.8 4.4c-.5-1.2-1.6-2.3-2.3-2.7.7 1 1.1 2.1 1.2 2.7v.1c-.8-2-2.2-2.8-3.3-4.5-.1-.1-.1-.2-.2-.3 0-.1 0-.1-.1-.1.1 0 .1 0 0 0-1.8 1.1-2.4 3.1-2.5 4.1-.8.1-1.6.4-2.2.9 0 0-.1.1-.1.1.2.3.5.5.8.7-.6.5-1 1.1-1.2 1.9v.1c0 .1 0 .2-.1.3-.2 1-.1 2 .3 3C6.8 14 10 15.5 13 14c2.6-1.3 3.3-4.4 1.8-6.7.4-.7.2-2 0-2.9z"/></svg>';
+    if (b.includes('safari')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 10.5l1.2-3.8 3.8-1.2-1.2 3.8z"/></svg>';
+    if (b.includes('edge')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M14.5 8.2c0-.1.1-.5.1-.8 0-3.1-2.6-7.4-7.6-7.4C3.1 0 0 3.6 0 7.4c0 0 .4-3.4 4.6-3.4 3.9 0 5.3 3 5.3 4.5 0 1.6-1.5 3-3.5 3-3.1 0-3.8-2-3.8-2s.7 3.5 4.7 3.5c2.3 0 4.2-1.1 5.4-2.7.8-1 1.5-2.3 1.8-3.7v1.6z"/></svg>';
+    if (b.includes('opera')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 2.6C4.2 3.7 3.3 5.7 3.3 8s.9 4.3 2.2 5.4c-3-1.2-5-4.2-5-7.4C.5 3.6 1.7 1.4 3.6.3c.7-.2 1.3-.3 2-.3-.1 0-.1.1-.1.1-1.5.5-2.5 1.5-2.5 1.5s1.3-1 2.5-1C7 .6 8 .8 8.8 1.3c-1.2-.1-2.4.4-3.3 1.3zm5 5.4c0-2.3-.9-4.3-2.2-5.4C9.5.6 11 .3 12.4.3c.7 0 1.4.1 2 .3C16.3 1.4 15.5 3.6 15.5 6c0 3.2-2 6.2-5 7.4 1.3-1.1 2.2-3.1 2.2-5.4z"/></svg>';
+    if (b.includes('samsung')) return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M4 8h8" stroke="currentColor" stroke-width="1.2"/></svg>';
+    return '<svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="1.5"/></svg>';
+  }
+
   function renderSessionsTable() {
     const el = document.getElementById('sessions-table-container');
     if (!el) return;
 
-    const headers = [
-      { key: 'visitor', label: 'Visitor', width: '22%', sortable: true },
-      { key: 'location', label: 'Location', sortable: true },
-      { key: 'pages', label: 'Pages', align: 'center', sortable: true },
-      { key: 'duration', label: 'Duration', sortable: true },
-      { key: 'device', label: 'Device' },
-      { key: 'started', label: 'Started', sortable: true },
-      { key: 'flags', label: '', align: 'right', width: '70px' },
-    ];
+    if (sessions.length === 0) {
+      el.innerHTML = '<div class="text-center py-12 text-slate-500 text-sm">No sessions found</div>';
+      return;
+    }
 
-    const rows = sessions.map(s => ({
-      id: s.id,
-      onClick: `App.navigate('sessions/${s.id}')`,
-      cells: {
-        visitor: `<div class="flex items-center gap-2.5">
-                    ${Components.avatarPlaceholder(s.email || s.visitorId)}
-                    <div>
-                      <div class="text-sm font-medium text-slate-200 truncate max-w-[160px]">${s.email || s.visitorId}</div>
-                      ${s.name ? `<div class="text-xs text-slate-500">${s.name}</div>` : ''}
-                    </div>
-                  </div>`,
-        location: `<div class="text-sm">
-                     <span>${s.country ? App.countryFlag(s.country) : ''} ${s.city || 'Unknown'}</span>
-                   </div>`,
-        pages: `<span class="text-slate-300">${s.pageViews}</span>`,
-        duration: `<span class="text-slate-300 font-mono text-xs">${App.formatDuration(s.duration)}</span>`,
-        device: `<div class="flex items-center gap-2 text-slate-400">
-                   <span title="${s.device}">${Components.deviceIcon(s.device)}</span>
-                   ${Components.browserIcon(s.browser)}
-                   <span class="text-xs text-slate-500">${s.os}</span>
-                 </div>`,
-        started: `<span class="text-slate-400 text-sm">${Components.timeAgo(s.startedAt)}</span>`,
-        flags: `<div class="flex items-center gap-1.5">
-                  ${s.rageClicks ? `<span class="inline-flex items-center gap-1 text-yellow-400" title="${s.rageClicks} rage clicks">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59"/></svg>
-                    <span class="text-xs font-medium">${s.rageClicks}</span>
-                  </span>` : ''}
-                  ${s.errors ? `<span class="inline-flex items-center gap-1 text-red-400" title="${s.errors} errors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
-                    <span class="text-xs font-medium">${s.errors}</span>
-                  </span>` : ''}
-                </div>`,
-      },
-    }));
+    // Smartlook-style compact session rows
+    const rowsHtml = sessions.map((s, i) => {
+      const flag = s.country ? App.countryFlag(s.country) : '';
+      const loc = s.city || (s.country || '');
+      const d = new Date(s.startedAt);
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' +
+                      d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-    el.innerHTML = Components.dataTable(headers, rows, { hoverable: true, striped: true });
+      // UTM tags
+      const utmTags = [];
+      if (s.utmSource) utmTags.push(`source: ${s.utmSource}`);
+      if (s.utmMedium) utmTags.push(`medium: ${s.utmMedium}`);
+      if (s.utmCampaign) utmTags.push(`campaign: ${s.utmCampaign}`);
+
+      return `
+        <div class="group border-b border-slate-700/40 hover:bg-slate-800/60 transition-colors cursor-pointer ${i % 2 === 0 ? 'bg-slate-800/20' : ''}"
+             onclick="App.navigate('sessions/${s.id}')">
+          <div class="flex items-center gap-3 px-4 py-3">
+            <!-- Avatar + visitor info -->
+            <div class="flex items-center gap-3 min-w-[200px] max-w-[220px]">
+              ${Components.avatarPlaceholder(s.email || s.visitorId)}
+              <div class="min-w-0">
+                <div class="text-xs text-slate-200 font-medium truncate">${s.email || s.visitorId}</div>
+                ${s.name ? `<div class="text-[10px] text-slate-500 truncate">${s.name}</div>` : ''}
+              </div>
+            </div>
+
+            <!-- Play button -->
+            <a href="#sessions/${s.id}" onclick="event.stopPropagation()"
+               class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600/20 hover:bg-blue-600/40 flex items-center justify-center transition-colors" title="Play replay">
+              <svg class="w-3.5 h-3.5 text-blue-400 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </a>
+
+            <!-- Date -->
+            <div class="flex items-center gap-1.5 min-w-[130px] text-slate-400">
+              <svg class="w-3.5 h-3.5 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25"/></svg>
+              <span class="text-xs">${dateStr}</span>
+            </div>
+
+            <!-- Pages -->
+            <div class="flex items-center gap-1.5 min-w-[50px] text-slate-400" title="${s.pageViews} pages">
+              <svg class="w-3.5 h-3.5 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              <span class="text-xs font-medium text-slate-300">${s.pageViews}</span>
+            </div>
+
+            <!-- Duration -->
+            <div class="flex items-center gap-1.5 min-w-[65px] text-slate-400" title="Duration">
+              <svg class="w-3.5 h-3.5 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="text-xs font-mono text-slate-300">${App.formatDuration(s.duration)}</span>
+            </div>
+
+            <!-- Events -->
+            <div class="flex items-center gap-1.5 min-w-[45px] text-slate-400" title="${s.eventCount} events">
+              <svg class="w-3.5 h-3.5 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/></svg>
+              <span class="text-xs font-medium text-slate-300">${s.eventCount}</span>
+            </div>
+
+            <!-- Spacer -->
+            <div class="flex-1"></div>
+
+            <!-- Flags (rage/error) -->
+            ${s.rageClicks ? `<span class="inline-flex items-center gap-1 text-yellow-400 mr-1" title="${s.rageClicks} rage clicks">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672z"/></svg>
+            </span>` : ''}
+            ${s.errors ? `<span class="inline-flex items-center gap-1 text-red-400 mr-1" title="${s.errors} errors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+            </span>` : ''}
+
+            <!-- Device / OS / Browser icons -->
+            <div class="flex items-center gap-2 text-slate-500" title="${s.device} / ${s.os} / ${s.browser}">
+              <span>${_deviceIcon(s.device)}</span>
+              <span>${_osIcon(s.os)}</span>
+              <span>${_browserIcon(s.browser)}</span>
+            </div>
+
+            <!-- Country flag -->
+            <span class="text-base ml-1" title="${loc}">${flag || '<span class="text-slate-600 text-xs">--</span>'}</span>
+          </div>
+          ${utmTags.length > 0 ? `
+            <div class="flex items-center gap-2 px-4 pb-2 -mt-1">
+              <span class="text-[10px] font-semibold text-slate-500 uppercase">UTM</span>
+              ${utmTags.map(t => `<span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">${t}</span>`).join('')}
+            </div>
+          ` : ''}
+        </div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden">
+        <!-- Header -->
+        <div class="flex items-center gap-3 px-4 py-2.5 border-b border-slate-700/50 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+          <div class="min-w-[200px] max-w-[220px]">Visitor</div>
+          <div class="w-8"></div>
+          <div class="min-w-[130px]">Date</div>
+          <div class="min-w-[50px]">Pages</div>
+          <div class="min-w-[65px]">Duration</div>
+          <div class="min-w-[45px]">Events</div>
+          <div class="flex-1"></div>
+          <div>Device</div>
+          <div class="w-8 text-right">Loc</div>
+        </div>
+        ${rowsHtml}
+      </div>`;
   }
 
   /* ------------------------------------------------------------------
@@ -437,6 +525,25 @@ const SessionsPage = (() => {
     }
 
     const s = session;
+
+    // Extract visited pages from events
+    const visitedPages = [];
+    if (s.url) visitedPages.push(s.url);
+    if (session.events && session.events.length) {
+      for (const evt of session.events) {
+        const t = evt.type;
+        const d = typeof evt.data === 'string' ? JSON.parse(evt.data) : (evt.data || {});
+        // PAGE_NAVIGATION (type 14): {from, to}
+        if (t === 14 && d.to && !visitedPages.includes(d.to)) {
+          visitedPages.push(d.to);
+        }
+        // SESSION_START (type 0): {url}
+        if (t === 0 && d.url && !visitedPages.includes(d.url)) {
+          visitedPages.push(d.url);
+        }
+      }
+    }
+    s.pages = visitedPages;
 
     container.innerHTML = `
       <div>

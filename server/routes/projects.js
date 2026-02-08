@@ -24,9 +24,37 @@ router.get('/', async (req, res) => {
       .order('created_at', { ascending: true });
 
     if (error) throw error;
-    res.json({ projects: projects || [] });
+
+    // Filter out projects with 0 sessions (stale/duplicate entries)
+    const filtered = [];
+    for (const p of (projects || [])) {
+      const { count, error: cErr } = await supabase.from('sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('project_id', p.id);
+      if (!cErr && count > 0) {
+        p.session_count = count;
+        filtered.push(p);
+      }
+    }
+
+    res.json({ projects: filtered });
   } catch (err) {
     console.error('[projects] GET / error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================================
+// DELETE /api/projects/:id — Delete a project (and optionally its data)
+// ============================================================================
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase.from('projects').delete().eq('id', id);
+    if (error) throw error;
+    res.json({ success: true, deleted: id });
+  } catch (err) {
+    console.error('[projects] DELETE /:id error:', err);
     res.status(500).json({ error: err.message });
   }
 });
