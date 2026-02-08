@@ -302,9 +302,15 @@
       if (this._initialized) return;
       options = options || {};
 
+      var rawApiUrl = options.apiUrl || '/api/events';
+      // If apiUrl is a base URL (doesn't end with /api/events), append the path
+      if (rawApiUrl && rawApiUrl.indexOf('/api/events') === -1) {
+        rawApiUrl = rawApiUrl.replace(/\/+$/, '') + '/api/events';
+      }
+
       var config = {
         projectId:      options.projectId || '',
-        apiUrl:         options.apiUrl || '/api/events',
+        apiUrl:         rawApiUrl,
         maskAllInputs:  options.maskInputs !== undefined ? !!options.maskInputs : true,
         maskSelectors:  options.maskSelectors || [],
         sampleRate:     typeof options.sampleRate === 'number' ? options.sampleRate : 1.0,
