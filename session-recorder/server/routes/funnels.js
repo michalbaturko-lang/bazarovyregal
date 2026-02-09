@@ -41,7 +41,7 @@ const ECOMMERCE_STEPS = [
   { type: 'url', value: '/cart', name: 'Cart Page' },
   { type: 'url', value: '/shipment', name: 'Shipping & Payment' },
   { type: 'url', value: '/checkout', name: 'Checkout' },
-  { type: 'url', value: '/Order-received', name: 'Order Complete' },
+  { type: 'url', value: '/order-recieved', name: 'Order Complete' },
 ];
 
 // ============================================================================
@@ -61,7 +61,12 @@ router.post('/seed-ecommerce', async (req, res) => {
       .limit(1);
 
     if (existing && existing.length > 0) {
-      return res.json({ funnel: existing[0], message: 'E-commerce funnel already exists' });
+      // Update steps to latest template (fixes URL typos etc.)
+      await supabase.from('funnels')
+        .update({ steps: ECOMMERCE_STEPS, updated_at: new Date().toISOString() })
+        .eq('id', existing[0].id);
+      const { data: updated } = await supabase.from('funnels').select('*').eq('id', existing[0].id).single();
+      return res.json({ funnel: updated || existing[0], message: 'E-commerce funnel updated' });
     }
 
     const id = uuidv4();
