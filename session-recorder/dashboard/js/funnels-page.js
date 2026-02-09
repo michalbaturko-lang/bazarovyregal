@@ -109,21 +109,23 @@ const FunnelsPage = (() => {
     container.innerHTML = Components.loading();
     await fetchFunnels();
 
-    // Auto-seed e-commerce funnel if none exist
-    if (funnels.length === 0 && !seeding) {
+    // Always call seed to keep e-commerce funnel steps up-to-date (creates if missing, updates if exists)
+    if (!seeding) {
       seeding = true;
-      container.innerHTML = `
-        <div class="flex flex-col items-center justify-center py-20">
-          <div class="relative w-10 h-10 mb-4">
-            <div class="absolute inset-0 rounded-full border-2 border-slate-700"></div>
-            <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-500 animate-spin"></div>
-          </div>
-          <span class="text-sm text-slate-400">Setting up E-commerce Conversion Funnel...</span>
-        </div>`;
+      if (funnels.length === 0) {
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-20">
+            <div class="relative w-10 h-10 mb-4">
+              <div class="absolute inset-0 rounded-full border-2 border-slate-700"></div>
+              <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-500 animate-spin"></div>
+            </div>
+            <span class="text-sm text-slate-400">Setting up E-commerce Conversion Funnel...</span>
+          </div>`;
+      }
       const seedResult = await seedEcommerceFunnel();
       seeding = false;
       if (seedResult) {
-        Components.toast('E-commerce funnel created automatically', 'success');
+        if (funnels.length === 0) Components.toast('E-commerce funnel created automatically', 'success');
         await fetchFunnels();
       }
     }
