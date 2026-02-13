@@ -1,0 +1,369 @@
+{
+  "generated_at": "2026-02-13T22:10:59.292764",
+  "monthly_budget_czk": 5000,
+  "campaigns": [],
+  "projections": {
+    "monthly": {
+      "clicks": 0,
+      "impressions": 0,
+      "conversions": 0,
+      "revenue_czk": 0,
+      "cost_czk": 0,
+      "roas_pct": 0,
+      "profit_czk": 0
+    },
+    "by_campaign": []
+  },
+  "keywords": {
+    "high_intent": [
+      {
+        "keyword": "kovove regaly levne",
+        "est_cpc": 4.5,
+        "est_volume": 880,
+        "intent": "purchase"
+      },
+      {
+        "keyword": "regaly do garaze",
+        "est_cpc": 3.8,
+        "est_volume": 1200,
+        "intent": "purchase"
+      },
+      {
+        "keyword": "kovovy regal akce",
+        "est_cpc": 3.2,
+        "est_volume": 590,
+        "intent": "purchase"
+      },
+      {
+        "keyword": "regal do sklepa",
+        "est_cpc": 3.5,
+        "est_volume": 720,
+        "intent": "purchase"
+      },
+      {
+        "keyword": "kovove regaly vyprodej",
+        "est_cpc": 2.8,
+        "est_volume": 320,
+        "intent": "purchase"
+      },
+      {
+        "keyword": "regaly do dilny",
+        "est_cpc": 4.0,
+        "est_volume": 480,
+        "intent": "purchase"
+      },
+      {
+        "keyword": "skladove regaly levne",
+        "est_cpc": 5.2,
+        "est_volume": 390,
+        "intent": "purchase"
+      },
+      {
+        "keyword": "policovy regal kovovy",
+        "est_cpc": 3.0,
+        "est_volume": 260,
+        "intent": "purchase"
+      },
+      {
+        "keyword": "bezroubove regaly",
+        "est_cpc": 3.8,
+        "est_volume": 210,
+        "intent": "purchase"
+      },
+      {
+        "keyword": "regal 180x90x40",
+        "est_cpc": 2.5,
+        "est_volume": 170,
+        "intent": "purchase"
+      }
+    ],
+    "medium_intent": [
+      {
+        "keyword": "kovove regaly",
+        "est_cpc": 6.0,
+        "est_volume": 2400,
+        "intent": "research"
+      },
+      {
+        "keyword": "regaly na naradi",
+        "est_cpc": 3.5,
+        "est_volume": 480,
+        "intent": "research"
+      },
+      {
+        "keyword": "regaly do kancelare",
+        "est_cpc": 5.0,
+        "est_volume": 320,
+        "intent": "research"
+      },
+      {
+        "keyword": "zinkovane regaly",
+        "est_cpc": 3.0,
+        "est_volume": 260,
+        "intent": "research"
+      },
+      {
+        "keyword": "regaly do spize",
+        "est_cpc": 2.8,
+        "est_volume": 390,
+        "intent": "research"
+      },
+      {
+        "keyword": "nosnost regalu",
+        "est_cpc": 1.5,
+        "est_volume": 170,
+        "intent": "research"
+      },
+      {
+        "keyword": "regal na pneumatiky",
+        "est_cpc": 3.5,
+        "est_volume": 210,
+        "intent": "research"
+      },
+      {
+        "keyword": "jak vybrat regal",
+        "est_cpc": 1.0,
+        "est_volume": 140,
+        "intent": "research"
+      }
+    ],
+    "local_intent": [
+      {
+        "keyword": "kovove regaly praha",
+        "est_cpc": 4.0,
+        "est_volume": 320,
+        "intent": "local"
+      },
+      {
+        "keyword": "regaly brno",
+        "est_cpc": 3.5,
+        "est_volume": 210,
+        "intent": "local"
+      },
+      {
+        "keyword": "regaly ostrava",
+        "est_cpc": 3.0,
+        "est_volume": 140,
+        "intent": "local"
+      },
+      {
+        "keyword": "regaly plzen",
+        "est_cpc": 2.8,
+        "est_volume": 90,
+        "intent": "local"
+      },
+      {
+        "keyword": "kovove regaly olomouc",
+        "est_cpc": 2.5,
+        "est_volume": 70,
+        "intent": "local"
+      }
+    ],
+    "negative_keywords": [
+      "drevene regaly",
+      "ikea regaly",
+      "plastove regaly",
+      "knihovna",
+      "regal na boty",
+      "pouzite regaly",
+      "bazarove regaly pouzite",
+      "regal na stenu",
+      "nastenny regal",
+      "regaly bazar",
+      "paletove regaly",
+      "prujezdne regaly"
+    ]
+  },
+  "audience_signals": {
+    "custom_segments": [
+      {
+        "name": "Kutilove a domaci majstri",
+        "search_terms": [
+          "regaly do garaze",
+          "organizace garaze",
+          "ulozne systemy dilna",
+          "naradi organizace",
+          "jak zorganizovat garaz"
+        ],
+        "urls": [
+          "https://www.hornbach.cz",
+          "https://www.obi.cz",
+          "https://www.bauhaus.cz",
+          "https://www.mountfield.cz"
+        ]
+      },
+      {
+        "name": "E-shop provozovatele",
+        "search_terms": [
+          "skladove regaly",
+          "vybaveni skladu",
+          "regaly pro eshop",
+          "organizace skladu",
+          "jak zacinat s eshopem"
+        ],
+        "urls": [
+          "https://www.shoptet.cz",
+          "https://www.upgates.cz"
+        ]
+      },
+      {
+        "name": "Noví majitele domu/bytu",
+        "search_terms": [
+          "vybaveni garaze",
+          "organizace sklepa",
+          "regaly do bytu",
+          "stehovani",
+          "zarizeni domu"
+        ],
+        "urls": [
+          "https://www.sreality.cz",
+          "https://www.bezrealitky.cz"
+        ]
+      }
+    ],
+    "demographic_targets": [
+      {
+        "age": "25-34",
+        "reason": "Mladí majitelé domů, začínající podnikatelé"
+      },
+      {
+        "age": "35-54",
+        "reason": "Hlavní nakupující segment, DIY, firmy"
+      },
+      {
+        "age": "55-64",
+        "reason": "Seniori, organizace domácnosti"
+      }
+    ],
+    "life_events": [
+      "Nedávno se přestěhoval",
+      "Koupil nový dům/byt",
+      "Založení firmy"
+    ],
+    "interests": [
+      "DIY a kutilství",
+      "Domácí organizace",
+      "E-commerce a podnikání",
+      "Garáž a dílna"
+    ]
+  },
+  "landing_pages": {
+    "shopping_landing_pages": [
+      {
+        "url": "https://www.bazarovyregal.cz/katalog.html",
+        "purpose": "Hlavni katalogova stranka - default pro Shopping",
+        "tips": [
+          "Pridat filtrovani podle ceny, barvy, rozmeru",
+          "Zvyraznit 'Skladem' badge u vsech produktu",
+          "Pridat 'Pridat do kosiku' CTA na kazdou kartu"
+        ]
+      },
+      {
+        "url": "https://www.bazarovyregal.cz/regal-180x90x40-cerna.html",
+        "purpose": "Bestseller produkt - vysoke konverze",
+        "tips": [
+          "Pridat vice fotek (detail, rozmer, montaz)",
+          "Pridat video montaze",
+          "Zvyraznit 'BESTSELLER' a '875 kg nosnost'"
+        ]
+      }
+    ],
+    "pmax_landing_pages": [
+      {
+        "url": "https://www.bazarovyregal.cz/regaly-do-garaze.html",
+        "purpose": "Kategorie garaze - vysoka konverze"
+      },
+      {
+        "url": "https://www.bazarovyregal.cz/regaly-pro-firmy.html",
+        "purpose": "B2B segment - vyssi AOV"
+      },
+      {
+        "url": "https://www.bazarovyregal.cz/likvidace-skladu-regaly.html",
+        "purpose": "Urgency/akce stranka"
+      }
+    ],
+    "general_tips": [
+      "Zajistete, ze vsechny landing pages maji rychlost nacitani pod 3s (LCP)",
+      "Kazda stranka musi mit jasne CTA 'Do kosiku' / 'Objednat'",
+      "Mobilni verze musi byt plne funkcni (60%+ trafficu z mobilu)",
+      "Pridejte schema.org Product markup na vsechny produktove stranky",
+      "Implementujte remarketing tagy pro navstevniky kteri neprovedly konverzi"
+    ]
+  },
+  "tracking_setup": {
+    "step_1_gtag": {
+      "title": "Implementace Google Ads a GA4 tracking",
+      "description": "Pridejte gtag.js snippet do vsech stranek webu",
+      "code_location": "pseo_html_template.py (wrap_page funkce) + index.html",
+      "status": "IMPLEMENTED - viz gtag snippet v HTML sablonach"
+    },
+    "step_2_conversions": {
+      "title": "Nastaveni konverznich akci",
+      "actions": [
+        {
+          "name": "purchase",
+          "trigger": "Dokonceni objednavky na vyprodej-regalu.cz",
+          "note": "Toto vyzaduje spolupráci s Shoptet (vyprodej-regalu.cz) pro cross-domain tracking"
+        },
+        {
+          "name": "add_to_cart",
+          "trigger": "Klik na 'Do kosiku' tlacitko",
+          "note": "Implementovano v tracking.js pomoci gtag event"
+        },
+        {
+          "name": "view_item",
+          "trigger": "Navsteva produktove stranky",
+          "note": "Automaticky z GA4 enhanced measurement"
+        },
+        {
+          "name": "begin_checkout",
+          "trigger": "Presmerovani na vyprodej-regalu.cz kosik",
+          "note": "Mereno jako klik na externi odkaz do kosiku"
+        }
+      ]
+    },
+    "step_3_merchant_center": {
+      "title": "Google Merchant Center nastaveni",
+      "actions": [
+        "Vytvorte ucet na merchants.google.com",
+        "Overete vlastnictvi domeny bazarovyregal.cz",
+        "Nahrajte merchant_feed.xml (vygeneroval generate_merchant_feed.py)",
+        "Nastavte automaticky fetch feedu - URL: https://www.bazarovyregal.cz/merchant_feed.xml",
+        "Propojte Merchant Center s Google Ads uctem",
+        "Zkontrolujte diagnostiku - opravte pripadne errory"
+      ]
+    },
+    "step_4_google_ads": {
+      "title": "Google Ads nastaveni",
+      "actions": [
+        "Vytvorte kampane dle doporuceni z ads_optimizer.py",
+        "Nastavte konverzni akce (purchase, add_to_cart)",
+        "Importujte negativni klicova slova",
+        "Nastavte audience signals pro PMax",
+        "Aktivujte auto-tagging (GCLID)"
+      ]
+    },
+    "step_5_cross_domain": {
+      "title": "Cross-domain tracking (bazarovyregal.cz -> vyprodej-regalu.cz)",
+      "description": "Dulezite: nakupni proces probiha na vyprodej-regalu.cz",
+      "actions": [
+        "V GA4: Nastaveni > Data Streams > Configure your domains > pridat vyprodej-regalu.cz",
+        "Na vyprodej-regalu.cz: pridat stejny gtag.js snippet s vasim GA4 Measurement ID",
+        "Otestovat cross-domain pomoci GA4 DebugView"
+      ]
+    }
+  },
+  "benchmarks": {
+    "avg_cpc_shopping_czk": 3.5,
+    "avg_cpc_pmax_czk": 5.0,
+    "avg_cpc_search_czk": 8.0,
+    "avg_ctr_shopping": 0.018,
+    "avg_ctr_pmax": 0.025,
+    "avg_conversion_rate": 0.025,
+    "avg_order_value_czk": 800,
+    "avg_margin_pct": 0.3,
+    "min_daily_budget_shopping": 100,
+    "min_daily_budget_pmax": 150,
+    "recommended_learning_period_days": 14
+  }
+}

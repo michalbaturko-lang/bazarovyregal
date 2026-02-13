@@ -120,6 +120,31 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
     <meta name="twitter:description" content="{meta_desc}">
     <meta name="twitter:image" content="{og_image}">
     <link rel="canonical" href="{canonical_url}">
+    <!-- Google Ads & GA4 Tracking -->
+    <script src="tracking_config.js"></script>
+    <script>
+        (function(){{
+          var c = window.BAZAROVYREGAL_TRACKING || {{}};
+          var gaId = c.GA4_MEASUREMENT_ID || '';
+          var adsId = c.GOOGLE_ADS_ID || '';
+          if (gaId && gaId !== 'G-XXXXXXXXXX') {{
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+            document.head.appendChild(s);
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = function(){{dataLayer.push(arguments);}};
+            gtag('js', new Date());
+            gtag('config', gaId, {{
+              send_page_view: true,
+              linker: {{ domains: [c.CROSS_DOMAIN || 'vyprodej-regalu.cz'] }}
+            }});
+            if (adsId && adsId !== 'AW-XXXXXXXXX') {{
+              gtag('config', adsId);
+            }}
+          }}
+        }})();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -241,5 +266,6 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
     <button onclick="toggleChat()" class="bg-primary-500 hover:bg-primary-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-transform hover:scale-110">?</button>
 </div>
 <script src="chatbot.js"></script>
+<script src="tracking.js"></script>
 </body>
 </html>'''
