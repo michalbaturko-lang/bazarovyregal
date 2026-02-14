@@ -1,0 +1,245 @@
+================================================================================
+  IMPLEMENTAČNÍ DOKUMENTACE - Shoptet (vyprodej-regalu.cz)
+  Bazarovyregal.cz → Vyprodej-regalu.cz
+  Vytvořeno: 2026-02-14
+================================================================================
+
+== PŘEHLED ==
+
+Web bazarovyregal.cz slouží jako marketingový web. Nákupní proces (košík,
+objednávka, platba) probíhá na vyprodej-regalu.cz (Shoptet).
+
+Pro správné měření konverzí z Google Ads je nutné na obou doménách sdílet:
+  - Stejné GA4 Measurement ID
+  - Stejný Google Ads Conversion ID
+  - Cross-domain tracking (linker)
+
+
+== REÁLNÁ ID ==
+
+  GA4 Measurement ID:   G-X2JLKXMNZ4
+  GA4 Tag ID:           GT-M6QSN3QP
+  Google Ads Account:   398-835-2476
+  Google Ads Conv. ID:  AW-17952868610
+  Conversion Label:     LIcHCKyrsPgbEIKSzPBC
+  send_to:              AW-17952868610/LIcHCKyrsPgbEIKSzPBC
+  Merchant Center ID:   5725817120
+  Feed URL:             https://www.bazarovyregal.cz/merchant_feed.xml
+
+
+================================================================================
+  KROK 1: GA4 v Shoptet admin
+================================================================================
+
+  1. Přihlaste se do administrace Shoptet (vyprodej-regalu.cz)
+  2. Jděte do: Nastavení e-shopu → Kódy pro web → Google Analytics
+     (nebo: Marketing → Google Analytics)
+  3. Vložte Measurement ID:
+
+     G-X2JLKXMNZ4
+
+  4. Zapněte "Enhanced e-commerce tracking" pokud je k dispozici
+  5. Uložte nastavení
+
+  POZNÁMKA: Shoptet má vestavěnou integraci GA4, která automaticky posílá
+  e-commerce eventy (purchase, add_to_cart, view_item atd.)
+
+
+================================================================================
+  KROK 2: Google Ads Conversion Tag v Shoptet
+================================================================================
+
+  VARIANTA A - Shoptet integrovaná funkce (preferovaná):
+
+  1. Jděte do: Marketing → Google Ads (nebo Nastavení → Google služby)
+  2. Vložte Google Ads Conversion ID:
+
+     AW-17952868610
+
+  3. Vložte Conversion Label:
+
+     LIcHCKyrsPgbEIKSzPBC
+
+  4. Shoptet automaticky vloží conversion tag na thank-you stránku
+
+  VARIANTA B - Ruční vložení kódu (pokud Shoptet nemá integraci):
+
+  1. Jděte do: Nastavení e-shopu → Kódy pro web → Vlastní kódy
+  2. Do sekce "Patička" (nebo "Kódy na všech stránkách") vložte obsah souboru:
+
+     checkout_tracking_snippet.html
+
+  3. Tento soubor obsahuje:
+     - gtag.js s GA4 ID (G-X2JLKXMNZ4)
+     - Cross-domain linker config
+     - Purchase conversion event (send_to: AW-17952868610/LIcHCKyrsPgbEIKSzPBC)
+     - SHA-256 email hashing pro Enhanced Conversions
+     - Automatickou detekci Shoptet order dat
+
+
+================================================================================
+  KROK 3: Cross-domain tracking
+================================================================================
+
+  Cross-domain tracking je KRITICKÝ pro správné měření konverzí.
+  Uživatel přichází z bazarovyregal.cz → klikne "Do košíku" →
+  je přesměrován na vyprodej-regalu.cz.
+
+  BEZ cross-domain trackingu by GA4 viděl dva oddělené session místo jednoho.
+
+  NA BAZAROVYREGAL.CZ (již implementováno):
+  - gtag config obsahuje: linker: { domains: ['bazarovyregal.cz', 'vyprodej-regalu.cz'] }
+  - Linky na vyprodej-regalu.cz automaticky dostanou _gl parametr
+
+  NA VYPRODEJ-REGALU.CZ (nutno nastavit):
+  1. V GA4 admin (analytics.google.com):
+     - Jděte do: Admin → Data Streams → Web stream
+     - Klikněte na "Configure tag settings"
+     - Klikněte na "Configure your domains"
+     - Přidejte:
+       - bazarovyregal.cz
+       - vyprodej-regalu.cz
+     - Uložte
+
+  2. V Shoptet admin:
+     - Pokud používáte Variantu B (ruční kód):
+       checkout_tracking_snippet.html již obsahuje linker config
+       s accept_incoming: true
+     - Pokud používáte Variantu A (Shoptet integraci):
+       Shoptet by měl automaticky přijímat _gl parametr
+
+  TESTOVÁNÍ:
+  1. Otevřete bazarovyregal.cz v prohlížeči
+  2. Klikněte na "Do košíku" u jakéhokoliv produktu
+  3. Zkontrolujte URL na vyprodej-regalu.cz - měla by obsahovat ?_gl=... parametr
+  4. V GA4 DebugView ověřte, že oba page_view eventy mají stejné session_id
+
+
+================================================================================
+  KROK 4: Google Merchant Center
+================================================================================
+
+  Merchant Center Account: 5725817120
+
+  1. Přihlaste se na merchants.google.com
+  2. Ověření domény:
+     - Meta tag je přidán na bazarovyregal.cz:
+       <meta name="google-site-verification" content="tf9_fVpjoW3eTmTv--4Ut0Whqqg2kGXLQ64R5SSyCmE" />
+     - Po deployi na Vercel klikněte "Verify" v Merchant Center
+
+  3. Nahrání feedu:
+     - Jděte do: Products → Feeds → Add primary feed
+     - Country: Czech Republic
+     - Language: Czech
+     - Fetch method: Scheduled fetch
+     - URL: https://www.bazarovyregal.cz/merchant_feed.xml
+     - Fetch frequency: Daily
+     - Fetch time: 04:00 CET
+
+  4. Propojení s Google Ads:
+     - Jděte do: Settings → Linked accounts → Google Ads
+     - Propojte s účtem: 398-835-2476
+
+  5. Diagnostika:
+     - Po nahrání feedu zkontrolujte Products → Diagnostics
+     - Opravte případné chyby (missing images, wrong prices, etc.)
+
+
+================================================================================
+  KROK 5: Purchase Event (dynamická hodnota objednávky)
+================================================================================
+
+  Purchase conversion event posílá dynamickou hodnotu objednávky:
+
+  gtag('event', 'conversion', {
+    'send_to': 'AW-17952868610/LIcHCKyrsPgbEIKSzPBC',
+    'value': ORDER_VALUE,
+    'currency': 'CZK',
+    'transaction_id': ORDER_ID
+  });
+
+  Shoptet proměnné na thank-you stránce:
+  - shoptet.order.code       → ORDER_ID (číslo objednávky)
+  - shoptet.order.totalPrice → ORDER_VALUE (celková cena v CZK)
+  - shoptet.order.email      → email zákazníka (pro Enhanced Conversions)
+  - shoptet.order.products   → pole produktů
+
+  Soubor checkout_tracking_snippet.html automaticky čte tyto proměnné
+  a posílá purchase event s dynamickými hodnotami.
+
+
+================================================================================
+  KROK 6: Enhanced Conversions
+================================================================================
+
+  Enhanced Conversions umožňují Google Ads lépe přiřadit konverze díky
+  hashovanému emailu zákazníka.
+
+  1. V Google Ads:
+     - Jděte do: Goals → Conversions → Settings
+     - Zapněte "Enhanced conversions"
+     - Vyberte "Google tag" jako zdroj
+
+  2. Implementace:
+     - checkout_tracking_snippet.html automaticky hashuje email
+       zákazníka (SHA-256) a posílá ho přes gtag('set', 'user_data', {...})
+     - Na bazarovyregal.cz tracking.js sleduje email inputy
+       a hashuje je pro Enhanced Conversions
+
+
+================================================================================
+  KROK 7: Site Verification Meta Tag
+================================================================================
+
+  Meta tag pro Google Merchant Center verification je přidán do:
+
+  1. index.html (hlavní stránka bazarovyregal.cz)
+  2. pseo_html_template.py (všechny pSEO stránky)
+
+  Tag:
+  <meta name="google-site-verification" content="tf9_fVpjoW3eTmTv--4Ut0Whqqg2kGXLQ64R5SSyCmE" />
+
+  Po deployi na Vercel:
+  1. V Google Merchant Center klikněte "Verify" pro bazarovyregal.cz
+  2. V Google Search Console potvrďte vlastnictví domény
+
+
+================================================================================
+  TESTOVACÍ CHECKLIST
+================================================================================
+
+  [ ] 1. Otevřít bazarovyregal.cz → F12 → Console
+        → Ověřit: žádné gtag errory, GA4 beacon se posílá
+
+  [ ] 2. Kliknout na produkt → ověřit view_item event v GA4 DebugView
+
+  [ ] 3. Kliknout "Do košíku" → ověřit add_to_cart event
+        → Ověřit: URL na vyprodej-regalu.cz obsahuje _gl= parametr
+
+  [ ] 4. Dokončit testovací objednávku na vyprodej-regalu.cz
+        → Ověřit: purchase event v GA4 DebugView
+        → Ověřit: conversion v Google Ads (může trvat 24h)
+
+  [ ] 5. Google Merchant Center → Products → Diagnostics
+        → Ověřit: feed nahrán, žádné critical errory
+
+  [ ] 6. Google Ads → Tools → Conversions
+        → Ověřit: purchase conversion status = "Recording conversions"
+
+
+================================================================================
+  SOUBORY K DEPLOYI
+================================================================================
+
+  Na bazarovyregal.cz (Vercel):
+  - tracking_config.js     (aktualizované reálné ID)
+  - tracking.js            (cross-domain + Enhanced Conversions)
+  - index.html             (Google verification meta tag)
+  - merchant_feed.xml      (generován z generate_merchant_feed.py)
+  - Všechny pSEO stránky   (přegenerovat s novou šablonou)
+
+  Na vyprodej-regalu.cz (Shoptet):
+  - checkout_tracking_snippet.html (vložit do Shoptet admin → Kódy pro web)
+    NEBO použít vestavěnou Shoptet integraci pro GA4/Google Ads
+
+================================================================================

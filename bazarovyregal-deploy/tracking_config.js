@@ -17,11 +17,11 @@
  */
 
 window.BAZAROVYREGAL_TRACKING = {
-  // === FILL IN YOUR IDs HERE ===
-  GA4_MEASUREMENT_ID: 'G-XXXXXXXXXX',        // TODO: Replace with your GA4 Measurement ID
-  GOOGLE_ADS_ID: 'AW-XXXXXXXXX',             // TODO: Replace with your Google Ads Conversion ID
-  CONVERSION_LABEL_PURCHASE: 'XXXXXXXXXXX',   // TODO: Replace with purchase conversion label
-  CONVERSION_LABEL_ADD_TO_CART: 'XXXXXXXXXXX', // TODO: Replace with add-to-cart conversion label
+  // === REAL IDs (configured 2026-02-14) ===
+  GA4_MEASUREMENT_ID: 'G-X2JLKXMNZ4',
+  GOOGLE_ADS_ID: 'AW-17952868610',
+  CONVERSION_LABEL_PURCHASE: 'LIcHCKyrsPgbEIKSzPBC',
+  CONVERSION_LABEL_ADD_TO_CART: 'LIcHCKyrsPgbEIKSzPBC', // Same label for now, update when separate add_to_cart conversion is created
 
   // === CROSS-DOMAIN TRACKING ===
   // Both domains MUST share the same GA4 property and tracking IDs
