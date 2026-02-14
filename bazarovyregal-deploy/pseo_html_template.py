@@ -137,7 +137,7 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
             gtag('js', new Date());
             gtag('config', gaId, {{
               send_page_view: true,
-              linker: {{ domains: [c.CROSS_DOMAIN || 'vyprodej-regalu.cz'] }}
+              linker: {{ domains: c.LINKER_DOMAINS || ['bazarovyregal.cz', 'vyprodej-regalu.cz'] }}
             }});
             if (adsId && adsId !== 'AW-XXXXXXXXX') {{
               gtag('config', adsId);

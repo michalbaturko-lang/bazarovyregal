@@ -1,0 +1,154 @@
+<!--
+  ============================================================
+  CHECKOUT TRACKING SNIPPET pro vyprodej-regalu.cz (Shoptet)
+  ============================================================
+
+  INSTRUKCE PRO NASAZENÍ:
+  1. Zkopírujte celý obsah tohoto souboru
+  2. V administraci Shoptet jděte do: Nastavení > Kódy pro web > Patička
+     (nebo: Nastavení > Google > Vlastní kódy)
+  3. Vložte kód do patičky webu
+
+  DŮLEŽITÉ:
+  - Nahraďte GA4_MEASUREMENT_ID vaším GA4 ID (formát: G-XXXXXXXXXX)
+  - Nahraďte GOOGLE_ADS_ID vaším Google Ads ID (formát: AW-XXXXXXXXX)
+  - Nahraďte CONVERSION_LABEL_PURCHASE vaším conversion labelem
+  - Tento snippet MUSÍ sdílet stejné GA4 property jako bazarovyregal.cz
+    pro funkční cross-domain tracking
+
+  SHOPTET PROMĚNNÉ:
+  Shoptet poskytuje na thank-you stránce tyto proměnné:
+  - shoptet.order.code        = číslo objednávky
+  - shoptet.order.totalPrice  = celková cena v CZK
+  - shoptet.order.email       = email zákazníka
+  - shoptet.order.products    = pole produktů
+  ============================================================
+-->
+
+<!-- Google tag (gtag.js) - SAME property as bazarovyregal.cz -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // === FILL IN YOUR IDs (must match bazarovyregal.cz tracking_config.js) ===
+  var GA4_ID = 'G-XXXXXXXXXX';           // TODO: Replace with GA4 Measurement ID
+  var ADS_ID = 'AW-XXXXXXXXX';           // TODO: Replace with Google Ads Conversion ID
+  var CONV_LABEL = 'XXXXXXXXXXX';         // TODO: Replace with purchase conversion label
+
+  // GA4 config with cross-domain linker (MUST match bazarovyregal.cz)
+  gtag('config', GA4_ID, {
+    send_page_view: true,
+    linker: {
+      domains: ['bazarovyregal.cz', 'vyprodej-regalu.cz'],
+      accept_incoming: true
+    }
+  });
+
+  // Google Ads config
+  if (ADS_ID && ADS_ID !== 'AW-XXXXXXXXX') {
+    gtag('config', ADS_ID);
+  }
+
+  // ============================================================
+  // SHA-256 hash for Enhanced Conversions
+  // ============================================================
+  function sha256ForEC(str) {
+    if (typeof crypto !== 'undefined' && crypto.subtle) {
+      var buffer = new TextEncoder().encode(str.trim().toLowerCase());
+      return crypto.subtle.digest('SHA-256', buffer).then(function(hash) {
+        return Array.from(new Uint8Array(hash))
+          .map(function(b) { return b.toString(16).padStart(2, '0'); })
+          .join('');
+      });
+    }
+    return Promise.resolve(str.trim().toLowerCase());
+  }
+
+  // ============================================================
+  // PURCHASE EVENT - fires on Shoptet thank-you page
+  // ============================================================
+  function trackShoptetPurchase() {
+    // Check if we're on the thank-you/order-complete page
+    if (typeof shoptet === 'undefined' || !shoptet.order) {
+      return;
+    }
+
+    var order = shoptet.order;
+    var orderId = order.code || ('ORD-' + Date.now());
+    var totalValue = parseFloat(order.totalPrice) || 0;
+    var customerEmail = order.email || '';
+
+    // Build items array from Shoptet order
+    var items = [];
+    if (order.products && order.products.length > 0) {
+      order.products.forEach(function(product, index) {
+        items.push({
+          item_id: product.code || ('item-' + index),
+          item_name: product.name || 'Regál',
+          price: parseFloat(product.price) || 0,
+          quantity: parseInt(product.amount) || 1,
+          currency: 'CZK',
+          item_brand: 'BazarovyRegal',
+          item_category: 'Kovove regaly'
+        });
+      });
+    }
+
+    // Enhanced Conversions: hash and set email
+    if (customerEmail) {
+      sha256ForEC(customerEmail).then(function(hashed) {
+        gtag('set', 'user_data', {
+          sha256_email_address: hashed
+        });
+
+        // Fire purchase AFTER user_data is set
+        firePurchaseEvents(orderId, totalValue, items);
+      });
+    } else {
+      firePurchaseEvents(orderId, totalValue, items);
+    }
+  }
+
+  function firePurchaseEvents(orderId, totalValue, items) {
+    // GA4 purchase event
+    gtag('event', 'purchase', {
+      transaction_id: orderId,
+      value: totalValue,
+      currency: 'CZK',
+      items: items
+    });
+
+    // Google Ads purchase conversion
+    if (ADS_ID && ADS_ID !== 'AW-XXXXXXXXX' && CONV_LABEL && CONV_LABEL !== 'XXXXXXXXXXX') {
+      gtag('event', 'conversion', {
+        send_to: ADS_ID + '/' + CONV_LABEL,
+        transaction_id: orderId,
+        value: totalValue,
+        currency: 'CZK'
+      });
+    }
+
+    console.log('[BR-Checkout] Purchase tracked:', orderId, totalValue + ' CZK', items.length + ' items');
+  }
+
+  // ============================================================
+  // Initialize - wait for Shoptet to load order data
+  // ============================================================
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(trackShoptetPurchase, 500);
+    });
+  } else {
+    setTimeout(trackShoptetPurchase, 500);
+  }
+
+  // Also listen for Shoptet's custom event (if available)
+  if (typeof shoptet !== 'undefined' && shoptet.scripts) {
+    shoptet.scripts.signalCustomEvent('OrderCreated');
+  }
+  document.addEventListener('ShoptetOrderCreated', function() {
+    trackShoptetPurchase();
+  });
+</script>

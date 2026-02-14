@@ -3,10 +3,12 @@
  *
  * Tracks key user interactions for campaign optimization:
  * - Product views (view_item)
- * - Add to cart clicks (add_to_cart)
+ * - Add to cart clicks (add_to_cart) + Google Ads conversion
  * - CTA button clicks (select_content)
  * - Catalog views (view_item_list)
  * - Outbound links to checkout domain (begin_checkout)
+ * - Cross-domain link decoration (bazarovyregal.cz <-> vyprodej-regalu.cz)
+ * - Enhanced Conversions setup (hashed email at purchase)
  *
  * Loaded after gtag.js and tracking_config.js
  */
@@ -31,6 +33,78 @@
     }
     log('Event:', eventName, params);
     gtag('event', eventName, params);
+  }
+
+  // ============================================================
+  // SHA-256 hash for Enhanced Conversions
+  // ============================================================
+
+  function sha256(str) {
+    if (typeof crypto !== 'undefined' && crypto.subtle) {
+      var buffer = new TextEncoder().encode(str.trim().toLowerCase());
+      return crypto.subtle.digest('SHA-256', buffer).then(function (hash) {
+        return Array.from(new Uint8Array(hash))
+          .map(function (b) { return b.toString(16).padStart(2, '0'); })
+          .join('');
+      });
+    }
+    // Fallback: return raw (gtag will hash if needed)
+    return Promise.resolve(str.trim().toLowerCase());
+  }
+
+  // ============================================================
+  // Enhanced Conversions - set user data when available
+  // ============================================================
+
+  function setupEnhancedConversions() {
+    if (typeof gtag !== 'function') return;
+
+    // Listen for email inputs across the site
+    var emailInputs = document.querySelectorAll(
+      'input[type="email"], input[name="email"], input[name*="mail"], input[id*="mail"]'
+    );
+
+    emailInputs.forEach(function (input) {
+      input.addEventListener('change', function () {
+        var email = input.value.trim().toLowerCase();
+        if (email && email.indexOf('@') > 0) {
+          sha256(email).then(function (hashed) {
+            gtag('set', 'user_data', {
+              sha256_email_address: hashed
+            });
+            log('Enhanced Conversions: email hashed and set');
+          });
+        }
+      });
+    });
+
+    log('Enhanced Conversions: initialized');
+  }
+
+  // ============================================================
+  // Cross-domain link decoration
+  // ============================================================
+
+  function setupCrossDomainLinks() {
+    var linkerDomains = config.LINKER_DOMAINS || ['bazarovyregal.cz', 'vyprodej-regalu.cz'];
+
+    // Decorate all links to linker domains with _gl parameter
+    linkerDomains.forEach(function (domain) {
+      // Skip current domain
+      if (window.location.hostname.indexOf(domain) > -1) return;
+
+      var links = document.querySelectorAll('a[href*="' + domain + '"]');
+      links.forEach(function (link) {
+        // gtag linker handles decoration automatically via config,
+        // but ensure links have proper target attribute for tracking
+        if (!link.getAttribute('data-br-tracked')) {
+          link.setAttribute('data-br-tracked', 'cross-domain');
+          log('Cross-domain link decorated:', link.href);
+        }
+      });
+    });
+
+    log('Cross-domain tracking: initialized for domains:', linkerDomains.join(', '));
   }
 
   // ============================================================
@@ -111,7 +185,7 @@
   }
 
   // ============================================================
-  // Track CTA button clicks
+  // Track CTA button clicks (add_to_cart + Google Ads conversion)
   // ============================================================
 
   function trackCTAClicks() {
@@ -125,20 +199,34 @@
       if (text.indexOf('ko') > -1 || text.indexOf('cart') > -1 ||
           text.indexOf('objednat') > -1 || text.indexOf('koupit') > -1) {
         btn.addEventListener('click', function () {
-          // Track add_to_cart
+          // Extract product data from page context
+          var h1 = document.querySelector('h1');
+          var priceEl = document.querySelector('.text-primary-600, .text-3xl.font-bold');
+          var price = priceEl ? parseFloat(priceEl.textContent.replace(/[^\d]/g, '')) : 0;
+          var name = h1 ? h1.textContent.trim() : 'Unknown';
+          var id = window.location.pathname.replace('.html', '').replace(/\//g, '') || 'unknown';
+
+          // Track add_to_cart with full item data
           sendEvent('add_to_cart', {
             currency: config.CURRENCY || 'CZK',
+            value: price,
             items: [{
-              item_name: document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : 'Unknown',
+              item_id: id,
+              item_name: name,
+              price: price,
+              currency: config.CURRENCY || 'CZK',
               item_brand: 'BazarovyRegal',
+              item_category: 'Kovove regaly',
             }],
           });
 
-          // Also send Google Ads conversion
+          // Also send Google Ads conversion for add_to_cart
           if (config.GOOGLE_ADS_ID && config.CONVERSION_LABEL_ADD_TO_CART &&
               config.GOOGLE_ADS_ID !== 'AW-XXXXXXXXX') {
-            gtag('event', 'conversion', {
+            sendEvent('conversion', {
               send_to: config.GOOGLE_ADS_ID + '/' + config.CONVERSION_LABEL_ADD_TO_CART,
+              value: price,
+              currency: config.CURRENCY || 'CZK',
             });
           }
         });
@@ -162,31 +250,43 @@
   }
 
   // ============================================================
-  // Track outbound links to checkout domain
+  // Track outbound links to checkout domain (begin_checkout)
   // ============================================================
 
   function trackOutboundLinks() {
-    var crossDomain = config.CROSS_DOMAIN || 'vyprodej-regalu.cz';
-    var links = document.querySelectorAll('a[href*="' + crossDomain + '"]');
+    var linkerDomains = config.LINKER_DOMAINS || ['bazarovyregal.cz', 'vyprodej-regalu.cz'];
 
-    links.forEach(function (link) {
-      link.addEventListener('click', function () {
-        sendEvent('begin_checkout', {
-          currency: config.CURRENCY || 'CZK',
-          items: [{
-            item_name: document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : 'Checkout',
-            item_brand: 'BazarovyRegal',
-          }],
+    linkerDomains.forEach(function (domain) {
+      // Skip current domain
+      if (window.location.hostname.indexOf(domain) > -1) return;
+
+      var links = document.querySelectorAll('a[href*="' + domain + '"]');
+      links.forEach(function (link) {
+        link.addEventListener('click', function () {
+          var h1 = document.querySelector('h1');
+          var priceEl = document.querySelector('.text-primary-600, .text-3xl.font-bold');
+          var price = priceEl ? parseFloat(priceEl.textContent.replace(/[^\d]/g, '')) : 0;
+
+          sendEvent('begin_checkout', {
+            currency: config.CURRENCY || 'CZK',
+            value: price,
+            items: [{
+              item_name: h1 ? h1.textContent.trim() : 'Checkout',
+              price: price,
+              currency: config.CURRENCY || 'CZK',
+              item_brand: 'BazarovyRegal',
+            }],
+          });
+          log('Outbound click to: ' + link.href);
         });
-        log('Outbound click to: ' + link.href);
       });
-    });
 
-    log('Outbound tracking: ' + links.length + ' links to ' + crossDomain);
+      log('Outbound tracking: ' + links.length + ' links to ' + domain);
+    });
   }
 
   // ============================================================
-  // Track catalog/list views
+  // Track catalog/list views (view_item_list)
   // ============================================================
 
   function trackCatalogView() {
@@ -260,6 +360,72 @@
   }
 
   // ============================================================
+  // Purchase tracking helper (called from checkout domain snippet)
+  // ============================================================
+
+  // Expose a global function for purchase tracking from vyprodej-regalu.cz
+  window.BR_trackPurchase = function (purchaseData) {
+    /*
+     * purchaseData = {
+     *   transaction_id: 'ORD-12345',
+     *   value: 1478,         // total in CZK
+     *   items: [
+     *     { item_id: 'regal-180x90x40-cerna', item_name: '...', price: 739, quantity: 2 }
+     *   ],
+     *   email: 'customer@example.com'  // optional, for Enhanced Conversions
+     * }
+     */
+    if (typeof gtag !== 'function') {
+      log('gtag not available for purchase tracking');
+      return;
+    }
+
+    var currency = config.CURRENCY || 'CZK';
+    var items = (purchaseData.items || []).map(function (item) {
+      return {
+        item_id: item.item_id || '',
+        item_name: item.item_name || '',
+        price: item.price || 0,
+        quantity: item.quantity || 1,
+        currency: currency,
+        item_brand: 'BazarovyRegal',
+        item_category: 'Kovove regaly',
+      };
+    });
+
+    // Enhanced Conversions: hash and set email if provided
+    if (purchaseData.email) {
+      sha256(purchaseData.email).then(function (hashed) {
+        gtag('set', 'user_data', {
+          sha256_email_address: hashed
+        });
+        log('Enhanced Conversions: email set for purchase');
+      });
+    }
+
+    // GA4 purchase event
+    sendEvent('purchase', {
+      transaction_id: purchaseData.transaction_id,
+      value: purchaseData.value,
+      currency: currency,
+      items: items,
+    });
+
+    // Google Ads purchase conversion
+    if (config.GOOGLE_ADS_ID && config.CONVERSION_LABEL_PURCHASE &&
+        config.GOOGLE_ADS_ID !== 'AW-XXXXXXXXX') {
+      sendEvent('conversion', {
+        send_to: config.GOOGLE_ADS_ID + '/' + config.CONVERSION_LABEL_PURCHASE,
+        transaction_id: purchaseData.transaction_id,
+        value: purchaseData.value,
+        currency: currency,
+      });
+    }
+
+    log('Purchase tracked:', purchaseData.transaction_id, purchaseData.value + ' ' + currency);
+  };
+
+  // ============================================================
   // Initialize all tracking
   // ============================================================
 
@@ -267,6 +433,8 @@
     log('Initializing tracking...');
     log('Config:', config);
 
+    setupCrossDomainLinks();
+    setupEnhancedConversions();
     trackProductPageView();
     trackProductClicks();
     trackCTAClicks();

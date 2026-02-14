@@ -11,7 +11,9 @@
  * 3. Replace CONVERSION_LABEL with your conversion label
  *    - Get it from: Google Ads > Tools > Conversions > Tag setup
  *
- * 4. Deploy the updated file to your website
+ * 4. Deploy the updated file to BOTH domains:
+ *    - bazarovyregal.cz (this site)
+ *    - vyprodej-regalu.cz (checkout site)
  */
 
 window.BAZAROVYREGAL_TRACKING = {
@@ -21,8 +23,11 @@ window.BAZAROVYREGAL_TRACKING = {
   CONVERSION_LABEL_PURCHASE: 'XXXXXXXXXXX',   // TODO: Replace with purchase conversion label
   CONVERSION_LABEL_ADD_TO_CART: 'XXXXXXXXXXX', // TODO: Replace with add-to-cart conversion label
 
-  // === CONFIGURATION (adjust as needed) ===
+  // === CROSS-DOMAIN TRACKING ===
+  // Both domains MUST share the same GA4 property and tracking IDs
+  LINKER_DOMAINS: ['bazarovyregal.cz', 'vyprodej-regalu.cz'],
+
+  // === CONFIGURATION ===
   CURRENCY: 'CZK',
-  CROSS_DOMAIN: 'vyprodej-regalu.cz',        // Cart/checkout domain
   DEBUG_MODE: false,                           // Set true for testing (logs events to console)
 };
