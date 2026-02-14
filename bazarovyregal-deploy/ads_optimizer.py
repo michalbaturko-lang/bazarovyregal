@@ -2,706 +2,1005 @@
 """
 Google Ads Campaign Optimizer for Bazarovyregal.cz
 
-Comprehensive tool for planning and optimizing Google Ads campaigns
-(Shopping + Performance Max) with focus on minimizing CPC while
-maximizing traffic.
+Start budget: 5 000 CZK/DEN
+Ceiling: 100 000 CZK/DEN (škálování na základě PNO výsledků)
+Target: tROAS 667% (PNO 15%)
+
+Ramp-up (na základě PNO výsledků):
+  Phase 1 (Týden 1-2):   5K/den  – Manual CPC, sbíráme data
+  Phase 2 (30+ konverzí): 5K/den  – Přepínáme na tROAS 667%
+  Phase 3 (PNO < 15%):  10K/den  – Škálujeme 2x
+  Phase 4 (PNO < 15%):  20K/den  – Přidáváme PMax
+  Phase 5 (PNO < 12%):  50K/den  – Plný Shopping + PMax + Search
+  Phase 6 (PNO < 10%): 100K/den  – Maximum scale
+
+Starting structure (5K/den):
+  Shopping (2 500 Kč/den) – Manual CPC → tROAS 667%
+  PMax     (1 500 Kč/den) – Maximize conversions → tROAS 667%
+  Search Brand (1 000 Kč/den) – Maximize clicks
 
 Usage:
-    python3 ads_optimizer.py                    # Full analysis report
-    python3 ads_optimizer.py --budget 5000      # Analysis with 5000 CZK monthly budget
-    python3 ads_optimizer.py --format json      # Output as JSON
-
-Outputs:
-    - Campaign structure recommendations
-    - Budget allocation strategy
-    - Keyword research & suggestions
-    - Audience signals for PMax
-    - ROI projections
-    - Landing page optimization tips
+    python3 ads_optimizer.py                     # Full report (Phase 1)
+    python3 ads_optimizer.py --phase 3           # Show Phase 3 budgets
+    python3 ads_optimizer.py --format json       # JSON export
+    python3 ads_optimizer.py --format csv        # Google Ads Editor CSV
 """
 
 import json
+import csv
 import sys
 import os
 from datetime import datetime
 
-from pseo_config import BASE_URL, PRODUCTS, CATEGORIES, LOCATIONS, PERSONAS, COLORS
-
+from pseo_config import BASE_URL
 
 # ============================================================
-# MARKET DATA - Czech e-commerce benchmarks (2025-2026)
+# CORE PARAMETERS
 # ============================================================
 
-BENCHMARKS = {
-    "avg_cpc_shopping_czk": 3.50,       # Average CPC for Shopping in CZ (home & garden)
-    "avg_cpc_pmax_czk": 5.00,           # Average CPC for PMax in CZ
-    "avg_cpc_search_czk": 8.00,         # Average CPC for Search in CZ
-    "avg_ctr_shopping": 0.018,           # 1.8% CTR for Shopping
-    "avg_ctr_pmax": 0.025,              # 2.5% CTR for PMax
-    "avg_conversion_rate": 0.025,        # 2.5% conversion rate for e-commerce CZ
-    "avg_order_value_czk": 800,          # Estimated AOV for shelving
-    "avg_margin_pct": 0.30,              # 30% margin estimate
-    "min_daily_budget_shopping": 50,      # Min daily budget CZK for Shopping
-    "min_daily_budget_pmax": 50,          # Min daily budget CZK for PMax
-    "recommended_learning_period_days": 14,  # Google Ads learning period
+STARTING_DAILY_BUDGET = 5_000    # CZK/den (start)
+MAX_DAILY_BUDGET = 100_000       # CZK/den (ceiling)
+TARGET_TROAS = 667               # tROAS 667% = PNO 15%
+TARGET_PNO = 15                  # PNO 15%
+CURRENCY = "CZK"
+AOV = 780                        # Average order value CZK
+MARGIN_PCT = 0.40                # Marže 40%
+CONV_RATE = 0.028                # Conversion rate 2.8%
+
+# ============================================================
+# SCALING PHASES (based on PNO results)
+# ============================================================
+
+PHASES = {
+    1: {
+        "daily_budget": 5_000,
+        "label": "Phase 1 – Learning (Manual CPC)",
+        "trigger": "Start",
+        "note": "Manual CPC. Sbíráme data. Neprovádět změny. Sledovat Search Terms.",
+        "bid_strategy_override": "Manual CPC",
+        "campaigns": ["Shopping", "PMax", "Search Brand"],
+    },
+    2: {
+        "daily_budget": 5_000,
+        "label": "Phase 2 – tROAS activation",
+        "trigger": "30+ konverzí",
+        "note": "Přepínáme Shopping + PMax na tROAS 667%. Brand zůstává Max clicks.",
+        "bid_strategy_override": None,  # Use campaign defaults
+        "campaigns": ["Shopping", "PMax", "Search Brand"],
+    },
+    3: {
+        "daily_budget": 10_000,
+        "label": "Phase 3 – First scale (2x)",
+        "trigger": "PNO < 15% stabilně 7 dní",
+        "note": "Zdvojnásobení rozpočtu. Přidáváme Search Generic. Sledovat CPA trend.",
+        "bid_strategy_override": None,
+        "campaigns": ["Shopping", "PMax", "Search Brand", "Search Generic"],
+    },
+    4: {
+        "daily_budget": 20_000,
+        "label": "Phase 4 – Adding PMax segments",
+        "trigger": "PNO < 15% stabilně 14 dní",
+        "note": "Rozdělujeme PMax na segmenty (Garáže, Domácnost, B2B). Přidáváme Search Competitor.",
+        "bid_strategy_override": None,
+        "campaigns": ["Shopping High Margin", "Shopping Core", "Shopping Low Price",
+                       "PMax Garáže", "PMax Domácnost", "PMax B2B",
+                       "Search Brand", "Search Generic", "Search Competitor"],
+    },
+    5: {
+        "daily_budget": 50_000,
+        "label": "Phase 5 – Aggressive scaling",
+        "trigger": "PNO < 12% stabilně",
+        "note": "Plná struktura 9 kampaní. tROAS bidding na všech (kromě Brand). Weekly optimalizace.",
+        "bid_strategy_override": None,
+        "campaigns": ["Shopping High Margin", "Shopping Core", "Shopping Low Price",
+                       "PMax Garáže", "PMax Domácnost", "PMax B2B",
+                       "Search Brand", "Search Generic", "Search Competitor"],
+    },
+    6: {
+        "daily_budget": 100_000,
+        "label": "Phase 6 – Maximum scale",
+        "trigger": "PNO < 10% stabilně",
+        "note": "Plný rozpočet 100K/den. Denní monitoring. Weekly optimalizace.",
+        "bid_strategy_override": None,
+        "campaigns": ["Shopping High Margin", "Shopping Core", "Shopping Low Price",
+                       "PMax Garáže", "PMax Domácnost", "PMax B2B",
+                       "Search Brand", "Search Generic", "Search Competitor"],
+    },
 }
 
 
 # ============================================================
-# KEYWORD DATABASE - Czech keywords for metal shelving
+# CAMPAIGN DEFINITIONS (all campaigns, activated per phase)
 # ============================================================
 
-KEYWORDS = {
-    "high_intent": [
-        {"keyword": "kovove regaly levne", "est_cpc": 4.5, "est_volume": 880, "intent": "purchase"},
-        {"keyword": "regaly do garaze", "est_cpc": 3.8, "est_volume": 1200, "intent": "purchase"},
-        {"keyword": "kovovy regal akce", "est_cpc": 3.2, "est_volume": 590, "intent": "purchase"},
-        {"keyword": "regal do sklepa", "est_cpc": 3.5, "est_volume": 720, "intent": "purchase"},
-        {"keyword": "kovove regaly vyprodej", "est_cpc": 2.8, "est_volume": 320, "intent": "purchase"},
-        {"keyword": "regaly do dilny", "est_cpc": 4.0, "est_volume": 480, "intent": "purchase"},
-        {"keyword": "skladove regaly levne", "est_cpc": 5.2, "est_volume": 390, "intent": "purchase"},
-        {"keyword": "policovy regal kovovy", "est_cpc": 3.0, "est_volume": 260, "intent": "purchase"},
-        {"keyword": "bezroubove regaly", "est_cpc": 3.8, "est_volume": 210, "intent": "purchase"},
-        {"keyword": "regal 180x90x40", "est_cpc": 2.5, "est_volume": 170, "intent": "purchase"},
-    ],
-    "medium_intent": [
-        {"keyword": "kovove regaly", "est_cpc": 6.0, "est_volume": 2400, "intent": "research"},
-        {"keyword": "regaly na naradi", "est_cpc": 3.5, "est_volume": 480, "intent": "research"},
-        {"keyword": "regaly do kancelare", "est_cpc": 5.0, "est_volume": 320, "intent": "research"},
-        {"keyword": "zinkovane regaly", "est_cpc": 3.0, "est_volume": 260, "intent": "research"},
-        {"keyword": "regaly do spize", "est_cpc": 2.8, "est_volume": 390, "intent": "research"},
-        {"keyword": "nosnost regalu", "est_cpc": 1.5, "est_volume": 170, "intent": "research"},
-        {"keyword": "regal na pneumatiky", "est_cpc": 3.5, "est_volume": 210, "intent": "research"},
-        {"keyword": "jak vybrat regal", "est_cpc": 1.0, "est_volume": 140, "intent": "research"},
-    ],
-    "local_intent": [
-        {"keyword": "kovove regaly praha", "est_cpc": 4.0, "est_volume": 320, "intent": "local"},
-        {"keyword": "regaly brno", "est_cpc": 3.5, "est_volume": 210, "intent": "local"},
-        {"keyword": "regaly ostrava", "est_cpc": 3.0, "est_volume": 140, "intent": "local"},
-        {"keyword": "regaly plzen", "est_cpc": 2.8, "est_volume": 90, "intent": "local"},
-        {"keyword": "kovove regaly olomouc", "est_cpc": 2.5, "est_volume": 70, "intent": "local"},
-    ],
-    "negative_keywords": [
-        "drevene regaly",
-        "ikea regaly",
-        "plastove regaly",
+# --- Phase 1-3: Simple structure ---
+CAMPAIGNS_SIMPLE = [
+    {
+        "name": "Shopping",
+        "type": "SHOPPING",
+        "budget_pct": 0.50,
+        "bid_strategy_default": "Target ROAS",
+        "bid_strategy_phase1": "Manual CPC",
+        "target_roas": 667,
+        "description": "Všechny produkty z feedu. Hlavní kanál.",
+        "avg_cpc": 3.5,
+        "product_groups": [
+            {"name": "Bestsellery", "filter": "custom_label_3 = bestseller", "bid_adj": "+20%"},
+            {"name": "Premium (800+ Kč)", "filter": "custom_label_0 = premium OR custom_label_0 = high", "bid_adj": "+15%"},
+            {"name": "Mid (600-800 Kč)", "filter": "custom_label_0 = mid", "bid_adj": "+10%"},
+            {"name": "Budget (< 600 Kč)", "filter": "custom_label_0 = budget", "bid_adj": "0%"},
+        ],
+    },
+    {
+        "name": "PMax",
+        "type": "PERFORMANCE_MAX",
+        "budget_pct": 0.30,
+        "bid_strategy_default": "Target ROAS",
+        "bid_strategy_phase1": "Maximize conversions",
+        "target_roas": 667,
+        "description": "Jeden PMax pro všechny segmenty. Rozdělíme až v Phase 4.",
+        "final_url": f"{BASE_URL}/katalog.html",
+        "avg_cpc": 5.0,
+        "asset_group": {
+            "headlines": [
+                "Kovové regály – LIKVIDACE SKLADU",
+                "Regály od 489 Kč | Záruka 7 let",
+                "Slevy až 40% na vše skladem",
+                "Bezšroubová montáž za 10 minut",
+                "Doprava zdarma nad 2000 Kč",
+            ],
+            "long_headlines": [
+                "Likvidace skladu: Kovové regály za likvidační ceny. Záruka 7 let. Montáž bez nářadí.",
+                "Nové kovové regály od 489 Kč. Do garáže, sklepa, dílny. Nosnost až 1050 kg.",
+            ],
+            "descriptions": [
+                "Likvidace skladu! Kovové regály za nejnižší ceny. Nosnost až 1050 kg. Bezšroubová montáž. 7 let záruka. Doprava od 99 Kč.",
+                "Nové kovové regály se slevou až 40%. Do garáže, sklepa, dílny. Skladem přes 10 000 ks. Objednejte dnes!",
+            ],
+            "audience_signal": "Kutilové a domácí majstři",
+        },
+    },
+    {
+        "name": "Search Brand",
+        "type": "SEARCH",
+        "budget_pct": 0.20,
+        "bid_strategy_default": "Maximize clicks",
+        "bid_strategy_phase1": "Maximize clicks",
+        "target_roas": None,
+        "description": "Ochrana značky. Nejnižší CPC, nejvyšší CTR.",
+        "avg_cpc": 1.0,
+        "ad_groups": [
+            {
+                "name": "Brand - Exact",
+                "match_type": "EXACT",
+                "keywords": [
+                    "bazarovyregal",
+                    "bazarovyregal.cz",
+                    "bazarovy regal",
+                    "bazarový regál",
+                ],
+            },
+            {
+                "name": "Brand - Checkout domain",
+                "match_type": "EXACT",
+                "keywords": [
+                    "vyprodej regalu",
+                    "vyprodej-regalu.cz",
+                    "výprodej regálů",
+                ],
+            },
+        ],
+    },
+    {
+        "name": "Search Generic",
+        "type": "SEARCH",
+        "budget_pct": 0.00,  # Added in Phase 3
+        "bid_strategy_default": "Target ROAS",
+        "bid_strategy_phase1": "Manual CPC",
+        "target_roas": 667,
+        "description": "Generické klíčové slova s nákupním záměrem. Aktivuje se od Phase 3.",
+        "avg_cpc": 6.0,
+        "ad_groups": [
+            {
+                "name": "Kovové regály - purchase intent",
+                "match_type": "PHRASE",
+                "keywords": [
+                    "kovové regály levně",
+                    "kovový regál akce",
+                    "kovové regály výprodej",
+                    "levné kovové regály",
+                    "kovový regál se slevou",
+                ],
+            },
+            {
+                "name": "Regály do garáže",
+                "match_type": "PHRASE",
+                "keywords": [
+                    "regál do garáže",
+                    "regál do garáže levně",
+                    "kovový regál garáž",
+                    "regály do garáže akce",
+                ],
+            },
+            {
+                "name": "Regály do sklepa/dílny",
+                "match_type": "PHRASE",
+                "keywords": [
+                    "regál do sklepa",
+                    "regál do dílny",
+                    "regály do sklepa levně",
+                    "skladový regál levně",
+                ],
+            },
+            {
+                "name": "Bezšroubové regály",
+                "match_type": "PHRASE",
+                "keywords": [
+                    "bezšroubový regál",
+                    "bezšroubové regály",
+                    "regál bez šroubů",
+                ],
+            },
+            {
+                "name": "Regály podle rozměrů",
+                "match_type": "PHRASE",
+                "keywords": [
+                    "regál 180x90x40",
+                    "regál 180 cm",
+                    "regál 200 cm",
+                    "regál 150x70",
+                ],
+            },
+        ],
+    },
+]
+
+# --- Phase 4-6: Full structure ---
+CAMPAIGNS_FULL = [
+    # SHOPPING split
+    {
+        "name": "Shopping High Margin",
+        "type": "SHOPPING",
+        "budget_pct": 0.25,
+        "bid_strategy_default": "Target ROAS",
+        "target_roas": 700,
+        "product_filter": "custom_label_0 = high OR custom_label_0 = premium",
+        "description": "Profesionální regály 800+ Kč. Nejvyšší marže.",
+        "priority": "HIGH",
+        "avg_cpc": 5.0,
+        "product_groups": [
+            {"name": "Profesionální regály", "filter": "custom_label_0 = premium", "bid_adj": "+25%"},
+            {"name": "High-margin regály", "filter": "custom_label_0 = high", "bid_adj": "+15%"},
+            {"name": "Bestsellery", "filter": "custom_label_3 = bestseller", "bid_adj": "+20%"},
+        ],
+    },
+    {
+        "name": "Shopping Core",
+        "type": "SHOPPING",
+        "budget_pct": 0.20,
+        "bid_strategy_default": "Target ROAS",
+        "target_roas": 667,
+        "product_filter": "custom_label_0 = mid",
+        "description": "Střední cenová kategorie 600-800 Kč.",
+        "priority": "MEDIUM",
+        "avg_cpc": 3.5,
+        "product_groups": [
+            {"name": "Střední regály - černé", "filter": "custom_label_1 = cerna AND custom_label_0 = mid", "bid_adj": "+10%"},
+            {"name": "Střední regály - zinkované", "filter": "custom_label_1 = zinkovany AND custom_label_0 = mid", "bid_adj": "+5%"},
+            {"name": "Střední regály - barevné", "filter": "custom_label_1 IN (bila, cervena, modra)", "bid_adj": "0%"},
+        ],
+    },
+    {
+        "name": "Shopping Low Price",
+        "type": "SHOPPING",
+        "budget_pct": 0.10,
+        "bid_strategy_default": "Target ROAS",
+        "target_roas": 667,
+        "product_filter": "custom_label_0 = budget",
+        "description": "Budget regály pod 600 Kč.",
+        "priority": "LOW",
+        "avg_cpc": 2.5,
+        "product_groups": [
+            {"name": "Budget - zinkované", "filter": "custom_label_0 = budget AND custom_label_1 = zinkovany", "bid_adj": "+5%"},
+            {"name": "Budget - ostatní", "filter": "custom_label_0 = budget", "bid_adj": "0%"},
+        ],
+    },
+    # PMAX split
+    {
+        "name": "PMax Garáže",
+        "type": "PERFORMANCE_MAX",
+        "budget_pct": 0.10,
+        "bid_strategy_default": "Target ROAS",
+        "target_roas": 667,
+        "description": "Regály do garáže. Kutilové, majitelé domů.",
+        "final_url": f"{BASE_URL}/regaly-do-garaze.html",
+        "avg_cpc": 4.5,
+        "asset_group": {
+            "headlines": [
+                "Regály do garáže – LIKVIDACE SKLADU",
+                "Kovové regály od 489 Kč | Skladem",
+                "Zinkované regály do garáže -40%",
+                "Nosnost až 875 kg | Záruka 7 let",
+                "Bezšroubová montáž za 10 minut",
+            ],
+            "long_headlines": [
+                "Kovové regály do garáže za likvidační ceny. Od 489 Kč. Záruka 7 let.",
+                "Pořádek v garáži za 10 minut. Zinkované regály odolné vlhkosti.",
+            ],
+            "descriptions": [
+                "Likvidace skladu! Kovové regály do garáže od 489 Kč. Zinkované, odolné vlhkosti. Nosnost až 875 kg. Záruka 7 let.",
+                "Organizujte garáž s kovovými regály za výprodejové ceny. Skladem přes 10 000 ks. Doprava od 99 Kč.",
+            ],
+            "audience_signal": "Kutilové a domácí majstři",
+        },
+    },
+    {
+        "name": "PMax Domácnost",
+        "type": "PERFORMANCE_MAX",
+        "budget_pct": 0.10,
+        "bid_strategy_default": "Target ROAS",
+        "target_roas": 667,
+        "description": "Regály do domácnosti. Sklep, spíž, dětský pokoj.",
+        "final_url": f"{BASE_URL}/regaly-pro-domacnost.html",
+        "avg_cpc": 5.0,
+        "asset_group": {
+            "headlines": [
+                "Regály do domu a bytu – SLEVA 40%",
+                "Kovové regály do sklepa od 489 Kč",
+                "Regály do spíže | Montáž za 10 min",
+                "Organizace domácnosti | Od 549 Kč",
+                "Regály do dětského pokoje | Skladem",
+            ],
+            "long_headlines": [
+                "Kovové regály pro domácnost. Do sklepa, spíže, komory. Od 489 Kč se zárukou 7 let.",
+                "Pořádek v domácnosti snadno a levně. Bezšroubové regály s nosností až 875 kg.",
+            ],
+            "descriptions": [
+                "Kovové regály do domácnosti za výprodejové ceny. Do sklepa, spíže, pokoje. Nosnost až 875 kg. Záruka 7 let.",
+                "Likvidace skladu! Regály pro domácnost od 489 Kč. Nové, nerozbalené. Doprava od 99 Kč.",
+            ],
+            "audience_signal": "Noví majitelé domu/bytu",
+        },
+    },
+    {
+        "name": "PMax B2B",
+        "type": "PERFORMANCE_MAX",
+        "budget_pct": 0.08,
+        "bid_strategy_default": "Target ROAS",
+        "target_roas": 667,
+        "description": "B2B segment. Sklady, kanceláře, e-shopy.",
+        "final_url": f"{BASE_URL}/regaly-pro-firmy.html",
+        "avg_cpc": 6.0,
+        "asset_group": {
+            "headlines": [
+                "Skladové regály pro firmy – VÝPRODEJ",
+                "Profesionální regály | Nosnost 1050 kg",
+                "Regály do kanceláře od 549 Kč",
+                "Regály pro e-shop sklad | -40%",
+                "Vybavení skladu za výprodejové ceny",
+            ],
+            "long_headlines": [
+                "Profesionální skladové regály pro firmy. Nosnost až 1050 kg. Slevy až 40%.",
+                "Vybavte celý sklad za zlomek ceny. Kovové regály pro e-shopy a kanceláře.",
+            ],
+            "descriptions": [
+                "Skladové regály pro firmy za velkoobchodní ceny. Nosnost až 1050 kg. Záruka 7 let. Expedice do 24h.",
+                "Likvidace skladu! Profesionální regály od 549 Kč. Pro e-shopy, kanceláře, archivy.",
+            ],
+            "audience_signal": "E-shop provozovatelé a firmy",
+        },
+    },
+    # SEARCH
+    {
+        "name": "Search Brand",
+        "type": "SEARCH",
+        "budget_pct": 0.05,
+        "bid_strategy_default": "Maximize clicks",
+        "target_roas": None,
+        "description": "Ochrana značky.",
+        "avg_cpc": 1.0,
+        "ad_groups": [
+            {
+                "name": "Brand - Exact",
+                "match_type": "EXACT",
+                "keywords": ["bazarovyregal", "bazarovyregal.cz", "bazarovy regal", "bazarový regál"],
+            },
+            {
+                "name": "Brand - Checkout domain",
+                "match_type": "EXACT",
+                "keywords": ["vyprodej regalu", "vyprodej-regalu.cz", "výprodej regálů"],
+            },
+        ],
+    },
+    {
+        "name": "Search Generic",
+        "type": "SEARCH",
+        "budget_pct": 0.07,
+        "bid_strategy_default": "Target ROAS",
+        "target_roas": 667,
+        "description": "Generické klíčové slova s nákupním záměrem.",
+        "avg_cpc": 6.0,
+        "ad_groups": [
+            {
+                "name": "Kovové regály - purchase",
+                "match_type": "PHRASE",
+                "keywords": ["kovové regály levně", "kovový regál akce", "kovové regály výprodej", "levné kovové regály"],
+            },
+            {
+                "name": "Regály do garáže",
+                "match_type": "PHRASE",
+                "keywords": ["regál do garáže", "regál do garáže levně", "kovový regál garáž"],
+            },
+            {
+                "name": "Regály do sklepa/dílny",
+                "match_type": "PHRASE",
+                "keywords": ["regál do sklepa", "regál do dílny", "regály do sklepa levně", "skladový regál levně"],
+            },
+            {
+                "name": "Bezšroubové regály",
+                "match_type": "PHRASE",
+                "keywords": ["bezšroubový regál", "bezšroubové regály", "regál bez šroubů"],
+            },
+        ],
+    },
+    {
+        "name": "Search Competitor",
+        "type": "SEARCH",
+        "budget_pct": 0.05,
+        "bid_strategy_default": "Maximize clicks",
+        "target_roas": None,
+        "description": "Cílení na konkurenční značky.",
+        "avg_cpc": 8.0,
+        "ad_groups": [
+            {
+                "name": "Competitor - DIY řetězce",
+                "match_type": "BROAD",
+                "keywords": ["hornbach regály kovové", "obi kovový regál", "bauhaus regály", "mountfield regály"],
+            },
+            {
+                "name": "Competitor - Online",
+                "match_type": "BROAD",
+                "keywords": ["mall.cz regály", "alza regály"],
+            },
+        ],
+    },
+]
+
+
+# ============================================================
+# NEGATIVE KEYWORDS
+# ============================================================
+
+NEGATIVE_KEYWORDS = {
+    "campaign_level": [
+        "dřevěné regály", "drevene regaly",
+        "ikea regály", "ikea regaly",
+        "plastové regály", "plastove regaly",
         "knihovna",
-        "regal na boty",
-        "pouzite regaly",
-        "bazarove regaly pouzite",
-        "regal na stenu",
-        "nastenny regal",
-        "regaly bazar",
-        "paletove regaly",
-        "prujezdne regaly",
+        "regál na boty", "regal na boty",
+        "použité regály", "pouzite regaly",
+        "bazarové regály použité",
+        "starý regál", "stary regal",
+        "regál na stěnu", "nástěnný regál",
+        "paletové regály", "paletove regaly",
+        "průjezdné regály", "prujezdne regaly",
+        "regál na víno", "regal na vino",
+        "regál do koupelny", "regál na květiny",
+    ],
+    "brand_campaign_negatives": [
+        "bazar", "bazarový", "použitý", "starý", "ojetý", "second hand",
     ],
 }
 
-
 # ============================================================
-# AUDIENCE SIGNALS for Performance Max
+# AUDIENCE SIGNALS
 # ============================================================
 
 AUDIENCE_SIGNALS = {
     "custom_segments": [
         {
-            "name": "Kutilove a domaci majstri",
+            "name": "Kutilové a domácí majstři",
             "search_terms": [
-                "regaly do garaze", "organizace garaze", "ulozne systemy dilna",
-                "naradi organizace", "jak zorganizovat garaz",
+                "regály do garáže", "organizace garáže", "úložné systémy dílna",
+                "nářadí organizace", "jak zorganizovat garáž", "DIY garáž",
             ],
-            "urls": [
+            "competitor_urls": [
                 "https://www.hornbach.cz", "https://www.obi.cz",
                 "https://www.bauhaus.cz", "https://www.mountfield.cz",
             ],
         },
         {
-            "name": "E-shop provozovatele",
+            "name": "E-shop provozovatelé a firmy",
             "search_terms": [
-                "skladove regaly", "vybaveni skladu", "regaly pro eshop",
-                "organizace skladu", "jak zacinat s eshopem",
+                "skladové regály", "vybavení skladu", "regály pro eshop",
+                "organizace skladu", "vybavení kanceláře",
             ],
-            "urls": [
+            "competitor_urls": [
                 "https://www.shoptet.cz", "https://www.upgates.cz",
+                "https://www.b2bpartner.cz",
             ],
         },
         {
-            "name": "Noví majitele domu/bytu",
+            "name": "Noví majitelé domu/bytu",
             "search_terms": [
-                "vybaveni garaze", "organizace sklepa", "regaly do bytu",
-                "stehovani", "zarizeni domu",
+                "vybavení garáže", "organizace sklepa", "regály do bytu",
+                "stěhování", "zařízení domu",
             ],
-            "urls": [
+            "competitor_urls": [
                 "https://www.sreality.cz", "https://www.bezrealitky.cz",
             ],
         },
     ],
     "demographic_targets": [
-        {"age": "25-34", "reason": "Mladí majitelé domů, začínající podnikatelé"},
-        {"age": "35-54", "reason": "Hlavní nakupující segment, DIY, firmy"},
-        {"age": "55-64", "reason": "Seniori, organizace domácnosti"},
+        {"age": "25-34", "gender": "All", "reason": "Mladí majitelé domů, začínající podnikatelé"},
+        {"age": "35-54", "gender": "All", "reason": "Hlavní nakupující segment, DIY, firmy"},
+        {"age": "55-64", "gender": "Male", "reason": "Seniori, garáž/dílna organizace"},
     ],
     "life_events": [
         "Nedávno se přestěhoval",
         "Koupil nový dům/byt",
         "Založení firmy",
     ],
-    "interests": [
-        "DIY a kutilství",
-        "Domácí organizace",
-        "E-commerce a podnikání",
-        "Garáž a dílna",
-    ],
+}
+
+# ============================================================
+# BENCHMARKS
+# ============================================================
+
+BENCHMARKS = {
+    "shopping_avg_cpc": 3.50,
+    "pmax_avg_cpc": 5.00,
+    "search_brand_cpc": 1.00,
+    "search_generic_cpc": 6.00,
+    "search_competitor_cpc": 8.00,
+    "conversion_rate": CONV_RATE,
+    "aov": AOV,
+    "margin": MARGIN_PCT,
 }
 
 
 # ============================================================
-# CAMPAIGN STRUCTURE
+# PROJECTIONS ENGINE
 # ============================================================
 
-def plan_campaign_structure(monthly_budget_czk):
-    """Generate optimal campaign structure based on budget."""
+def get_campaigns_for_phase(phase):
+    """Get the right campaign list for the phase."""
+    if phase <= 3:
+        return CAMPAIGNS_SIMPLE
+    return CAMPAIGNS_FULL
 
-    daily_budget = monthly_budget_czk / 30
 
-    campaigns = []
+def get_budget_allocation(phase):
+    """Return budget allocations for campaigns in a given phase."""
+    phase_info = PHASES.get(phase, PHASES[1])
+    daily_total = phase_info["daily_budget"]
+    active_campaign_names = phase_info["campaigns"]
+    campaigns = get_campaigns_for_phase(phase)
 
-    # ---- SHOPPING CAMPAIGN (Standard) ----
-    shopping_budget_pct = 0.45  # 45% to Shopping
-    shopping_daily = daily_budget * shopping_budget_pct
+    allocations = []
+    for c in campaigns:
+        if c["name"] not in active_campaign_names:
+            continue
 
-    if shopping_daily >= BENCHMARKS["min_daily_budget_shopping"]:
-        campaigns.append({
-            "name": "Shopping - Kovove regaly",
-            "type": "SHOPPING",
-            "daily_budget_czk": round(shopping_daily),
-            "monthly_budget_czk": round(shopping_daily * 30),
-            "bid_strategy": "Maximize clicks" if monthly_budget_czk < 10000 else "Target ROAS",
-            "target_roas": 400 if monthly_budget_czk >= 10000 else None,
-            "product_groups": [
-                {
-                    "name": "Bestsellery",
-                    "filter": "custom_label_3 = bestseller",
-                    "bid_adjustment": "+20%",
-                    "priority": "HIGH",
-                },
-                {
-                    "name": "Budget regaly (do 600 Kc)",
-                    "filter": "custom_label_0 = budget",
-                    "bid_adjustment": "0%",
-                    "priority": "MEDIUM",
-                },
-                {
-                    "name": "Stredni trida (600-800 Kc)",
-                    "filter": "custom_label_0 = mid",
-                    "bid_adjustment": "+10%",
-                    "priority": "MEDIUM",
-                },
-                {
-                    "name": "Premium regaly (800+ Kc)",
-                    "filter": "custom_label_0 = premium",
-                    "bid_adjustment": "+15%",
-                    "priority": "MEDIUM",
-                },
-            ],
-            "notes": [
-                "Zacnete s Maximize clicks pro sber dat",
-                "Po 2 tydnech (50+ konverzi) prejdete na Target ROAS",
-                "Pouzijte negativni klicova slova z ads_optimizer.py",
-                "Sledujte Search terms report a pridavejte negative weekly",
-            ],
+        # For simple structure (Phase 1-3), use predefined percentages
+        if phase <= 3:
+            if c["name"] == "Shopping":
+                daily = round(daily_total * 0.50)
+            elif c["name"] == "PMax":
+                daily = round(daily_total * 0.30)
+            elif c["name"] == "Search Brand":
+                daily = round(daily_total * 0.20)
+            elif c["name"] == "Search Generic":
+                daily = round(daily_total * 0.10) if phase >= 3 else 0
+            else:
+                daily = round(daily_total * c["budget_pct"])
+            # Adjust for Phase 3 which adds Search Generic
+            if phase == 3:
+                if c["name"] == "Shopping":
+                    daily = round(daily_total * 0.45)
+                elif c["name"] == "PMax":
+                    daily = round(daily_total * 0.25)
+                elif c["name"] == "Search Brand":
+                    daily = round(daily_total * 0.15)
+                elif c["name"] == "Search Generic":
+                    daily = round(daily_total * 0.15)
+        else:
+            daily = round(daily_total * c["budget_pct"])
+
+        if daily <= 0:
+            continue
+
+        # Determine bid strategy
+        bid_strategy = c["bid_strategy_default"] if not phase_info.get("bid_strategy_override") else phase_info["bid_strategy_override"]
+        # Brand always stays on Maximize clicks
+        if c["name"] == "Search Brand":
+            bid_strategy = "Maximize clicks"
+
+        allocations.append({
+            "campaign": c,
+            "daily_budget": daily,
+            "monthly_budget": daily * 30,
+            "bid_strategy": bid_strategy,
         })
 
-    # ---- PMAX CAMPAIGN ----
-    pmax_budget_pct = 0.40  # 40% to PMax
-    pmax_daily = daily_budget * pmax_budget_pct
+    return allocations
 
-    if pmax_daily >= BENCHMARKS["min_daily_budget_pmax"]:
-        campaigns.append({
-            "name": "PMax - Bazarovyregal.cz",
-            "type": "PERFORMANCE_MAX",
-            "daily_budget_czk": round(pmax_daily),
-            "monthly_budget_czk": round(pmax_daily * 30),
-            "bid_strategy": "Maximize conversions" if monthly_budget_czk < 15000 else "Maximize conversion value",
-            "asset_groups": [
-                {
-                    "name": "Likvidace skladu - hlavni",
-                    "final_url": f"{BASE_URL}/katalog.html",
-                    "headlines": [
-                        "Kovove regaly - LIKVIDACE SKLADU",
-                        "Slevy az 40% na vse skladem",
-                        "Regaly od 489 Kc | Zaruka 7 let",
-                        "Bezroubova montaz za 10 minut",
-                        "Doprava zdarma nad 2000 Kc",
-                    ],
-                    "long_headlines": [
-                        "Likvidace skladu: Kovove regaly za likvidacni ceny. Zaruka 7 let.",
-                        "Nove kovove regaly od 489 Kc. Montaz bez naradi za 10 minut.",
-                    ],
-                    "descriptions": [
-                        "Likvidace skladu! Kovove regaly za nejnizsi ceny. Nosnost az 1050 kg. Bezroubova montaz. 7 let zaruka. Doprava od 99 Kc.",
-                        "Nove kovove regaly se slevou az 40%. Do garaze, sklepa, dilny. Skladem pres 10000 ks. Objednejte dnes!",
-                    ],
-                    "audience_signal": "Kutilove a domaci majstri",
-                },
-                {
-                    "name": "Regaly pro firmy",
-                    "final_url": f"{BASE_URL}/regaly-pro-firmy.html",
-                    "headlines": [
-                        "Skladove regaly pro firmy",
-                        "Nosnost az 1050 kg | Od 549 Kc",
-                        "Profesionalni regaly do skladu",
-                        "Velkoobchodni ceny pro firmy",
-                        "E-shop sklad - regaly od 549 Kc",
-                    ],
-                    "long_headlines": [
-                        "Profesionalni skladove regaly pro firmy. Nosnost 1050 kg. Slevy az 75%.",
-                        "Vybavte cely sklad za zlomek ceny. Kovove regaly pro e-shopy a firmy.",
-                    ],
-                    "descriptions": [
-                        "Profesionalni kovove regaly pro firmy a e-shopy. Nosnost az 1050 kg. Montaz za 10 minut. Slevy az 75%. Zaruka 7 let.",
-                        "Skladove regaly za velkoobchodni ceny. Idealni pro e-shop, sklad, kancelar. Objednejte jiz od 1 kusu.",
-                    ],
-                    "audience_signal": "E-shop provozovatele",
-                },
-                {
-                    "name": "Regaly do domacnosti",
-                    "final_url": f"{BASE_URL}/regaly-pro-domacnost.html",
-                    "headlines": [
-                        "Regaly do garaze a sklepa",
-                        "Od 489 Kc | Montaz bez naradi",
-                        "Kovove regaly do bytu a domu",
-                        "Organizace spize a komory",
-                        "Regaly 150-200 cm | Skladem",
-                    ],
-                    "long_headlines": [
-                        "Kovove regaly do garaze, sklepa a domacnosti. Od 489 Kc se zarukou 7 let.",
-                        "Poradek v garazi za 10 minut. Bezroubove regaly s nosnosti az 875 kg.",
-                    ],
-                    "descriptions": [
-                        "Kovove regaly pro domacnost. Do garaze, sklepa, spize. Bezroubova montaz. Nosnost az 875 kg. Zaruka 7 let. Od 489 Kc.",
-                        "Likvidace skladu! Regaly pro domacnost za nejnizsi ceny. Skladem, doprava od 99 Kc. Objednejte dnes.",
-                    ],
-                    "audience_signal": "Noví majitele domu/bytu",
-                },
-            ],
-            "notes": [
-                "PMax potrebuje 2-4 tydny na uceni (learning period)",
-                "Neprovadejte zmeny behem learning period",
-                "Pridejte audience signals z ads_optimizer.py",
-                "Pouzijte final URL expansion = ON pro lepsi pokryti",
-            ],
+
+def calculate_projections(phase=1):
+    """Calculate traffic, conversion, and revenue projections."""
+    allocations = get_budget_allocation(phase)
+    results = []
+
+    for alloc in allocations:
+        c = alloc["campaign"]
+        daily_budget = alloc["daily_budget"]
+        monthly_budget = alloc["monthly_budget"]
+        avg_cpc = c["avg_cpc"]
+
+        est_clicks_daily = int(daily_budget / avg_cpc)
+        est_clicks_monthly = est_clicks_daily * 30
+        est_conversions_monthly = int(est_clicks_monthly * CONV_RATE)
+        est_revenue_monthly = est_conversions_monthly * AOV
+
+        actual_roas = (est_revenue_monthly / monthly_budget * 100) if monthly_budget > 0 else 0
+        actual_pno = (monthly_budget / est_revenue_monthly * 100) if est_revenue_monthly > 0 else 0
+        profit = est_revenue_monthly * MARGIN_PCT - monthly_budget
+
+        results.append({
+            "campaign": c["name"],
+            "type": c["type"],
+            "daily_budget": daily_budget,
+            "monthly_budget": monthly_budget,
+            "bid_strategy": alloc["bid_strategy"],
+            "target_roas": c.get("target_roas"),
+            "avg_cpc": avg_cpc,
+            "est_clicks_daily": est_clicks_daily,
+            "est_clicks_monthly": est_clicks_monthly,
+            "est_conversions_monthly": est_conversions_monthly,
+            "est_revenue_monthly": est_revenue_monthly,
+            "est_roas_pct": round(actual_roas),
+            "est_pno_pct": round(actual_pno, 1),
+            "est_profit_monthly": round(profit),
         })
 
-    # ---- SEARCH CAMPAIGN (brand protection + high-intent) ----
-    search_budget_pct = 0.15  # 15% to Search
-    search_daily = daily_budget * search_budget_pct
-
-    if search_daily >= 50:  # Minimum viable for Search
-        campaigns.append({
-            "name": "Search - Brand + High Intent",
-            "type": "SEARCH",
-            "daily_budget_czk": round(search_daily),
-            "monthly_budget_czk": round(search_daily * 30),
-            "bid_strategy": "Maximize clicks",
-            "ad_groups": [
-                {
-                    "name": "Brand - Bazarovyregal",
-                    "keywords": [
-                        "bazarovyregal",
-                        "bazarovy regal",
-                        "bazarovyregal.cz",
-                        "vyprodej regalu",
-                        "vyprodej-regalu.cz",
-                    ],
-                    "match_type": "PHRASE",
-                },
-                {
-                    "name": "High Intent - Nakup",
-                    "keywords": [
-                        "kovove regaly levne",
-                        "kovovy regal akce",
-                        "kovove regaly vyprodej",
-                        "regal do garaze levne",
-                        "bezroubovy regal",
-                    ],
-                    "match_type": "PHRASE",
-                },
-            ],
-            "notes": [
-                "Brand kampan chrani pred konkurenci na vase klicova slova",
-                "Nizke CPC na brand keywords (0.5-2 CZK)",
-                "Sledujte Auction Insights pro konkurenci",
-            ],
-        })
-
-    return campaigns
+    return results
 
 
-def calculate_projections(campaigns):
-    """Calculate traffic and revenue projections."""
-    projections = {
-        "monthly": {"clicks": 0, "impressions": 0, "conversions": 0, "revenue_czk": 0, "cost_czk": 0},
-        "by_campaign": [],
+def calculate_totals(projections):
+    """Sum up totals from projections."""
+    totals = {
+        "daily_budget": sum(p["daily_budget"] for p in projections),
+        "monthly_budget": sum(p["monthly_budget"] for p in projections),
+        "est_clicks_monthly": sum(p["est_clicks_monthly"] for p in projections),
+        "est_conversions_monthly": sum(p["est_conversions_monthly"] for p in projections),
+        "est_revenue_monthly": sum(p["est_revenue_monthly"] for p in projections),
     }
-
-    for campaign in campaigns:
-        monthly_budget = campaign["monthly_budget_czk"]
-        campaign_type = campaign["type"]
-
-        if campaign_type == "SHOPPING":
-            avg_cpc = BENCHMARKS["avg_cpc_shopping_czk"]
-            ctr = BENCHMARKS["avg_ctr_shopping"]
-        elif campaign_type == "PERFORMANCE_MAX":
-            avg_cpc = BENCHMARKS["avg_cpc_pmax_czk"]
-            ctr = BENCHMARKS["avg_ctr_pmax"]
-        else:  # SEARCH
-            avg_cpc = BENCHMARKS["avg_cpc_search_czk"]
-            ctr = 0.035  # Higher CTR for brand/high-intent search
-
-        est_clicks = int(monthly_budget / avg_cpc)
-        est_impressions = int(est_clicks / ctr)
-        est_conversions = int(est_clicks * BENCHMARKS["avg_conversion_rate"])
-        est_revenue = est_conversions * BENCHMARKS["avg_order_value_czk"]
-        est_roas = (est_revenue / monthly_budget * 100) if monthly_budget > 0 else 0
-
-        campaign_proj = {
-            "campaign": campaign["name"],
-            "type": campaign_type,
-            "monthly_budget_czk": monthly_budget,
-            "est_clicks": est_clicks,
-            "est_impressions": est_impressions,
-            "est_conversions": est_conversions,
-            "est_revenue_czk": est_revenue,
-            "est_roas_pct": round(est_roas),
-            "est_cpc_czk": avg_cpc,
-        }
-        projections["by_campaign"].append(campaign_proj)
-
-        projections["monthly"]["clicks"] += est_clicks
-        projections["monthly"]["impressions"] += est_impressions
-        projections["monthly"]["conversions"] += est_conversions
-        projections["monthly"]["revenue_czk"] += est_revenue
-        projections["monthly"]["cost_czk"] += monthly_budget
-
-    total_cost = projections["monthly"]["cost_czk"]
-    total_revenue = projections["monthly"]["revenue_czk"]
-    projections["monthly"]["roas_pct"] = round(total_revenue / total_cost * 100) if total_cost > 0 else 0
-    projections["monthly"]["profit_czk"] = round(
-        total_revenue * BENCHMARKS["avg_margin_pct"] - total_cost
+    totals["est_roas_pct"] = round(
+        totals["est_revenue_monthly"] / totals["monthly_budget"] * 100
+    ) if totals["monthly_budget"] > 0 else 0
+    totals["est_pno_pct"] = round(
+        totals["monthly_budget"] / totals["est_revenue_monthly"] * 100, 1
+    ) if totals["est_revenue_monthly"] > 0 else 0
+    totals["est_profit_monthly"] = round(
+        totals["est_revenue_monthly"] * MARGIN_PCT - totals["monthly_budget"]
     )
-
-    return projections
-
-
-def get_landing_page_recommendations():
-    """Generate landing page optimization recommendations."""
-    return {
-        "shopping_landing_pages": [
-            {
-                "url": f"{BASE_URL}/katalog.html",
-                "purpose": "Hlavni katalogova stranka - default pro Shopping",
-                "tips": [
-                    "Pridat filtrovani podle ceny, barvy, rozmeru",
-                    "Zvyraznit 'Skladem' badge u vsech produktu",
-                    "Pridat 'Pridat do kosiku' CTA na kazdou kartu",
-                ],
-            },
-            {
-                "url": f"{BASE_URL}/regal-180x90x40-cerna.html",
-                "purpose": "Bestseller produkt - vysoke konverze",
-                "tips": [
-                    "Pridat vice fotek (detail, rozmer, montaz)",
-                    "Pridat video montaze",
-                    "Zvyraznit 'BESTSELLER' a '875 kg nosnost'",
-                ],
-            },
-        ],
-        "pmax_landing_pages": [
-            {
-                "url": f"{BASE_URL}/regaly-do-garaze.html",
-                "purpose": "Kategorie garaze - vysoka konverze",
-            },
-            {
-                "url": f"{BASE_URL}/regaly-pro-firmy.html",
-                "purpose": "B2B segment - vyssi AOV",
-            },
-            {
-                "url": f"{BASE_URL}/likvidace-skladu-regaly.html",
-                "purpose": "Urgency/akce stranka",
-            },
-        ],
-        "general_tips": [
-            "Zajistete, ze vsechny landing pages maji rychlost nacitani pod 3s (LCP)",
-            "Kazda stranka musi mit jasne CTA 'Do kosiku' / 'Objednat'",
-            "Mobilni verze musi byt plne funkcni (60%+ trafficu z mobilu)",
-            "Pridejte schema.org Product markup na vsechny produktove stranky",
-            "Implementujte remarketing tagy pro navstevniky kteri neprovedly konverzi",
-        ],
-    }
+    return totals
 
 
-def generate_tracking_setup_guide():
-    """Generate tracking implementation guide."""
-    return {
-        "step_1_gtag": {
-            "title": "Implementace Google Ads a GA4 tracking",
-            "description": "Pridejte gtag.js snippet do vsech stranek webu",
-            "code_location": "pseo_html_template.py (wrap_page funkce) + index.html",
-            "status": "IMPLEMENTED - viz gtag snippet v HTML sablonach",
-        },
-        "step_2_conversions": {
-            "title": "Nastaveni konverznich akci",
-            "actions": [
-                {
-                    "name": "purchase",
-                    "trigger": "Dokonceni objednavky na vyprodej-regalu.cz",
-                    "note": "Toto vyzaduje spolupráci s Shoptet (vyprodej-regalu.cz) pro cross-domain tracking",
-                },
-                {
-                    "name": "add_to_cart",
-                    "trigger": "Klik na 'Do kosiku' tlacitko",
-                    "note": "Implementovano v tracking.js pomoci gtag event",
-                },
-                {
-                    "name": "view_item",
-                    "trigger": "Navsteva produktove stranky",
-                    "note": "Automaticky z GA4 enhanced measurement",
-                },
-                {
-                    "name": "begin_checkout",
-                    "trigger": "Presmerovani na vyprodej-regalu.cz kosik",
-                    "note": "Mereno jako klik na externi odkaz do kosiku",
-                },
-            ],
-        },
-        "step_3_merchant_center": {
-            "title": "Google Merchant Center nastaveni",
-            "actions": [
-                "Vytvorte ucet na merchants.google.com",
-                "Overete vlastnictvi domeny bazarovyregal.cz",
-                "Nahrajte merchant_feed.xml (vygeneroval generate_merchant_feed.py)",
-                "Nastavte automaticky fetch feedu - URL: https://www.bazarovyregal.cz/merchant_feed.xml",
-                "Propojte Merchant Center s Google Ads uctem",
-                "Zkontrolujte diagnostiku - opravte pripadne errory",
-            ],
-        },
-        "step_4_google_ads": {
-            "title": "Google Ads nastaveni",
-            "actions": [
-                "Vytvorte kampane dle doporuceni z ads_optimizer.py",
-                "Nastavte konverzni akce (purchase, add_to_cart)",
-                "Importujte negativni klicova slova",
-                "Nastavte audience signals pro PMax",
-                "Aktivujte auto-tagging (GCLID)",
-            ],
-        },
-        "step_5_cross_domain": {
-            "title": "Cross-domain tracking (bazarovyregal.cz -> vyprodej-regalu.cz)",
-            "description": "Dulezite: nakupni proces probiha na vyprodej-regalu.cz",
-            "actions": [
-                "V GA4: Nastaveni > Data Streams > Configure your domains > pridat vyprodej-regalu.cz",
-                "Na vyprodej-regalu.cz: pridat stejny gtag.js snippet s vasim GA4 Measurement ID",
-                "Otestovat cross-domain pomoci GA4 DebugView",
-            ],
-        },
-    }
+# ============================================================
+# REPORT GENERATOR
+# ============================================================
 
+def print_report(phase=1):
+    """Print comprehensive campaign report."""
+    phase_info = PHASES.get(phase, PHASES[1])
+    projections = calculate_projections(phase)
+    totals = calculate_totals(projections)
 
-def print_report(monthly_budget_czk):
-    """Print comprehensive campaign optimization report."""
+    print("\n" + "=" * 75)
+    print("  GOOGLE ADS CAMPAIGN OPTIMIZER – Bazarovyregal.cz")
+    print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    print("=" * 75)
 
-    print("\n" + "=" * 70)
-    print("  GOOGLE ADS CAMPAIGN OPTIMIZER - Bazarovyregal.cz")
-    print("  " + datetime.now().strftime("%Y-%m-%d %H:%M"))
-    print("=" * 70)
+    # Phase overview
+    print(f"\n  START: {STARTING_DAILY_BUDGET:,} CZK/den | CEILING: {MAX_DAILY_BUDGET:,} CZK/den")
+    print(f"  TARGET: tROAS {TARGET_TROAS}% | PNO {TARGET_PNO}%")
+    print(f"\n  ŠKÁLOVACÍ PLÁN (na základě PNO výsledků):")
+    for p, info in PHASES.items():
+        marker = " <<<" if p == phase else ""
+        print(f"    Phase {p}: {info['daily_budget']:>7,} CZK/den  –  {info['label']}")
+        print(f"             Trigger: {info['trigger']}{marker}")
 
-    # Budget analysis
-    print(f"\n  MESICNI ROZPOCET: {monthly_budget_czk:,} CZK")
-    print(f"  DENNI ROZPOCET:  {monthly_budget_czk/30:.0f} CZK")
+    print(f"\n  AKTUÁLNÍ: Phase {phase} – {phase_info['label']}")
+    print(f"  Denní rozpočet:   {phase_info['daily_budget']:>10,} CZK")
+    print(f"  Měsíční rozpočet: {phase_info['daily_budget'] * 30:>9,} CZK")
+    print(f"  Bid strategy:     {phase_info.get('bid_strategy_override', 'Per campaign (viz níže)')}")
+    print(f"  Poznámka: {phase_info['note']}")
 
     # Campaign structure
-    campaigns = plan_campaign_structure(monthly_budget_czk)
+    campaigns = get_campaigns_for_phase(phase)
+    active_names = phase_info["campaigns"]
 
-    print(f"\n{'='*70}")
-    print("  DOPORUCENA STRUKTURA KAMPANI")
-    print(f"{'='*70}")
+    print(f"\n{'=' * 75}")
+    print(f"  AKTIVNÍ KAMPANĚ – Phase {phase}")
+    print(f"{'=' * 75}")
 
-    for i, c in enumerate(campaigns, 1):
+    for i, p in enumerate(projections, 1):
+        # Find campaign definition
+        c = None
+        for camp in campaigns:
+            if camp["name"] == p["campaign"]:
+                c = camp
+                break
+        if not c:
+            continue
+
         print(f"\n  [{i}] {c['name']}")
-        print(f"      Typ:      {c['type']}")
-        print(f"      Rozpocet: {c['daily_budget_czk']} CZK/den ({c['monthly_budget_czk']:,} CZK/mesic)")
-        print(f"      Strategie: {c['bid_strategy']}")
+        print(f"      Typ:        {c['type']}")
+        print(f"      Rozpočet:   {p['daily_budget']:,} CZK/den ({p['monthly_budget']:,} CZK/měsíc)")
+        print(f"      Strategie:  {p['bid_strategy']}", end="")
+        if c.get("target_roas") and "Manual" not in p["bid_strategy"] and "Maximize" not in p["bid_strategy"]:
+            print(f" ({c['target_roas']}%)", end="")
+        print()
+        print(f"      Avg CPC:    {c['avg_cpc']} CZK")
+        print(f"      Popis:      {c['description']}")
 
         if c.get("product_groups"):
-            print(f"      Produktove skupiny:")
+            print(f"      Produktové skupiny:")
             for pg in c["product_groups"]:
-                print(f"        - {pg['name']} [{pg['priority']}] (bid: {pg['bid_adjustment']})")
+                print(f"        • {pg['name']} (bid: {pg['bid_adj']})")
 
-        if c.get("asset_groups"):
-            print(f"      Asset skupiny:")
-            for ag in c["asset_groups"]:
-                print(f"        - {ag['name']}")
-                print(f"          URL: {ag['final_url']}")
-                print(f"          Audience: {ag['audience_signal']}")
+        if c.get("asset_group"):
+            ag = c["asset_group"]
+            print(f"      Asset group:")
+            print(f"        Headlines:  {ag['headlines'][0]}")
+            print(f"                    {ag['headlines'][1]}")
+            print(f"        Audience:   {ag['audience_signal']}")
+            print(f"        Landing:    {c.get('final_url', BASE_URL)}")
 
         if c.get("ad_groups"):
             print(f"      Ad Groups:")
             for ag in c["ad_groups"]:
-                print(f"        - {ag['name']} ({ag['match_type']})")
-                print(f"          Keywords: {', '.join(ag['keywords'][:3])}...")
+                kws = ", ".join(ag["keywords"][:3])
+                print(f"        • {ag['name']} [{ag['match_type']}]: {kws}...")
 
-        if c.get("notes"):
-            print(f"      Poznamky:")
-            for note in c["notes"]:
-                print(f"        * {note}")
+    # Projections table
+    print(f"\n{'=' * 75}")
+    print(f"  PROJEKCE VÝSLEDKŮ – Phase {phase}")
+    print(f"{'=' * 75}")
 
-    # Projections
-    projections = calculate_projections(campaigns)
+    header = f"  {'Kampaň':<28} {'Budget/den':>10} {'Kliknutí':>9} {'Konverze':>9} {'Tržby':>10} {'ROAS':>7} {'PNO':>6}"
+    print(f"\n{header}")
+    print(f"  {'-' * 79}")
 
-    print(f"\n{'='*70}")
-    print("  PROJEKCE VYSLEDKU (mesicne)")
-    print(f"{'='*70}")
+    for p in projections:
+        name = p["campaign"][:28]
+        print(f"  {name:<28} {p['daily_budget']:>9,} {p['est_clicks_monthly']:>9,} "
+              f"{p['est_conversions_monthly']:>9} {p['est_revenue_monthly']:>9,} "
+              f"{p['est_roas_pct']:>6}% {p['est_pno_pct']:>5.1f}%")
 
-    print(f"\n  {'Kampan':<35} {'Kliknuti':>10} {'Konverze':>10} {'ROAS':>8}")
-    print(f"  {'-'*63}")
-    for cp in projections["by_campaign"]:
-        print(f"  {cp['campaign']:<35} {cp['est_clicks']:>10,} {cp['est_conversions']:>10} {cp['est_roas_pct']:>7}%")
+    print(f"  {'-' * 79}")
+    print(f"  {'CELKEM':<28} {totals['daily_budget']:>9,} {totals['est_clicks_monthly']:>9,} "
+          f"{totals['est_conversions_monthly']:>9} {totals['est_revenue_monthly']:>9,} "
+          f"{totals['est_roas_pct']:>6}% {totals['est_pno_pct']:>5.1f}%")
 
-    m = projections["monthly"]
-    print(f"  {'-'*63}")
-    print(f"  {'CELKEM':<35} {m['clicks']:>10,} {m['conversions']:>10} {m['roas_pct']:>7}%")
-    print(f"\n  Odhadovane zobrazeni:  {m['impressions']:>12,}")
-    print(f"  Odhadovane kliknuti:  {m['clicks']:>12,}")
-    print(f"  Odhadovane konverze:  {m['conversions']:>12}")
-    print(f"  Odhadovane trzby:     {m['revenue_czk']:>12,} CZK")
-    print(f"  Naklady na reklamu:   {m['cost_czk']:>12,} CZK")
-    print(f"  Odhadovany zisk:      {m['profit_czk']:>12,} CZK")
-    print(f"  ROAS:                 {m['roas_pct']:>12}%")
+    print(f"\n  Měsíční náklady:    {totals['monthly_budget']:>12,} CZK")
+    print(f"  Měsíční tržby:      {totals['est_revenue_monthly']:>12,} CZK")
+    print(f"  Měsíční zisk:       {totals['est_profit_monthly']:>12,} CZK")
+    print(f"  ROAS:               {totals['est_roas_pct']:>12}%")
+    print(f"  PNO:                {totals['est_pno_pct']:>11.1f}%")
 
-    # Keywords
-    print(f"\n{'='*70}")
-    print("  DOPORUCENA KLICOVA SLOVA")
-    print(f"{'='*70}")
-
-    print(f"\n  HIGH INTENT (nakupni zamer):")
-    for kw in KEYWORDS["high_intent"]:
-        print(f"    {kw['keyword']:<35} CPC: {kw['est_cpc']:.1f} CZK  Vol: {kw['est_volume']:>5}/mes")
-
-    print(f"\n  MEDIUM INTENT (vyzkum):")
-    for kw in KEYWORDS["medium_intent"]:
-        print(f"    {kw['keyword']:<35} CPC: {kw['est_cpc']:.1f} CZK  Vol: {kw['est_volume']:>5}/mes")
-
-    print(f"\n  NEGATIVNI KLICOVA SLOVA (vylouci nepodstatny traffic):")
-    for nk in KEYWORDS["negative_keywords"]:
-        print(f"    - {nk}")
-
-    # Audience signals
-    print(f"\n{'='*70}")
-    print("  AUDIENCE SIGNALS PRO PMAX")
-    print(f"{'='*70}")
-
-    for seg in AUDIENCE_SIGNALS["custom_segments"]:
-        print(f"\n  Segment: {seg['name']}")
-        print(f"    Hledane vyrazy: {', '.join(seg['search_terms'][:3])}...")
-        print(f"    Konkurencni weby: {', '.join(seg['urls'][:2])}")
-
-    print(f"\n  Demograficke cileni:")
-    for demo in AUDIENCE_SIGNALS["demographic_targets"]:
-        print(f"    Vek {demo['age']}: {demo['reason']}")
-
-    # Tracking setup
-    print(f"\n{'='*70}")
-    print("  TRACKING & IMPLEMENTACE")
-    print(f"{'='*70}")
-
-    guide = generate_tracking_setup_guide()
-    for step_key, step in guide.items():
-        print(f"\n  {step['title']}")
-        if step.get("actions"):
-            for action in step["actions"]:
-                if isinstance(action, dict):
-                    print(f"    - {action['name']}: {action['trigger']}")
-                else:
-                    print(f"    - {action}")
-
-    # Quick optimization tips
-    print(f"\n{'='*70}")
-    print("  TIPY PRO OPTIMALIZACI (minimalizace nakladu)")
-    print(f"{'='*70}")
-
-    tips = [
-        "1. Zacnete s nizsim rozpoctem a postupne zvysujte na zaklade vysledku",
-        "2. Prvnich 14 dni je learning period - nementte nastaveni kampani",
-        "3. Kazdy tyden kontrolujte Search Terms Report a pridavejte negative keywords",
-        "4. Pouzijte ad schedule - omezete reklamy na hodiny s nejvyssimi konverzemi",
-        "5. Cilete geograficky na CR (pripadne i SK pro vyssi zasah)",
-        "6. Optimalizujte produktovy feed - titulky s klicovymi slovy zvysuji CTR",
-        "7. Pouzijte custom labels ve feedu pro segmentaci produktu v kampanich",
-        "8. Testujte ruzne landing pages - A/B testovani zvysuje konverze",
-        "9. Nastavte remarketing - navrat navstevniku je 3-5x levnejsi nez novy klik",
-        "10. Monitorujte Quality Score - vyssi QS = nizsi CPC",
-    ]
-    for tip in tips:
-        print(f"  {tip}")
-
-    print(f"\n{'='*70}")
-    print("  DALSI KROKY")
-    print(f"{'='*70}")
+    # Bid strategy transition guide
+    print(f"\n{'=' * 75}")
+    print("  BID STRATEGY PŘECHOD")
+    print(f"{'=' * 75}")
     print("""
-  1. Spustte generate_merchant_feed.py pro vygenerovani produktoveho feedu
-  2. Nahrajte IDs do konfigurace:
-     - GA4 Measurement ID (G-XXXXXXXXXX)
-     - Google Ads Conversion ID (AW-XXXXXXXXX)
-     do souboru tracking_config.js
-  3. Vytvorte ucet Google Merchant Center
-  4. Nahrajte feed a propojte s Google Ads
-  5. Vytvorte kampane dle doporuceni vyse
-  6. Sledujte vysledky a optimalizujte tydne
+  START (Phase 1):  Manual CPC na Shopping + PMax
+    → Nastavit max CPC = 5 Kč pro Shopping, 7 Kč pro PMax
+    → Sbíráme konverzní data
+
+  PO 30+ KONVERZÍCH (Phase 2):
+    → Shopping: přepnout na Target ROAS 667%
+    → PMax: přepnout na Target ROAS 667%
+    → Brand Search: ponechat Maximize clicks
+
+  ŠKÁLOVÁNÍ (Phase 3+):
+    → Zvyšovat budget pouze pokud PNO < 15%
+    → Zvyšovat max 2x za fázi
+    → Nikdy neškálovat během learning period (7 dní po změně)
 """)
 
-    print("=" * 70)
+    # Negative keywords
+    print(f"{'=' * 75}")
+    print("  NEGATIVNÍ KLÍČOVÁ SLOVA")
+    print(f"{'=' * 75}")
+
+    print(f"\n  Campaign-level (všechny kampaně):")
+    for nk in NEGATIVE_KEYWORDS["campaign_level"]:
+        print(f"    – {nk}")
+
+    print(f"\n  Brand kampaň – extra negative:")
+    for nk in NEGATIVE_KEYWORDS["brand_campaign_negatives"]:
+        print(f"    – {nk}")
+
+    # Implementation checklist
+    print(f"\n{'=' * 75}")
+    print("  IMPLEMENTAČNÍ CHECKLIST")
+    print(f"{'=' * 75}")
+    checklist = [
+        "1. Vyplnit IDs v tracking_config.js (GA4 + Google Ads)",
+        "2. Nahrát merchant_feed.xml do Google Merchant Center",
+        "3. Propojit Merchant Center s Google Ads",
+        "4. Vytvořit 3 kampaně: Shopping + PMax + Search Brand",
+        "5. Nastavit Manual CPC (Shopping max 5 Kč, PMax max 7 Kč)",
+        "6. Importovat negativní klíčová slova",
+        "7. Nasadit checkout_tracking_snippet.html na vyprodej-regalu.cz",
+        "8. V GA4 přidat cross-domain: bazarovyregal.cz + vyprodej-regalu.cz",
+        "9. Aktivovat Enhanced Conversions v Google Ads",
+        "10. Po 30+ konverzích přepnout na tROAS 667%",
+        "11. Škálovat budget na základě PNO výsledků (viz fáze výše)",
+    ]
+    for item in checklist:
+        print(f"  {item}")
+
+    print(f"\n{'=' * 75}\n")
 
 
-def export_json(monthly_budget_czk, output_dir):
+# ============================================================
+# GOOGLE ADS EDITOR CSV EXPORT
+# ============================================================
+
+def export_google_ads_csv(phase=1, output_dir="."):
+    """Export campaign structure as Google Ads Editor CSV."""
+    projections = calculate_projections(phase)
+    campaigns = get_campaigns_for_phase(phase)
+    filepath = os.path.join(output_dir, "google_ads_campaigns.csv")
+
+    rows = []
+    for p in projections:
+        # Find campaign definition
+        c = None
+        for camp in campaigns:
+            if camp["name"] == p["campaign"]:
+                c = camp
+                break
+        if not c:
+            continue
+
+        # Campaign row
+        row = {
+            "Campaign": c["name"],
+            "Campaign Type": c["type"].replace("PERFORMANCE_MAX", "Performance Max"),
+            "Campaign Daily Budget": p["daily_budget"],
+            "Bid Strategy Type": p["bid_strategy"],
+            "Target ROAS": c.get("target_roas", ""),
+            "Campaign Status": "Paused",
+            "Ad Group": "",
+            "Keyword": "",
+            "Match Type": "",
+            "Max CPC": "",
+            "Final URL": c.get("final_url", f"{BASE_URL}/katalog.html"),
+            "Headline 1": "", "Headline 2": "", "Headline 3": "",
+            "Description 1": "", "Description 2": "",
+        }
+        rows.append(row)
+
+        # Search campaign keywords
+        if c.get("ad_groups"):
+            for ag in c["ad_groups"]:
+                for kw in ag["keywords"]:
+                    rows.append({
+                        "Campaign": c["name"],
+                        "Campaign Type": "", "Campaign Daily Budget": "",
+                        "Bid Strategy Type": "", "Target ROAS": "", "Campaign Status": "",
+                        "Ad Group": ag["name"],
+                        "Keyword": kw,
+                        "Match Type": ag["match_type"].capitalize(),
+                        "Max CPC": "",
+                        "Final URL": c.get("final_url", f"{BASE_URL}/katalog.html"),
+                        "Headline 1": "", "Headline 2": "", "Headline 3": "",
+                        "Description 1": "", "Description 2": "",
+                    })
+
+        # PMax asset groups
+        if c.get("asset_group"):
+            ag = c["asset_group"]
+            rows.append({
+                "Campaign": c["name"],
+                "Campaign Type": "", "Campaign Daily Budget": "",
+                "Bid Strategy Type": "", "Target ROAS": "", "Campaign Status": "",
+                "Ad Group": f"Asset Group – {c['name']}",
+                "Keyword": "", "Match Type": "", "Max CPC": "",
+                "Final URL": c.get("final_url", f"{BASE_URL}/katalog.html"),
+                "Headline 1": ag["headlines"][0] if ag["headlines"] else "",
+                "Headline 2": ag["headlines"][1] if len(ag["headlines"]) > 1 else "",
+                "Headline 3": ag["headlines"][2] if len(ag["headlines"]) > 2 else "",
+                "Description 1": ag["descriptions"][0] if ag["descriptions"] else "",
+                "Description 2": ag["descriptions"][1] if len(ag["descriptions"]) > 1 else "",
+            })
+
+    fieldnames = [
+        "Campaign", "Campaign Type", "Campaign Daily Budget",
+        "Bid Strategy Type", "Target ROAS", "Campaign Status",
+        "Ad Group", "Keyword", "Match Type", "Max CPC", "Final URL",
+        "Headline 1", "Headline 2", "Headline 3",
+        "Description 1", "Description 2",
+    ]
+
+    with open(filepath, "w", newline="", encoding="utf-8-sig") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    # Negative keywords CSV
+    neg_filepath = os.path.join(output_dir, "google_ads_negative_keywords.csv")
+    with open(neg_filepath, "w", newline="", encoding="utf-8-sig") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Campaign", "Ad Group", "Keyword", "Match Type"])
+        active_names = PHASES.get(phase, PHASES[1])["campaigns"]
+        for nk in NEGATIVE_KEYWORDS["campaign_level"]:
+            for camp in campaigns:
+                if camp["name"] in active_names:
+                    writer.writerow([camp["name"], "", nk, "Phrase"])
+        for nk in NEGATIVE_KEYWORDS["brand_campaign_negatives"]:
+            writer.writerow(["Search Brand", "", nk, "Exact"])
+
+    print(f"  CSV exported: {filepath}")
+    print(f"  Negative keywords CSV: {neg_filepath}")
+    return filepath
+
+
+# ============================================================
+# JSON EXPORT
+# ============================================================
+
+def export_json(phase=1, output_dir="."):
     """Export full analysis as JSON."""
-    campaigns = plan_campaign_structure(monthly_budget_czk)
-    projections = calculate_projections(campaigns)
-    landing_pages = get_landing_page_recommendations()
-    tracking = generate_tracking_setup_guide()
+    projections = calculate_projections(phase)
+    totals = calculate_totals(projections)
 
     data = {
         "generated_at": datetime.now().isoformat(),
-        "monthly_budget_czk": monthly_budget_czk,
-        "campaigns": campaigns,
-        "projections": projections,
-        "keywords": KEYWORDS,
+        "starting_daily_budget": STARTING_DAILY_BUDGET,
+        "max_daily_budget": MAX_DAILY_BUDGET,
+        "target_troas": TARGET_TROAS,
+        "target_pno": TARGET_PNO,
+        "current_phase": phase,
+        "phases": {str(k): v for k, v in PHASES.items()},
+        "campaigns": [p for p in projections],
+        "totals": totals,
+        "negative_keywords": NEGATIVE_KEYWORDS,
         "audience_signals": AUDIENCE_SIGNALS,
-        "landing_pages": landing_pages,
-        "tracking_setup": tracking,
         "benchmarks": BENCHMARKS,
     }
 
     filepath = os.path.join(output_dir, "ads_plan.json")
     with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"\n  JSON exported: {filepath}")
+        json.dump(data, f, ensure_ascii=False, indent=2, default=str)
+    print(f"  JSON exported: {filepath}")
     return filepath
 
 
+# ============================================================
+# MAIN
+# ============================================================
+
 def main():
-    # Parse arguments
-    monthly_budget = 5000  # Default 5000 CZK/month
     output_format = "text"
+    phase = 1  # Default to Phase 1 (starting budget)
 
     args = sys.argv[1:]
     i = 0
     while i < len(args):
-        if args[i] == "--budget" and i + 1 < len(args):
-            monthly_budget = int(args[i + 1])
-            i += 2
-        elif args[i] == "--format" and i + 1 < len(args):
+        if args[i] == "--format" and i + 1 < len(args):
             output_format = args[i + 1]
+            i += 2
+        elif args[i] == "--phase" and i + 1 < len(args):
+            phase = int(args[i + 1])
+            i += 2
+        elif args[i] == "--week" and i + 1 < len(args):
+            # Backward compat: map week to phase
+            phase = int(args[i + 1])
             i += 2
         else:
             i += 1
@@ -709,13 +1008,13 @@ def main():
     output_dir = os.path.dirname(os.path.abspath(__file__))
 
     if output_format == "json":
-        export_json(monthly_budget, output_dir)
+        export_json(phase, output_dir)
+    elif output_format == "csv":
+        export_google_ads_csv(phase, output_dir)
     else:
-        print_report(monthly_budget)
-
-    # Always export JSON alongside text
-    if output_format != "json":
-        export_json(monthly_budget, output_dir)
+        print_report(phase)
+        export_json(phase, output_dir)
+        export_google_ads_csv(phase, output_dir)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,12 @@
+﻿Campaign,Campaign Type,Campaign Daily Budget,Bid Strategy Type,Target ROAS,Campaign Status,Ad Group,Keyword,Match Type,Max CPC,Final URL,Headline 1,Headline 2,Headline 3,Description 1,Description 2
+Shopping,SHOPPING,2500,Manual CPC,667,Paused,,,,,https://www.bazarovyregal.cz/katalog.html,,,,,
+PMax,Performance Max,1500,Manual CPC,667,Paused,,,,,https://www.bazarovyregal.cz/katalog.html,,,,,
+PMax,,,,,,Asset Group – PMax,,,,https://www.bazarovyregal.cz/katalog.html,Kovové regály – LIKVIDACE SKLADU,Regály od 489 Kč | Záruka 7 let,Slevy až 40% na vše skladem,Likvidace skladu! Kovové regály za nejnižší ceny. Nosnost až 1050 kg. Bezšroubová montáž. 7 let záruka. Doprava od 99 Kč.,"Nové kovové regály se slevou až 40%. Do garáže, sklepa, dílny. Skladem přes 10 000 ks. Objednejte dnes!"
+Search Brand,SEARCH,1000,Maximize clicks,,Paused,,,,,https://www.bazarovyregal.cz/katalog.html,,,,,
+Search Brand,,,,,,Brand - Exact,bazarovyregal,Exact,,https://www.bazarovyregal.cz/katalog.html,,,,,
+Search Brand,,,,,,Brand - Exact,bazarovyregal.cz,Exact,,https://www.bazarovyregal.cz/katalog.html,,,,,
+Search Brand,,,,,,Brand - Exact,bazarovy regal,Exact,,https://www.bazarovyregal.cz/katalog.html,,,,,
+Search Brand,,,,,,Brand - Exact,bazarový regál,Exact,,https://www.bazarovyregal.cz/katalog.html,,,,,
+Search Brand,,,,,,Brand - Checkout domain,vyprodej regalu,Exact,,https://www.bazarovyregal.cz/katalog.html,,,,,
+Search Brand,,,,,,Brand - Checkout domain,vyprodej-regalu.cz,Exact,,https://www.bazarovyregal.cz/katalog.html,,,,,
+Search Brand,,,,,,Brand - Checkout domain,výprodej regálů,Exact,,https://www.bazarovyregal.cz/katalog.html,,,,,
