@@ -7,7 +7,9 @@ Generates XML feed (RSS 2.0 with Google Shopping namespace) for:
 - Performance Max campaigns
 - Free product listings
 
-Covers ALL 87 products from the full catalog.
+Covers ALL 87 products with HTML landing pages.
+Uses REAL e-shop prices where available (17 manually defined products),
+formula prices for the remaining 70 products.
 
 Usage:
     python3 generate_merchant_feed.py
@@ -15,8 +17,6 @@ Usage:
 Output:
     merchant_feed.xml  - Main product feed for Google Merchant Center
     merchant_feed.txt  - Tab-delimited feed (alternative format)
-
-Feed specification: https://support.google.com/merchants/answer/7052112
 """
 
 import os
@@ -42,6 +42,13 @@ COLOR_IMAGES = {
     "Profesionální": "https://vyprodej-regalucz.s26.cdn-upgates.com/_cache/b/1/b17ce5b491bdb73a0df3160b51fbcf7e-1-regal-1800x1200x500-mm-lakovany-5-policovy-nosnost-1050-kg-modro-oranzovy-pravy-18120501050orangeblue1.jpeg",
 }
 
+# Specific product images (higher quality, from the products list)
+SPECIFIC_IMAGES = {
+    "regal-150x70x30-cerna": "https://vyprodej-regalucz.s26.cdn-upgates.com/v/v6903779a99ff1-1-regal-1500x700x300-mm-lakovany-4-policovy-nosnost-700-kg-cerny-pravy-15070304700black1.jpeg",
+    "regal-180x60x40-cerna": "https://vyprodej-regalucz.s26.cdn-upgates.com/j/j690377a5dc94d-1-regal-1800x600x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18060405875black1.jpeg",
+    "regal-180x40x40-cerna": "https://vyprodej-regalucz.s26.cdn-upgates.com/2/2690377a330269-1-regal-1800x400x400-mm-lakovany-5-policovy-nosnost-875-kg-cerny-pravy-18040405875black1.jpeg",
+}
+
 COLOR_SLUG_MAP = {
     "Černá": "cerna", "Bílá": "bila", "Červená": "cervena",
     "Modrá": "modra", "Zinkovaný": "zinkovany", "Profesionální": "profesionalni",
@@ -52,7 +59,36 @@ COLOR_LABEL_MAP = {
     "Modrá": "modry", "Zinkovaný": "zinkovany", "Profesionální": "profesionalni",
 }
 
-# All 87 product slugs (same as in generate_full_product_pages.py)
+
+# ============================================================
+# REAL PRICES - manually defined products with e-shop prices
+# Source: generate_full_product_pages.py (lines 18-37)
+# These are the actual prices from vyprodej-regalu.cz
+# ============================================================
+
+REAL_PRICES = {
+    "regal-150x70x30-cerna":          {"price": 599, "priceOrig": 2396, "capacity": 700, "image": SPECIFIC_IMAGES.get("regal-150x70x30-cerna", COLOR_IMAGES["Černá"])},
+    "regal-150x70x30-cervena":        {"price": 599, "priceOrig": 2396, "capacity": 700},
+    "regal-150x70x30-bila":           {"price": 599, "priceOrig": 2396, "capacity": 700},
+    "regal-150x70x30-zinkovany":      {"price": 549, "priceOrig": 2196, "capacity": 700},
+    "regal-180x90x40-cerna":          {"price": 739, "priceOrig": 2956, "capacity": 875, "bestseller": True},
+    "regal-180x90x40-bila":           {"price": 739, "priceOrig": 2956, "capacity": 875},
+    "regal-180x90x40-zinkovany":      {"price": 649, "priceOrig": 2596, "capacity": 875},
+    "regal-180x90x40-cervena":        {"price": 759, "priceOrig": 3036, "capacity": 875},
+    "regal-180x90x40-modra":          {"price": 759, "priceOrig": 3036, "capacity": 875},
+    "regal-180x60x40-cerna":          {"price": 689, "priceOrig": 2756, "capacity": 875, "image": SPECIFIC_IMAGES.get("regal-180x60x40-cerna", COLOR_IMAGES["Černá"])},
+    "regal-180x60x40-bila":           {"price": 689, "priceOrig": 2756, "capacity": 875},
+    "regal-180x40x40-cerna":          {"price": 629, "priceOrig": 2516, "capacity": 875, "image": SPECIFIC_IMAGES.get("regal-180x40x40-cerna", COLOR_IMAGES["Černá"])},
+    "regal-180x40x40-zinkovany":      {"price": 579, "priceOrig": 2316, "capacity": 875},
+    "regal-180x40x30-zinkovany":      {"price": 549, "priceOrig": 2196, "capacity": 875},
+    "regal-200x90x40-cerna":          {"price": 849, "priceOrig": 3396, "capacity": 875},
+    "regal-220x90x45-cerna":          {"price": 899, "priceOrig": 3596, "capacity": 875},
+    "regal-180x120x50-cerna":         {"price": 1149, "priceOrig": 4596, "capacity": 875},
+    "regal-180x120x50-profesionalni": {"price": 1249, "priceOrig": 4996, "capacity": 1050},
+}
+
+
+# All 87 product slugs (matching generate_full_product_pages.py existing_files)
 PRODUCT_SLUGS = [
     "regal-150x70x30-cerna", "regal-150x70x30-cervena", "regal-150x70x30-zinkovany",
     "regal-180x90x40-bila", "regal-180x90x40-zinkovany",
@@ -88,7 +124,9 @@ PRODUCT_SLUGS = [
 
 
 def parse_product(slug):
-    """Parse product slug into structured product data."""
+    """Parse product slug into structured product data.
+    Uses REAL prices for 18 known products, formula for the rest."""
+
     # Parse slug: regal-{H}x{W}x{D}-{color_slug}
     parts = slug.replace("regal-", "").split("-")
     dims = parts[0].split("x")
@@ -107,24 +145,35 @@ def parse_product(slug):
     capacity_per_shelf = 210 if color == "Profesionální" else 175
     capacity = shelves * capacity_per_shelf
 
-    # Price formula (matches generate_full_product_pages.py)
-    base_price = 400 + (height // 10) * 15 + (width // 10) * 10 + (depth // 10) * 5
-    if color == "Zinkovaný":
-        base_price -= 50
-    elif color == "Profesionální":
-        base_price += 200
-    price = (base_price // 10) * 10 - 1
-    price_orig = price * 4
+    # Check for REAL price override
+    real = REAL_PRICES.get(slug)
+    if real:
+        price = real["price"]
+        price_orig = real["priceOrig"]
+        capacity = real.get("capacity", capacity)
+        is_bestseller = real.get("bestseller", False)
+        image = real.get("image", COLOR_IMAGES.get(color, COLOR_IMAGES["Černá"]))
+        price_source = "real"
+    else:
+        # Formula price (matches generate_full_product_pages.py all_products)
+        base_price = 400 + (height // 10) * 15 + (width // 10) * 10 + (depth // 10) * 5
+        if color == "Zinkovaný":
+            base_price -= 50
+        elif color == "Profesionální":
+            base_price += 200
+        price = (base_price // 10) * 10 - 1
+        price_orig = price * 4
+        is_bestseller = False
+        image = COLOR_IMAGES.get(color, COLOR_IMAGES["Černá"])
+        price_source = "formula"
+
+    # Use specific image if available
+    if slug in SPECIFIC_IMAGES:
+        image = SPECIFIC_IMAGES[slug]
 
     # Estimate weight from dimensions
     volume_factor = (height * width * depth) / 1000000
     weight_kg = round(5 + volume_factor * 20, 1)
-
-    # Image URL
-    image = COLOR_IMAGES.get(color, COLOR_IMAGES["Černá"])
-
-    # Detect bestseller
-    is_bestseller = (slug == "regal-180x90x40-cerna")
 
     # Build description
     color_label = COLOR_LABEL_MAP.get(color, color.lower())
@@ -164,6 +213,7 @@ def parse_product(slug):
         "weight_kg": weight_kg,
         "image": image,
         "is_bestseller": is_bestseller,
+        "price_source": price_source,
     }
 
 
@@ -184,22 +234,27 @@ def generate_xml_feed(products, output_dir):
     lines.append('  <channel>')
     lines.append('    <title>Bazarovyregal.cz - Kovove regaly</title>')
     lines.append(f'    <link>{BASE_URL}</link>')
-    lines.append('    <description>Kovove regaly za likvidacni ceny. Slevy az 75%. Zaruka 7 let. 87 produktu skladem.</description>')
+    lines.append('    <description>Kovove regaly za likvidacni ceny. Slevy az 75%. Zaruka 7 let.</description>')
 
     for i, p in enumerate(products):
         product_id = f"BR-{i+1:03d}"
         link = f"{BASE_URL}/{p['filename']}"
 
-        # Price tier
+        # Price tier for campaign segmentation
         if p["price"] < 600:
             price_tier = "budget"
         elif p["price"] < 800:
             price_tier = "mid"
+        elif p["price"] < 1000:
+            price_tier = "high"
         else:
             price_tier = "premium"
 
         # Size category
         size_cat = "compact" if p["height"] <= 150 else ("standard" if p["height"] <= 180 else "tall")
+
+        # Width category
+        width_cat = "narrow" if p["width"] <= 60 else ("medium" if p["width"] <= 90 else "wide")
 
         # Shipping
         shipping_price = "0 CZK" if p["price"] >= 2000 else "99 CZK"
@@ -270,6 +325,8 @@ def generate_txt_feed(products, output_dir):
             price_tier = "budget"
         elif p["price"] < 800:
             price_tier = "mid"
+        elif p["price"] < 1000:
+            price_tier = "high"
         else:
             price_tier = "premium"
 
@@ -316,13 +373,26 @@ def main():
     print("=" * 60)
 
     products = build_all_products()
-    print(f"\n  Products in catalog: {len(products)}")
+    print(f"\n  Total products: {len(products)}")
 
     # Stats
+    real_count = sum(1 for p in products if p["price_source"] == "real")
+    formula_count = sum(1 for p in products if p["price_source"] == "formula")
     prices = [p["price"] for p in products]
+    print(f"  Real prices (e-shop): {real_count}")
+    print(f"  Formula prices: {formula_count}")
     print(f"  Price range: {min(prices)} - {max(prices)} CZK")
     print(f"  Colors: {len(set(p['color'] for p in products))}")
     print(f"  Heights: {sorted(set(p['height'] for p in products))}")
+
+    # Price tier breakdown
+    tiers = {}
+    for p in products:
+        tier = "budget" if p["price"] < 600 else ("mid" if p["price"] < 800 else ("high" if p["price"] < 1000 else "premium"))
+        tiers[tier] = tiers.get(tier, 0) + 1
+    print(f"\n  Price tiers:")
+    for tier in ["budget", "mid", "high", "premium"]:
+        print(f"    {tier}: {tiers.get(tier, 0)} products")
 
     print("\nGenerating XML feed...")
     xml_path = generate_xml_feed(products, output_dir)
@@ -333,16 +403,18 @@ def main():
     print("\n" + "=" * 60)
     print("  FEED GENERATION COMPLETE")
     print("=" * 60)
-    print(f"\n  Files created:")
-    print(f"    1. {xml_path}")
-    print(f"    2. {txt_path}")
-    print(f"  Total products in feed: {len(products)}")
-    print(f"\n  Next steps:")
-    print(f"    1. Upload merchant_feed.xml to Google Merchant Center")
-    print(f"    2. Set feed URL: {BASE_URL}/merchant_feed.xml")
-    print(f"    3. Schedule automatic fetch (daily recommended)")
-    print(f"    4. Verify products in Merchant Center diagnostics")
-    print(f"    5. Link Merchant Center to Google Ads account")
+    print(f"\n  Files: {xml_path}")
+    print(f"         {txt_path}")
+    print(f"  Total products: {len(products)}")
+    print(f"  Feed URL: {BASE_URL}/merchant_feed.xml")
+
+    # Price discrepancy warnings
+    print("\n  WARNINGS:")
+    print("  * 18 products use real e-shop prices (549-1249 CZK)")
+    print("  * 69 products use formula prices (matching HTML detail pages)")
+    print("  * index.html shows promotional prices (489, 2949) that differ")
+    print("  * To fix: regenerate HTML pages with real prices using")
+    print("    generate_full_product_pages.py with updated all_products")
     print()
 
 
