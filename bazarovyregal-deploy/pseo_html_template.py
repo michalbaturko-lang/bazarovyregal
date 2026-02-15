@@ -108,6 +108,7 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
     <title>{title}</title>
     <meta name="description" content="{meta_desc}">
     <meta name="seznam-wmt" content="gsVJMRIZ0wBQpM8lNS073cpS20Kruq25" />
+    <meta name="google-site-verification" content="tf9_fVpjoW3eTmTv--4Ut0Whqqg2kGXLQ64R5SSyCmE" />
     <meta property="og:title" content="{title}">
     <meta property="og:description" content="{meta_desc}">
     <meta property="og:image" content="{og_image}">
@@ -120,8 +121,12 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
     <meta name="twitter:description" content="{meta_desc}">
     <meta name="twitter:image" content="{og_image}">
     <link rel="canonical" href="{canonical_url}">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {{
@@ -136,6 +141,13 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
         }}
     </script>
     {schema_json}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17952868610"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){{dataLayer.push(arguments);}}
+        gtag('js', new Date());
+        gtag('config', 'AW-17952868610');
+    </script>
 </head>
 <body class="bg-gray-50 font-sans">
 
