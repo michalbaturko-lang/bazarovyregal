@@ -1,2 +1,4 @@
 __pycache__/
 *.pyc
+generate_logo.py
+replace_logo.py
