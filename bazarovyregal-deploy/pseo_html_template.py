@@ -163,14 +163,8 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
 
 <header class="bg-white shadow-sm sticky top-0 z-50">
     <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-        <a href="index.html" class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg">
-                <span class="text-white text-3xl font-black">B</span>
-            </div>
-            <div>
-                <div class="text-2xl font-black text-gray-900">Bazarovyregal<span class="text-primary-500">.cz</span></div>
-                <div class="text-xs text-red-600 font-bold uppercase">Likvidace skladu</div>
-            </div>
+        <a href="index.html" class="flex items-center">
+            <img src="logo_v3_final.png" alt="Bazarovyregal.cz - Nové regály za bazarové ceny" class="h-14 w-auto">
         </a>
         <nav class="hidden md:flex gap-4 text-sm font-medium">
             <a href="index.html" class="text-gray-600 hover:text-primary-500">Uvod</a>
