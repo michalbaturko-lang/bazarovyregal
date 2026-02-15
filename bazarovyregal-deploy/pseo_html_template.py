@@ -108,6 +108,7 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
     <title>{title}</title>
     <meta name="description" content="{meta_desc}">
     <meta name="seznam-wmt" content="gsVJMRIZ0wBQpM8lNS073cpS20Kruq25" />
+    <meta name="google-site-verification" content="tf9_fVpjoW3eTmTv--4Ut0Whqqg2kGXLQ64R5SSyCmE" />
     <meta property="og:title" content="{title}">
     <meta property="og:description" content="{meta_desc}">
     <meta property="og:image" content="{og_image}">
@@ -140,6 +141,13 @@ def wrap_page(slug, title, meta_desc, h1, body_html, breadcrumb_category, schema
         }}
     </script>
     {schema_json}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17952868610"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){{dataLayer.push(arguments);}}
+        gtag('js', new Date());
+        gtag('config', 'AW-17952868610');
+    </script>
 </head>
 <body class="bg-gray-50 font-sans">
 
